@@ -38,7 +38,7 @@ export const DepositFormProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const invalidateWrapper = useInvalidateWrapper();
-  const { isDappActive } = useDappStatus();
+  const { isDappActive, isSupportedChain } = useDappStatus();
   const { depositStrategy } = useDepositStrategy();
   const { context, contextValue, isLoading } = useDepositFormData();
   const { isWalletWhitelisted } = useWalletWhitelisted();
@@ -81,10 +81,12 @@ export const DepositFormProvider: React.FC<React.PropsWithChildren> = ({
       token,
       maxAvailable: tokenValue
         ? minBN(tokenValue.balance, tokenValue.maxDeposit)
-        : undefined,
+        : isSupportedChain
+          ? undefined
+          : 0n,
       isLoading,
     };
-  }, [token, contextValue, isLoading]);
+  }, [token, contextValue, isLoading, isSupportedChain]);
 
   return (
     <DepositFormContext.Provider value={value}>

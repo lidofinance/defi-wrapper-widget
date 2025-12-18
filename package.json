@@ -10,7 +10,8 @@
     "dev": "vite --config vite.config.js",
     "lint": "eslint --ext ts,tsx,js,mjs .",
     "lint:fix": "yarn lint --fix",
-    "types": "tsc --noEmit"
+    "types": "tsc --noEmit",
+    "prepare": "husky"
   },
   "dependencies": {
     "@chakra-ui/react": "3.24.2",

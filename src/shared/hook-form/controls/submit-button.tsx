@@ -67,7 +67,7 @@ export const SubmitButton = ({
 
   return (
     <Button
-      disabled={!isWalletWhitelisted}
+      disabled={!isWalletWhitelisted || !isSupportedChain}
       type="submit"
       size={'2xl'}
       loading={isValidating || isSubmitting || isLoading || isFormLoading}
