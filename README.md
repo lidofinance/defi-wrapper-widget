@@ -1,6 +1,6 @@
 # Stv Pool Dapp Widget
 
-[Demo widget inside of an iframe](https://silver-adventure-kropk85.pages.github.io/iframe.html)
+[Demo widget inside of an iframe](https://friendly-adventure-3enkg54.pages.github.io/iframe.html)
 
 ### Configuration
 
