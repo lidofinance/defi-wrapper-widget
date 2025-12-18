@@ -1,0 +1,168 @@
+name: Deploy to GitHub Pages
+
+on:
+  # Trigger the workflow on push to main branch
+  push:
+    branches: [develop]
+  # Allow manual triggering
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Environment ${{ matrix.env }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        env: [StvPool, StvStETHPool, StvStrategyPool]
+    env:
+      VITE_POOL_ADDRESS: ${{ vars[format('VITE_POOL_ADDRESS_{0}', matrix.env)] }}
+      VITE_WIDGET_TITLE: ${{ vars[format('VITE_WIDGET_TITLE_{0}', matrix.env)] }}
+      VITE_BASE_URL: ${{vars[format('/{0}', matrix.env)]}}
+      VITE_POOL_TYPE: ${{matrix.env}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: corepack enable
+        run: corepack enable
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Restore Yarn cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .yarn/cache
+            .yarn/install-state.gz
+            ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Create .env file from variables
+        run: |
+          echo "VITE_DEFAULT_CHAIN=${{vars.VITE_DEFAULT_CHAIN}}">> .env
+          echo "VITE_SUPPORTED_CHAINS=${{vars.VITE_SUPPORTED_CHAINS}}">> .env
+          echo "VITE_PUBLIC_EL_RPC_URLS_1=${{vars.VITE_PUBLIC_EL_RPC_URLS_1}}">> .env
+          echo "VITE_DEVNET_OVERRIDES=${{vars.VITE_DEVNET_OVERRIDES}}" >> .env
+          echo "VITE_PUBLIC_EL_RPC_URLS_560048=${{vars.VITE_PUBLIC_EL_RPC_URLS_560048}}">> .env
+          echo "VITE_WALLETCONNECT_PROJECT_ID=${{vars.VITE_WALLETCONNECT_PROJECT_ID}}">> .env
+          echo "VITE_STRATEGY_ADDRESS=${{ vars.VITE_STRATEGY_ADDRESS }}">> .env
+          echo "VITE_POOL_ADDRESS=${{ env.VITE_POOL_ADDRESS }}">> .env
+          echo "VITE_WIDGET_TITLE=${{ env.VITE_WIDGET_TITLE }}">> .env
+          echo "VITE_BASE_URL=${{ env.VITE_BASE_URL }}">> .env
+          echo "VITE_POOL_TYPE=${{ env.VITE_POOL_TYPE }}">> .env
+
+      - name: Build Environment
+        run: yarn build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.env }}
+          path: './dist'
+
+  build-iframe:
+    name: Build Iframe
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: corepack enable
+        run: corepack enable
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Restore Yarn cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .yarn/cache
+            .yarn/install-state.gz
+            ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build iframe
+        run: yarn build:iframe
+
+      - name: Upload iframe build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-iframe
+          path: './dist'
+
+  merge-and-deploy:
+    name: Merge and Deploy
+    needs: [build, build-iframe]
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download build StvPool
+        uses: actions/download-artifact@v4
+        with:
+          name: build-StvPool
+          path: './dist/StvPool'
+
+      - name: Download build StvStETHPool
+        uses: actions/download-artifact@v4
+        with:
+          name: build-StvStETHPool
+          path: './dist/StvStETHPool'
+
+      - name: Download build StvStrategyPool
+        uses: actions/download-artifact@v4
+        with:
+          name: build-StvStrategyPool
+          path: './dist/StvStrategyPool'
+
+      - name: Download iframe build
+        uses: actions/download-artifact@v4
+        with:
+          name: build-iframe
+          path: './dist'
+
+      - name: Merge builds
+        run: |
+          ls -la ./dist
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: './dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

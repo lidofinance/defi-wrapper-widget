@@ -1,0 +1,217 @@
+/* Pill container styles */
+.pillContainer1 {
+  display: flex;
+  align-items: center;
+  gap: var(--lido-space-sm);
+  width: fit-content;
+  padding: var(--lido-space-sm);
+  padding-right: var(--lido-space-md);
+  border-radius: var(--lido-border-radius-xl);
+  background-color: color-mix(
+    in srgb,
+    var(--lido-color-textDark) 6%,
+    transparent
+  );
+  white-space: nowrap;
+  text-wrap: nowrap;
+}
+
+.pillContainer[data-clickable='true'] {
+  cursor: pointer;
+}
+
+.pillContainer[data-hover-effect='true']:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--lido-color-textDark) 12%,
+    transparent
+  );
+}
+
+/* Pill container background color variants */
+.pillContainerTransparent {
+  background-color: transparent;
+}
+
+.pillContainerError {
+  background-color: color-mix(
+    in srgb,
+    var(--lido-color-error) 10%,
+    transparent
+  );
+}
+
+.pillContainerError[data-hover-effect='true']:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--lido-color-error) 30%,
+    transparent
+  );
+}
+
+.pillContainerSuccess {
+  background-color: color-mix(
+    in srgb,
+    var(--lido-color-success) 30%,
+    transparent
+  );
+}
+
+.pillContainerSuccess[data-hover-effect='true']:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--lido-color-success) 40%,
+    transparent
+  );
+}
+
+.pillContainerActive {
+  background-color: color-mix(
+    in srgb,
+    var(--lido-color-textDark) 12%,
+    transparent
+  );
+}
+
+.pillContainerActive[data-hover-effect='true']:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--lido-color-textDark) 15%,
+    transparent
+  );
+}
+
+/* Address text styles */
+.addressText {
+  /* Base styles will be applied via props */
+}
+
+.addressTextXs {
+  font-size: var(--lido-font-size-xs);
+  line-height: 1.5em;
+}
+
+.addressTextSm {
+  font-size: var(--lido-font-size-sm);
+  line-height: 1.5em;
+}
+
+.addressTextMd {
+  font-size: var(--lido-font-size-md);
+  line-height: 1.5em;
+}
+
+.addressTextLg {
+  font-size: var(--lido-font-size-lg);
+  line-height: 1.4em;
+}
+
+.addressTextCrossed {
+  text-decoration: line-through;
+  text-decoration-color: var(--lido-color-text);
+}
+
+/* Selectable wrapper */
+.selectableWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lido-space-sm);
+  width: fit-content;
+  padding-right: var(--lido-space-sm);
+  border-radius: var(--lido-border-radius-xl);
+  background-color: color-mix(
+    in srgb,
+    var(--lido-color-textDark) 6%,
+    transparent
+  );
+}
+
+.selectableWrapper:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--lido-color-textDark) 12%,
+    transparent
+  );
+}
+
+.selectableWrapperError {
+  background-color: color-mix(
+    in srgb,
+    var(--lido-color-error) 10%,
+    transparent
+  );
+}
+
+.selectableWrapperError:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--lido-color-error) 30%,
+    transparent
+  );
+}
+
+/* Label */
+.label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: color-mix(
+    in srgb,
+    var(--lido-color-textSecondary) 20%,
+    transparent
+  );
+  cursor: pointer;
+}
+
+/* Hidden checkbox */
+.hiddenCheckbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Popover styles */
+.popoverWrapper {
+  padding: var(--lido-space-md);
+}
+
+.popoverContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lido-space-sm);
+  padding: 0;
+}
+
+.actionGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--lido-space-xl);
+}
+
+.actionWrapper {
+  display: flex;
+  align-items: center;
+}
+
+/* Styled tooltip */
+.styledTooltip {
+  background: var(--lido-color-foreground);
+  box-shadow: var(--lido-box-shadow-xs) var(--lido-color-shadowLight);
+  padding: var(--lido-space-md);
+  max-width: unset !important;
+  opacity: 0;
+  pointer-events: none;
+  animation: fadeIn 0.1s ease-in forwards;
+  animation-delay: 0.6s;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    pointer-events: all;
+  }
+}

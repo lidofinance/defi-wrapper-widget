@@ -1,0 +1,18 @@
+/* Address Avatar */
+.addressAvatarCommon {
+  margin: 0px;
+  height: 24px;
+  width: 24px;
+}
+
+.addressAvatarImage {
+  composes: addressAvatarCommon;
+  border-radius: 50px;
+  display: inline-block;
+  overflow: hidden;
+  padding: 0px;
+}
+
+.addressAvatarLoader {
+  composes: addressAvatarCommon;
+}

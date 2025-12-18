@@ -1,0 +1,10 @@
+.identicon {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 1000px;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}

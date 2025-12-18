@@ -1,0 +1,11 @@
+services:
+  dev:
+    build: .
+    ports:
+      - "3017:3017"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+

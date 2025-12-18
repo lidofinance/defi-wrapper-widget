@@ -1,0 +1,38 @@
+name: PR tests
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: corepack enable
+        run: corepack enable
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Create .env file from secrets
+        run: |
+          echo "VITE_DEFAULT_CHAIN=${{vars.VITE_DEFAULT_CHAIN}}">> .env
+          echo "VITE_SUPPORTED_CHAINS=${{vars.VITE_SUPPORTED_CHAINS}}">> .env
+          echo "VITE_PUBLIC_EL_RPC_URLS_1=${{vars.VITE_PUBLIC_EL_RPC_URLS_1}}">> .env
+          echo "VITE_DEVNET_OVERRIDES=${{vars.VITE_DEVNET_OVERRIDES}}" >> .env
+          echo "VITE_PUBLIC_EL_RPC_URLS_560048=${{vars.VITE_PUBLIC_EL_RPC_URLS_560048}}">> .env
+          echo "VITE_WALLETCONNECT_PROJECT_ID=${{vars.VITE_WALLETCONNECT_PROJECT_ID}}">> .env
+          echo "VITE_POOL_ADDRESS=0x0000000000000000000000000000000000000000">> .env
+          echo "VITE_STRATEGY_ADDRESS=${{ vars.VITE_STRATEGY_ADDRESS }}">> .env
+          echo "VITE_POOL_TYPE=StvStETHPool">> .env
+
+      - name: Build
+        run: yarn build:all

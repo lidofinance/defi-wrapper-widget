@@ -1,0 +1,21 @@
+{
+  "contracts": {
+    "lidoLocator": "0xe2EF9536DAAAEBFf5b1c130957AB3E80056b06D8",
+    "stakingRouter": "0xCc820558B39ee15C7C45B59390B503b83fb499A8",
+    "withdrawalQueue": "0xfe56573178f1bcdf53F01A6E9977670dcBBD9186",
+    "lido": "0x3508A952176b3c15387C97BE809eaffB1982176a",
+    "wsteth": "0x7E99eE3C66636DE415D2d7C880938F2f40f94De4",
+    "weth": "0x2387fD72C1DA19f6486B843F5da562679FbB4057",
+    "predepositGuarantee": "0xa5F55f3402beA2B14AE15Dae1b6811457D43581d",
+    "vaultFactory": "0xf0Cf0c852Bb2b41eF8171399a71be79aa67e6295",
+    "vaultHub": "0x4C9fFC325392090F789255b9948Ab1659b797964",
+    "vaultViewer": "0x069f5f448475c843e099198b5e9F9977bF84FDd0",
+    "lazyOracle": "0xf41491C79C30e8f4862d3F4A5b790171adB8e04A",
+    "operatorGrid": "0x501e678182bB5dF3f733281521D3f3D1aDe69917"
+  },
+  "api": {
+    "vaultsApi": "https://stvaults-api-hoodi.testnet.fi",
+    "ethApi": "https://eth-api-hoodi.testnet.fi",
+    "ggvApi": "https://api.sevenseas.capital"
+  }
+}
