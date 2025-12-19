@@ -2,7 +2,11 @@
 
 [Demo widget inside of an iframe](https://friendly-adventure-3enkg54.pages.github.io/iframe.html)
 
+
 ### Configuration
+
+>  [!WARNING]
+> Testent only, did not pass audit, do not apply on mainnet until further notice
 
 Based on your deployment of Stv Pool you must fill in variables in `.env` file:
 
