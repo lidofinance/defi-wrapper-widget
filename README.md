@@ -6,7 +6,7 @@
 ### Configuration
 
 >  [!WARNING]
-> Testent only, did not pass audit, do not apply on mainnet until further notice
+> Testent only, has not passed audits yet, do not apply on mainnet until further notice
 
 Based on your deployment of Stv Pool you must fill in variables in `.env` file:
 
