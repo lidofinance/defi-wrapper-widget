@@ -97,6 +97,10 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
+      - name: Create .env file from variables
+        run: |
+          echo "VITE_BASE_URL=${{ vars.VITE_BASE_URL }}" >> .env
+
       - name: Restore Yarn cache
         uses: actions/cache@v4
         with:
