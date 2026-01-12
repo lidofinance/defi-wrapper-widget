@@ -67,7 +67,6 @@ export const Navigation = ({
     <WrapperLayout>
       <SplashScreen isLoading={showSplashScreen}>
         <TransactionModal
-          isDashboardAvailable={showDashboard}
           backToDashboard={() => setMode('dashboard')}
           onModalOpen={() => {
             setModePristine(false);

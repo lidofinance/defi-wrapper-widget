@@ -65,11 +65,9 @@ export const TransactionModal = ({
   children,
   backToDashboard,
   onModalOpen,
-  isDashboardAvailable,
 }: PropsWithChildren & {
   backToDashboard: () => void;
   onModalOpen: () => void;
-  isDashboardAvailable: boolean;
 }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -136,7 +134,6 @@ export const TransactionModal = ({
       <TransactionModalContent
         backToDashboard={backToDashboard}
         onModalOpen={onModalOpen}
-        isDashboardAvailable={isDashboardAvailable}
       />
     </TransactionModalContext.Provider>
   );
