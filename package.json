@@ -61,7 +61,7 @@
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-react": "^7.33.1",
-    "eslint-plugin-react-hooks": "^5.0.0-canary-7118f5dd7-20230705",
+    "eslint-plugin-react-hooks": "7.0.1",
     "eslint-plugin-sonarjs": "^0.20.0",
     "eslint-plugin-unicorn": "^48.0.1",
     "husky": "^9.1.7",
