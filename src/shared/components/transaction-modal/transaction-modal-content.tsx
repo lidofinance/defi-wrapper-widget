@@ -124,11 +124,9 @@ const showTransactionStatusIcon = (state: TransactionModalState) => {
 export const TransactionModalContent = ({
   backToDashboard,
   onModalOpen,
-  isDashboardAvailable,
 }: {
   backToDashboard: () => void;
   onModalOpen: () => void;
-  isDashboardAvailable: boolean;
 }) => {
   const { dispatchModal, ...state } = useTransactionModal();
   const isOpen = state.isOpen;

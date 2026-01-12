@@ -3,7 +3,7 @@ import { encodeFunctionData, type Abi, type Address, type Hex } from 'viem';
 // copy from view internals
 const getFunctionParameters = (values: unknown[]) => {
   const hasArgs = values.length > 0 && Array.isArray(values[0]);
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
   const args = (hasArgs ? values[0]! : []) as unknown[];
   const options = ((hasArgs ? values[1] : values[0]) ?? {}) as any;
   return { args, options };

@@ -9,7 +9,7 @@ import { useMutation } from '@tanstack/react-query';
 
 // @wagmi/core provides async wagmi actions
 // avoid putting it in main dependencies as it will eventually conflict with wagmi package
-// eslint-disable-next-line import/no-extraneous-dependencies
+
 import {
   sendCalls,
   sendTransaction,
