@@ -59,6 +59,7 @@ jobs:
 
       - name: Create .env file from variables
         run: |
+          echo "VITE_BASE_URL=${{ vars.VITE_BASE_URL }}" >> .env
           echo "VITE_DEFAULT_CHAIN=${{vars.VITE_DEFAULT_CHAIN}}">> .env
           echo "VITE_SUPPORTED_CHAINS=${{vars.VITE_SUPPORTED_CHAINS}}">> .env
           echo "VITE_PUBLIC_EL_RPC_URLS_1=${{vars.VITE_PUBLIC_EL_RPC_URLS_1}}">> .env

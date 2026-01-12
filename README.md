@@ -1,11 +1,10 @@
 # Stv Pool Dapp Widget
 
-[Demo widget inside of an iframe](https://friendly-adventure-3enkg54.pages.github.io/iframe.html)
-
+[Demo widget inside of an iframe](https://lidofinance.github.io/defi-wrapper-widget/iframe.html)
 
 ### Configuration
 
->  [!WARNING]
+> [!WARNING]
 > Testent only, has not passed audits yet, do not apply on mainnet until further notice
 
 Based on your deployment of Stv Pool you must fill in variables in `.env` file:
