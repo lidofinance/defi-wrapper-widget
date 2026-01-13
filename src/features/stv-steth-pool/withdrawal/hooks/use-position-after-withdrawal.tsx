@@ -25,7 +25,8 @@ export const usePositionAfterWithdrawal = (
       !address ||
       !availableMintData ||
       isBalanceLoading ||
-      !repayRatioData
+      !repayRatioData ||
+      typeof assets !== 'bigint'
     ) {
       return undefined;
     }

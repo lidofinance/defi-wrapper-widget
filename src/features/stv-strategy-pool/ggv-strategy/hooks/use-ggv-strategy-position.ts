@@ -60,7 +60,7 @@ export const getGGVStrategyPosition = async ({
     ggvStrategyContract.read.wstethOf([address]),
     ggvStrategyContract.read.mintedStethSharesOf([address]),
     ggvStrategyContract.read.WSTETH(),
-    wrapper.prepare.balanceOf([strategyProxyAddress]),
+    wrapper.read.balanceOf([strategyProxyAddress]),
     wrapper.read.poolReserveRatioBP(),
   ]);
 
