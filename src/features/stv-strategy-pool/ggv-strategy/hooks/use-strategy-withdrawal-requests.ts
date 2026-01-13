@@ -102,8 +102,6 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
           }
         : undefined; // no processable request
 
-    console.log('processableRequest', processableRequest);
-
     const processWithdrawalRequest = processableRequest
       ? () => {
           return processWithdrawal({
