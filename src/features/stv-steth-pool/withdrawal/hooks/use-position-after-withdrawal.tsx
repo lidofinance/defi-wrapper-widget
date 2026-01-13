@@ -11,7 +11,7 @@ export const usePositionAfterWithdrawal = (
   widthdrawalAmountInEth: bigint | null,
 ) => {
   const { address } = useDappStatus();
-  const { activeVault, queryKeys } = useVault();
+  const { activeVault } = useVault();
   const { assets, isBalanceLoading } = useWrapperBalance();
   const { data: availableMintData } = useAvailableMint();
   const { data: repayRatioData } = useRepayRebalanceRatio(
