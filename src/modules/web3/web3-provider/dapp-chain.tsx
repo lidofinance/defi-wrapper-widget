@@ -1,5 +1,4 @@
-// TODO: deprecate
-import React, { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 import { useAccount } from 'wagmi';
 import invariant from 'tiny-invariant';
 import { USER_CONFIG } from '@/config';

@@ -12,9 +12,6 @@ import {
 } from 'viem';
 import type { Connection } from 'wagmi';
 import { PROVIDER_BATCH_TIME, PROVIDER_MAX_BATCH } from '@/config';
-// todo: fix typings later
-// @ts-ignore
-import type { OnResponseFn } from 'viem/_types/clients/transports/fallback';
 
 // We disable those methods so wagmi uses getLogs instead to watch events
 // Filters are not suitable for public rpc and break when changing between fallbacks
@@ -23,6 +20,8 @@ const DISABLED_METHODS = new Set([
   'eth_getFilterChanges',
   'eth_uninstallFilter',
 ]);
+
+type OnResponseFn = (params: unknown) => void;
 
 // Viem transport wrapper that allows runtime changes via setter
 const runtimeMutableTransport = (
@@ -34,7 +33,7 @@ const runtimeMutableTransport = (
   return [
     (params) => {
       const defaultTransport = fallback(mainTransports)(params);
-      let externalOnResponse: OnResponseFn;
+      let externalOnResponse: OnResponseFn | undefined;
 
       const onResponse: OnResponseFn = (params: unknown) => {
         if ((params as any).status === 'error' && !(params as any).skipLog) {

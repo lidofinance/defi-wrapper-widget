@@ -646,19 +646,6 @@ export const StvStethAbi = [
   },
   {
     type: 'function',
-    name: 'forcedRebalanceThresholdBP',
-    inputs: [],
-    outputs: [
-      {
-        name: 'threshold',
-        type: 'uint256',
-        internalType: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
     name: 'getAllowListAddresses',
     inputs: [],
     outputs: [
@@ -992,6 +979,32 @@ export const StvStethAbi = [
   },
   {
     type: 'function',
+    name: 'poolForcedRebalanceThresholdBP',
+    inputs: [],
+    outputs: [
+      {
+        name: 'threshold',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'poolReserveRatioBP',
+    inputs: [],
+    outputs: [
+      {
+        name: 'reserveRatio',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     name: 'poolType',
     inputs: [],
     outputs: [
@@ -1091,6 +1104,25 @@ export const StvStethAbi = [
   },
   {
     type: 'function',
+    name: 'rebalanceExceedingMintedStethShares',
+    inputs: [
+      {
+        name: '_stethShares',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: 'stvBurned',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     name: 'rebalanceMintedStethSharesForWithdrawalQueue',
     inputs: [
       {
@@ -1187,19 +1219,6 @@ export const StvStethAbi = [
     ],
     outputs: [],
     stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    name: 'reserveRatioBP',
-    inputs: [],
-    outputs: [
-      {
-        name: 'reserveRatio',
-        type: 'uint256',
-        internalType: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -1592,7 +1611,6 @@ export const StvStethAbi = [
     ],
     stateMutability: 'view',
   },
-  // Disabled overloaded functions to avoid ABI conflicts
   // {
   //   type: 'function',
   //   name: 'unlockedAssetsOf',
@@ -2067,22 +2085,6 @@ export const StvStethAbi = [
   },
   {
     type: 'error',
-    name: 'ArraysLengthMismatch',
-    inputs: [
-      {
-        name: 'firstArrayLength',
-        type: 'uint256',
-        internalType: 'uint256',
-      },
-      {
-        name: 'secondArrayLength',
-        type: 'uint256',
-        internalType: 'uint256',
-      },
-    ],
-  },
-  {
-    type: 'error',
     name: 'CannotRebalanceWithdrawalQueue',
     inputs: [],
   },
@@ -2207,6 +2209,11 @@ export const StvStethAbi = [
   {
     type: 'error',
     name: 'InsufficientBalance',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InsufficientExceedingShares',
     inputs: [],
   },
   {

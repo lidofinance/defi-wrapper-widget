@@ -61,7 +61,7 @@ export const getGGVStrategyPosition = async ({
     ggvStrategyContract.read.mintedStethSharesOf([address]),
     ggvStrategyContract.read.WSTETH(),
     wrapper.prepare.balanceOf([strategyProxyAddress]),
-    wrapper.read.reserveRatioBP(),
+    wrapper.read.poolReserveRatioBP(),
   ]);
 
   // adjust ggv balance by pending withdrawal requests

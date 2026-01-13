@@ -72,13 +72,11 @@ export const useDepositMint = () => {
           ],
         });
 
-        let maxMintShares = minBN(
+        // TODO: check for roudning issues overstepping max minting capacity by 1 wei
+        const maxMintShares = minBN(
           remainingUserMintingCapacityShares,
           remainingVaultMintingCapacityShares,
         );
-        // TODO: fix in contract/ or find a better way to detect rounding issues
-        // lower shares by 1 wei to avoid possible rounding issues
-        maxMintShares = maxBN(maxMintShares - 1n, 0n);
 
         const maxMintSteth = await shares.convertToSteth(maxMintShares);
 
