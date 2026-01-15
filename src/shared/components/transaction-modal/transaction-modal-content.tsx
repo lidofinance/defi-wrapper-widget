@@ -47,7 +47,7 @@ const showBackToDashboardButton = (
   backToSameTab: () => void,
 ) => {
   if (state.stage === 'success' || state.stage === 'error') {
-    const text = state.stage === 'error' ? 'Try again' : 'Go to dashboard';
+    const text = state.stage === 'error' ? 'Go back' : 'Go to dashboard';
     const onClickAction =
       state.stage === 'error' ? backToSameTab : onBackToDashboard;
     return (
@@ -124,11 +124,9 @@ const showTransactionStatusIcon = (state: TransactionModalState) => {
 export const TransactionModalContent = ({
   backToDashboard,
   onModalOpen,
-  isDashboardAvailable,
 }: {
   backToDashboard: () => void;
   onModalOpen: () => void;
-  isDashboardAvailable: boolean;
 }) => {
   const { dispatchModal, ...state } = useTransactionModal();
   const isOpen = state.isOpen;

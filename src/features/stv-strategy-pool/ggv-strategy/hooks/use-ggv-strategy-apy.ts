@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import { useStethApr, useVaultApr } from '@/modules/vaults';
+import { useMintingLimits } from '@/modules/defi-wrapper';
+
 import { useGGVApr } from './use-ggv-apr';
 import { useGGVStrategyPosition } from './use-ggv-strategy-position';
-import { useMintingLimits } from './use-minting-limits';
 
 const aprToApy = (aprPercent: number) => {
   const apr = aprPercent / 100;

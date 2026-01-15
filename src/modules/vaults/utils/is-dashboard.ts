@@ -29,9 +29,6 @@ export const isDashboard = async (
   publicClient: RegisteredPublicClient,
   dashboardAddress: Address,
 ): Promise<boolean> => {
-  // TODO: return this check on mainnet when vault factory is stabilized
-  return true;
-
   const [contractCode, canonicalCode] = await Promise.all([
     publicClient.getCode({ address: dashboardAddress }),
     getProxyCodeWithCache(publicClient),

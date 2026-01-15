@@ -180,8 +180,6 @@ export const useWithdrawalRepay = () => {
                 loadingDescription: DEFAULT_LOADING_DESCRIPTION,
               });
 
-              // TODO: repay call
-
               // todo: extreme share rate might cause amountInStv to be rightfully 0
               const amountInStv = await convertFromEthToStv(
                 publicClient,

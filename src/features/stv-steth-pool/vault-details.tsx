@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormatPercent } from '@/shared/formatters';
 import { DashboardVaultDetails } from '@/shared/wrapper/dashboard';
-import { useMintingLimits } from './deposit/hooks/use-minting-limits';
+import { useMintingLimits } from '@/modules/defi-wrapper';
 
 export const VaultDetails = () => {
   const { data: mintData } = useMintingLimits();

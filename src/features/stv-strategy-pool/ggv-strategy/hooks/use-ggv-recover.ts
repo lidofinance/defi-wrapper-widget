@@ -50,7 +50,7 @@ export const useGGVRecover = () => {
 
               // recover ERC20
               calls.push({
-                ...ggvStrategyContract.encode.recoverERC20([
+                ...ggvStrategyContract.encode.safeTransferERC20([
                   assetToRecover,
                   address,
                   amountToRecover,

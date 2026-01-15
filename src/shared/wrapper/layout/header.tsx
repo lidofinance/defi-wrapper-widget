@@ -1,17 +1,19 @@
 import React from 'react';
-import { Flex, Text } from '@chakra-ui/react';
-import { Alert } from '@chakra-ui/react';
-import { USER_CONFIG } from '@/config';
+import { Alert, Flex, Text } from '@chakra-ui/react';
+import { USER_CONFIG, useUserConfig } from '@/config';
 import { useDappStatus } from '@/modules/web3';
 import { Connect } from '@/shared/wallet';
 import { WalletModal } from '@/shared/wallet/wallet-modal';
 import MainLogo from 'assets/icons/header_logo.svg?react';
 
 export const WidgetHeader: React.FC = () => {
-  const { address, isSupportedChain, isWalletConnected } = useDappStatus();
+  const { defaultChain } = useUserConfig();
+  const { address, isSupportedChain, isWalletConnected, supportedChainLabels } =
+    useDappStatus();
 
   const title = USER_CONFIG.widgetTitle;
   const showChainAlert = isWalletConnected && !isSupportedChain;
+
   return (
     <>
       <Flex alignItems="center" justify="space-between" width="full" mb={2}>
@@ -25,8 +27,8 @@ export const WidgetHeader: React.FC = () => {
           <Alert.Content>
             <Alert.Title>Unsupported network</Alert.Title>
             <Alert.Description>
-              This app doesn’t support your current network. Please switch to
-              Ethereum in your wallet.
+              This app doesn’t support your current network. Please switch to{' '}
+              {supportedChainLabels[defaultChain]} in your wallet.
             </Alert.Description>
           </Alert.Content>
         </Alert.Root>

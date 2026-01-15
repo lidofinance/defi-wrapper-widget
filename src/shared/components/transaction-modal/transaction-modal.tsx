@@ -16,7 +16,6 @@ import type {
   TransactionModalState,
 } from './types';
 
-// todo: don't like it here, move to some other file
 export const DEFAULT_SIGNING_DESCRIPTION =
   'Confirm this transaction in your wallet';
 export const DEFAULT_LOADING_DESCRIPTION = 'Awaiting block confirmation';
@@ -65,11 +64,9 @@ export const TransactionModal = ({
   children,
   backToDashboard,
   onModalOpen,
-  isDashboardAvailable,
 }: PropsWithChildren & {
   backToDashboard: () => void;
   onModalOpen: () => void;
-  isDashboardAvailable: boolean;
 }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -136,7 +133,6 @@ export const TransactionModal = ({
       <TransactionModalContent
         backToDashboard={backToDashboard}
         onModalOpen={onModalOpen}
-        isDashboardAvailable={isDashboardAvailable}
       />
     </TransactionModalContext.Provider>
   );

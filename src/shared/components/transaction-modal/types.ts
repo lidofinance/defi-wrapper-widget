@@ -2,8 +2,7 @@ import type { Dispatch } from 'react';
 import { Flow, TransactionCallbacks } from '@/modules/web3';
 
 // todo: update
-//@ts-ignore
-export type TransactionResponse = any;
+export type TransactionResponse = unknown;
 
 type TransactionModalStage =
   | 'none'

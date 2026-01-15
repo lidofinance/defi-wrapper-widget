@@ -44,7 +44,7 @@ export const useStrategyWithdrawalRequestsRead = (includeBoost?: boolean) => {
     (expiredGGVRequests?.length ?? 0) === 0 &&
     (proxyRequests?.pending.length ?? 0) === 0 &&
     (proxyRequests?.finalized.length ?? 0) === 0 &&
-    (ggvPosition?.totalStvToWithdrawFromProxy ?? 0) <= 0n &&
+    (ggvPosition?.totalEthToWithdrawFromProxy ?? 0) <= 0n &&
     (ggvPosition?.stethSharesToRecover ?? 0) <= 0n;
 
   return {
@@ -85,7 +85,7 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
     const processableRequest =
       ggvPosition &&
       minProccessableValueInEth &&
-      (ggvPosition.totalStvToWithdrawFromProxy > 0n ||
+      (ggvPosition.totalEthToWithdrawFromProxy > 0n ||
         ggvPosition.stethSharesToRepay > 0n)
         ? {
             stvToWithdraw: ggvPosition.totalStvToWithdrawFromProxy,

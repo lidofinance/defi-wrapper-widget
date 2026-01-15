@@ -42,7 +42,7 @@ export const AmountInput: React.FC<TokenAmountInputProps> = forwardRef<
 
   const lastInputValue = useRef(defaultValue);
   const inputRef = useRef<HTMLInputElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
   useImperativeHandle(ref, () => inputRef.current!, []);
 
   const handleChange = useCallback(
