@@ -502,29 +502,6 @@ export const ggvStrategyAbi = [
   },
   {
     type: 'function',
-    name: 'recoverERC20',
-    inputs: [
-      {
-        name: '_token',
-        type: 'address',
-        internalType: 'address',
-      },
-      {
-        name: '_recipient',
-        type: 'address',
-        internalType: 'address',
-      },
-      {
-        name: '_amount',
-        type: 'uint256',
-        internalType: 'uint256',
-      },
-    ],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
     name: 'remainingMintingCapacitySharesOf',
     inputs: [
       {
@@ -714,6 +691,29 @@ export const ggvStrategyAbi = [
         name: 'account',
         type: 'address',
         internalType: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'safeTransferERC20',
+    inputs: [
+      {
+        name: '_token',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: '_recipient',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: '_amount',
+        type: 'uint256',
+        internalType: 'uint256',
       },
     ],
     outputs: [],
@@ -1175,6 +1175,11 @@ export const ggvStrategyAbi = [
   },
   {
     type: 'error',
+    name: 'InsufficientWsteth',
+    inputs: [],
+  },
+  {
+    type: 'error',
     name: 'InvalidInitialization',
     inputs: [],
   },
@@ -1200,11 +1205,6 @@ export const ggvStrategyAbi = [
   },
   {
     type: 'error',
-    name: 'NothingToExit',
-    inputs: [],
-  },
-  {
-    type: 'error',
     name: 'SafeCastOverflowedUintDowncast',
     inputs: [
       {
@@ -1212,17 +1212,6 @@ export const ggvStrategyAbi = [
         type: 'uint8',
         internalType: 'uint8',
       },
-      {
-        name: 'value',
-        type: 'uint256',
-        internalType: 'uint256',
-      },
-    ],
-  },
-  {
-    type: 'error',
-    name: 'SafeCastOverflowedUintToInt',
-    inputs: [
       {
         name: 'value',
         type: 'uint256',

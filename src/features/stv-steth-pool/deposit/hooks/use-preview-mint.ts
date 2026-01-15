@@ -2,13 +2,12 @@ import { usePublicClient } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import { useWatch } from 'react-hook-form';
 import invariant from 'tiny-invariant';
-import { useStvSteth } from '@/modules/defi-wrapper';
+import { useStvSteth, useMintingLimits } from '@/modules/defi-wrapper';
 import { readWithReport, useVault } from '@/modules/vaults';
 import { useDappStatus, useLidoSDK } from '@/modules/web3';
 
 import { factorMulBN, isEqualEpsilonBN, minBN } from '@/utils/bn';
 
-import { useMintingLimits } from './use-minting-limits';
 import { DepositFormValues } from '../deposit-form-context/types';
 
 export const usePreviewMint = () => {

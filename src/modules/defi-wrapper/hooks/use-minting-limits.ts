@@ -1,12 +1,13 @@
 import { usePublicClient } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
-import { useStvSteth } from '@/modules/defi-wrapper';
 import {
   readWithReport,
   useVault,
   VAULT_TOTAL_BASIS_POINTS,
 } from '@/modules/vaults';
+
+import { useStvSteth } from '../wrapper-provider';
 
 export const useMintingLimits = () => {
   const publicClient = usePublicClient();
@@ -22,7 +23,7 @@ export const useMintingLimits = () => {
           publicClient,
           report: activeVault?.report,
           contracts: [
-            wrapper.prepare.reserveRatioBP(),
+            wrapper.prepare.poolReserveRatioBP(),
             dashboard.prepare.remainingMintingCapacityShares([0n]),
             wrapper.prepare.totalMintedStethShares(),
           ],

@@ -95,13 +95,11 @@ export const useDepositStrategy = () => {
                   ],
                 });
 
-              let maxMintShares = minBN(
+              // TODO: check for roudning issues overstepping max minting capacity by 1 wei
+              const maxMintShares = minBN(
                 proxyCapacityShares,
                 vaultCapacityShares,
               );
-              // TODO: remove on testnet 4 contracts
-              // lower shares by 1 wei to avoid possible rounding issues
-              maxMintShares = maxBN(maxMintShares - 1n, 0n);
 
               const reportCalls = await prepareReportCalls();
               calls.push(...reportCalls);

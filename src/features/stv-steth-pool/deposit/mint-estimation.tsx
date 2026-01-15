@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Alert, Flex, Text } from '@chakra-ui/react';
+import { useMintingLimits } from '@/modules/defi-wrapper';
 import { MintTokenSwitch } from '@/shared/components/mint-token-switch';
 import { FormatPercent, FormatToken } from '@/shared/formatters';
 import { FormatTokenWithIcon } from '@/shared/formatters/format-token-with-icon';
@@ -9,7 +10,6 @@ import {
   MintableTokens,
 } from './deposit-form-context/types';
 
-import { useMintingLimits } from './hooks/use-minting-limits';
 import { usePreviewMint } from './hooks/use-preview-mint';
 import { MintEstimationWarning } from './mint-estimation-warning';
 import { ReserveRatioTooltip } from './reserve-ratio-tooltip';
