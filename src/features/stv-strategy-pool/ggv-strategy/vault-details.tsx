@@ -5,6 +5,7 @@ import { ApyTooltipContent } from './apy-tooltip-content';
 export const VaultDetails = () => {
   return (
     <DashboardVaultDetails
+      showMaxTVL={true}
       additionalContent={<ApyTooltipContent />}
       showLiquidityFee={true}
       vaultDescription={

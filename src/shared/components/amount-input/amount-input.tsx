@@ -28,7 +28,6 @@ type TokenAmountInputProps = InputProps & {
   error?: React.ReactNode;
 };
 
-// todo: add error handling and displaying
 export const AmountInput: React.FC<TokenAmountInputProps> = forwardRef<
   HTMLInputElement,
   TokenAmountInputProps

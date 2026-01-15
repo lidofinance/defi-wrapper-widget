@@ -122,7 +122,7 @@ const runtimeMutableTransport = (
 // returns Viem transport map that uses browser wallet RPC provider when available fallbacked by our RPC and default RPCs
 export const useWeb3Transport = (
   supportedChains: readonly Chain[],
-  backendRpcMap: Record<number, string>,
+  backendRpcMap: Record<number, string[]>,
 ) => {
   const { transportMap, setTransportMap } = useMemo(() => {
     const batchConfig = {
@@ -134,10 +134,12 @@ export const useWeb3Transport = (
       ({ transportMap, setTransportMap }, chain) => {
         const [transport, setTransport] = runtimeMutableTransport([
           // api/rpc
-          http(backendRpcMap[chain.id], {
-            batch: batchConfig,
-            name: backendRpcMap[chain.id],
-          }),
+          ...backendRpcMap[chain.id].map((url) =>
+            http(url, {
+              batch: batchConfig,
+              name: url,
+            }),
+          ),
           // fallback rpc from wagmi.chains like cloudfare-eth
           http(undefined, {
             batch: batchConfig,

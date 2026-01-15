@@ -51,8 +51,6 @@ export const AddressBadge = forwardRef<HTMLDivElement, AddressBadgeProps>(
       props.onClick?.(event);
     };
 
-    // todo: fix  typings later
-    // @ts-ignore
     const address = parsing['data'];
 
     const pillClassName = clsx(

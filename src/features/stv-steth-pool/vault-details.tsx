@@ -7,6 +7,7 @@ export const VaultDetails = () => {
   const { data: mintData } = useMintingLimits();
   return (
     <DashboardVaultDetails
+      showMaxTVL={true}
       showLiquidityFee={true}
       vaultDescription={
         <>

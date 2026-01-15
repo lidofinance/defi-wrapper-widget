@@ -1,7 +1,6 @@
 import type { Dispatch } from 'react';
 import { Flow, TransactionCallbacks } from '@/modules/web3';
 
-// todo: update
 export type TransactionResponse = unknown;
 
 type TransactionModalStage =

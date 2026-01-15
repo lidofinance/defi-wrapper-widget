@@ -48,13 +48,22 @@ export const useGGVProcessWithdrawal = () => {
 
         const formatted = formatBalance(ethToReceive).actual;
 
-        // TODO: add text for healing
+        const isHealingOnly = stvToWithdraw <= 0n && sharesToRepay > 0n;
+
+        const successText = isHealingOnly
+          ? `Posisition healed by repaying shares`
+          : `Withdrawal of ${formatted} ETH processed`;
+
+        const successDescription = isHealingOnly
+          ? `You have successfully repaid shares to heal your position.`
+          : `You can claim your funds after the withdrawal process finished. Waiting time is approximately 7 days.`;
+
         const { success } = await withSuccess(
           sendTX({
-            successText: `Withdrawal of ${formatted} ETH processed`,
-            successDescription: `You can claim your funds after the withdrawal process finished. Waiting time is approximately 7 days.`,
+            successText,
+            successDescription,
             flow: 'withdrawal',
-            AATitleText: `Withdrawal of ${formatted} ETH processed`,
+            AATitleText: successText,
             AASigningDescription: DEFAULT_SIGNING_DESCRIPTION,
             AALoadingDescription: DEFAULT_LOADING_DESCRIPTION,
             transactions: async () => {
@@ -62,11 +71,6 @@ export const useGGVProcessWithdrawal = () => {
               const reportCalls = await prepareReportCalls();
               // report
               calls.push(...reportCalls);
-
-              invariant(
-                sharesToRepay <= 0n && stvToWithdraw <= 0n,
-                'Nothing to process',
-              );
 
               // repay
               if (sharesToRepay > 0n) {
@@ -85,6 +89,8 @@ export const useGGVProcessWithdrawal = () => {
                   ]),
                 });
               }
+
+              invariant(calls.length !== 0, 'Nothing to process');
 
               return calls;
             },
