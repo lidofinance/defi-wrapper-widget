@@ -1,11 +1,14 @@
+import { ComponentProps, FC } from 'react';
+
 import { USER_CONFIG } from '@/config';
 import { DATA_UNAVAILABLE } from '@/consts/text';
 import { Tooltip } from '@/shared/components/tooltip/tooltip';
-import { Component } from '@/types';
 
-export type FormatPriceComponent = Component<
-  'span',
-  { amount: number | null | undefined; currency?: string }
+export type FormatPriceComponent = FC<
+  ComponentProps<'span'> & {
+    amount: number | null | undefined;
+    currency?: string;
+  }
 >;
 
 export const FormatPrice: FormatPriceComponent = (props) => {

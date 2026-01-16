@@ -1,5 +1,5 @@
 # Use official Node.js image for build
-FROM node:20 AS builder
+FROM node:22 AS builder
 WORKDIR /app
 RUN corepack enable
 COPY package.json yarn.lock .yarnrc.yml ./
