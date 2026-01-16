@@ -9,6 +9,8 @@ import {
 import { http, publicActions } from 'viem';
 import { createConfig, fallback, useConnections, WagmiProvider } from 'wagmi';
 import { CHAINS } from '@lidofinance/lido-ethereum-sdk';
+// @ts-expect-error lido ui has old package.json
+import { CookieThemeProvider } from '@lidofinance/lido-ui';
 import {
   getDefaultWalletsModalConfig,
   ReefKnotWalletsModal,
@@ -213,11 +215,14 @@ export const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
         reconnectOnMount={false}
       >
         <ReefKnotProvider config={reefKnotConfig}>
-          <ReefKnotWalletsModal
-            style={{ maxWidth: '440px' }}
-            config={walletsModalConfig}
-            darkThemeEnabled={false}
-          />
+          {/* lido ui provider for ReefKnotWalletsModal */}
+          <CookieThemeProvider overrideThemeName="light">
+            <ReefKnotWalletsModal
+              style={{ maxWidth: '440px' }}
+              config={walletsModalConfig}
+              darkThemeEnabled={false}
+            />
+          </CookieThemeProvider>
           <SupportL1Chains>{children}</SupportL1Chains>
         </ReefKnotProvider>
       </WagmiProvider>
