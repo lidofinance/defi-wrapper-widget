@@ -1,9 +1,10 @@
+import { maxUint128 } from 'viem';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
-import { useVault, readWithReport } from '@/modules/vaults';
+import { useVault, readWithReport, getLidoV3Contract } from '@/modules/vaults';
 import { useEthUsd, useLidoSDK } from '@/modules/web3';
-import { useDefiWrapper, useStvSteth } from '../wrapper-provider';
-import { maxUint128 } from 'viem';
+import { minBN } from '@/utils/bn';
+import { useStvSteth } from '../wrapper-provider';
 
 export const useMaxWrapperTvl = () => {
   const { publicClient } = useLidoSDK();
@@ -27,8 +28,15 @@ export const useMaxWrapperTvl = () => {
         },
       );
 
-      // TODO: max cap remainingSharesToMint by LIDO.maxEternalShares - Lido.externalShares
-      const maxVaultShares = currentSharesMinted + remainingSharesToMint;
+      const lidoV3 = getLidoV3Contract(publicClient);
+
+      const maxMintableExternalShares =
+        await lidoV3.read.getMaxMintableExternalShares();
+
+      const maxVaultShares = minBN(
+        currentSharesMinted + remainingSharesToMint,
+        maxMintableExternalShares,
+      );
 
       const [maxEtherLocked] = await readWithReport({
         publicClient,

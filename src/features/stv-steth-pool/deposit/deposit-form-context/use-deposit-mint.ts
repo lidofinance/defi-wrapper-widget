@@ -22,7 +22,7 @@ import {
   useTransactionModal,
 } from '@/shared/components/transaction-modal';
 import { getReferralAddress } from '@/shared/wrapper/refferals/get-refferal-address';
-import { maxBN, minBN } from '@/utils/bn';
+import { minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
 import type { DepositFormValidatedValues } from './types';
@@ -73,6 +73,7 @@ export const useDepositMint = () => {
         });
 
         // TODO: check for roudning issues overstepping max minting capacity by 1 wei
+        // TOOD: limit by LIDO tvl
         const maxMintShares = minBN(
           remainingUserMintingCapacityShares,
           remainingVaultMintingCapacityShares,
