@@ -1,9 +1,9 @@
-import { useMintingLimits } from '@/modules/defi-wrapper';
+import { useVaultCapacity } from '@/modules/defi-wrapper';
 import { FormatPercent } from '@/shared/formatters';
 import { DashboardVaultDetails } from '@/shared/wrapper/dashboard';
 
 export const VaultDetails = () => {
-  const { data: mintData } = useMintingLimits();
+  const { data: vaultCapacity } = useVaultCapacity();
   return (
     <DashboardVaultDetails
       showMaxTVL={true}
@@ -15,7 +15,9 @@ export const VaultDetails = () => {
           repaid on withdrawal according to the Reserve Ratio{' '}
           <FormatPercent
             decimals="percent"
-            value={mintData?.reserveRatioPercent}
+            // hide loading data
+            fallback=""
+            value={vaultCapacity?.reserveRatioPercent}
           />
           .
         </>

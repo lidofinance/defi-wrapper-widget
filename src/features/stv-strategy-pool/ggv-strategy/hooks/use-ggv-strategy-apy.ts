@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useMintingLimits } from '@/modules/defi-wrapper';
+import { useVaultCapacity } from '@/modules/defi-wrapper';
 import { useStethApr, useVaultApr } from '@/modules/vaults';
 
 import { useGGVApr } from './use-ggv-apr';
@@ -32,8 +32,8 @@ export const useGGVStrategyApy = () => {
   const { data: vaultApr, isPending: isLoadingVaultApr } = useVaultApr();
   const { data: stethApr, isPending: isLoadingStethApr } = useStethApr();
   const { data: ggvApr, isPending: isLoadingGgvApr } = useGGVApr();
-  const { data: mintingLimits, isPending: isLoadingMintingLimits } =
-    useMintingLimits();
+  const { data: vaultCapacity, isPending: isLoadingVaultCapacity } =
+    useVaultCapacity();
   const { data: ggvPosition, isPending: isLoadingGgvPosition } =
     useGGVStrategyPosition();
 
@@ -41,15 +41,15 @@ export const useGGVStrategyApy = () => {
     isLoadingVaultApr ||
     isLoadingStethApr ||
     isLoadingGgvApr ||
-    isLoadingMintingLimits ||
+    isLoadingVaultCapacity ||
     isLoadingGgvPosition;
 
   const data = useMemo(() => {
-    if (!vaultApr || !stethApr || !ggvApr || !mintingLimits) {
+    if (!vaultApr || !stethApr || !ggvApr || !vaultCapacity) {
       return undefined;
     }
 
-    const defaultUtilizationRate = 1 - mintingLimits.reserveRatioPercent / 100;
+    const defaultUtilizationRate = 1 - vaultCapacity.reserveRationUnit;
 
     const currentUtilizationRate =
       ggvPosition?.currentUtilizationBP !== undefined
@@ -114,7 +114,7 @@ export const useGGVStrategyApy = () => {
       strategyAprSmaCurrent,
       strategyApySmaCurrent,
     };
-  }, [vaultApr, stethApr, ggvApr, mintingLimits, ggvPosition]);
+  }, [vaultApr, stethApr, ggvApr, vaultCapacity, ggvPosition]);
 
   return { ...data, updatedAt: vaultApr?.updatedAt, isLoadingApr };
 };

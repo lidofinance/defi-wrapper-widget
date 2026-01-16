@@ -2,8 +2,12 @@ import { usePublicClient } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import { useWatch } from 'react-hook-form';
 import invariant from 'tiny-invariant';
-import { useStvSteth, useMintingLimits } from '@/modules/defi-wrapper';
-import { readWithReport, useVault } from '@/modules/vaults';
+import { useStvSteth } from '@/modules/defi-wrapper';
+import {
+  readWithReport,
+  useVault,
+  VAULT_TOTAL_BASIS_POINTS,
+} from '@/modules/vaults';
 import { useDappStatus, useLidoSDK } from '@/modules/web3';
 
 import { factorMulBN, isEqualEpsilonBN, minBN } from '@/utils/bn';
@@ -14,13 +18,14 @@ export const usePreviewMint = () => {
   const amount = useWatch<DepositFormValues, 'amount'>({
     name: 'amount',
   });
+  const tokenToMint = useWatch<DepositFormValues, 'tokenToMint'>({
+    name: 'tokenToMint',
+  });
   const { address } = useDappStatus();
   const publicClient = usePublicClient();
   const { wrapper, dashboard } = useStvSteth();
   const { shares } = useLidoSDK();
   const { queryKeys, activeVault } = useVault();
-
-  const { data: mintingLimits } = useMintingLimits();
 
   const query = useQuery({
     queryKey: [
@@ -28,8 +33,7 @@ export const usePreviewMint = () => {
       'preview-mint',
       { amount: amount?.toString(), address },
     ],
-    enabled:
-      typeof amount === 'bigint' && !!address && !!wrapper && !!dashboard,
+    enabled: typeof amount === 'bigint' && !!address && !!dashboard,
     queryFn: async () => {
       invariant(address, '[usePreviewMint] address is undefined');
       invariant(
@@ -52,10 +56,15 @@ export const usePreviewMint = () => {
       const [
         remainingUserMintingCapacitySteth,
         remainingVaultMintingCapacitySteth,
+        reserveRatioBP,
       ] = await Promise.all([
         shares.convertToSteth(remainingUserMintingCapacityShares),
         shares.convertToSteth(remainingVaultMintingCapacityShares),
+        wrapper.read.poolReserveRatioBP(),
       ]);
+
+      const reserveRatioPercent =
+        (Number(reserveRatioBP) / VAULT_TOTAL_BASIS_POINTS) * 100;
 
       const maxToMintShares = minBN(
         remainingUserMintingCapacityShares,
@@ -66,6 +75,14 @@ export const usePreviewMint = () => {
         remainingVaultMintingCapacitySteth,
       );
 
+      const expectedMintedSteth = factorMulBN(
+        amount,
+        1 - reserveRatioPercent / 100,
+      );
+
+      const expectedMintedStethShares =
+        await shares.convertToShares(expectedMintedSteth);
+
       return {
         maxToMintShares,
         remainingUserMintingCapacityShares,
@@ -74,36 +91,32 @@ export const usePreviewMint = () => {
         maxToMintSteth,
         remainingUserMintingCapacitySteth,
         remainingVaultMintingCapacitySteth,
+
+        expectedMintedSteth,
+        expectedMintedStethShares,
+        reserveRatioPercent,
       };
     },
   });
 
-  const expectedMintedAmount =
-    mintingLimits &&
-    amount &&
-    factorMulBN(amount, 1 - mintingLimits.reserveRatioPercent / 100);
+  const maxMint =
+    (tokenToMint === 'STETH'
+      ? query.data?.maxToMintSteth
+      : query.data?.maxToMintShares) ?? 0n;
+  const expectedMint =
+    (tokenToMint === 'STETH'
+      ? query.data?.expectedMintedSteth
+      : query.data?.expectedMintedStethShares) ?? 0n;
 
-  const shouldShowWarning =
-    query.data?.maxToMintSteth !== undefined &&
-    expectedMintedAmount &&
-    !isEqualEpsilonBN(expectedMintedAmount, query.data?.maxToMintSteth);
+  const shouldShowWarning = !isEqualEpsilonBN(maxMint, expectedMint);
 
-  const mintingSpread =
-    expectedMintedAmount && query.data?.maxToMintSteth !== undefined
-      ? query.data.maxToMintSteth - expectedMintedAmount
-      : 0n;
-
-  const wrapperdMintingSpread =
-    amount && mintingLimits && query.data?.maxToMintShares !== undefined
-      ? query.data.maxToMintShares -
-        factorMulBN(amount, 1 - mintingLimits.reserveRatioPercent / 100)
-      : 0n;
+  const mintingSpread = maxMint - expectedMint;
 
   return {
     ...query,
     shouldShowWarning,
-    expectedMintedAmount,
+    maxMint,
+    expectedMint,
     mintingSpread,
-    wrappedMintingSpread: wrapperdMintingSpread,
   };
 };

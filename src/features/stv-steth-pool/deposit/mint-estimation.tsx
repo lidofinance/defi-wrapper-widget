@@ -1,7 +1,5 @@
-import { useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Alert, Flex, Text } from '@chakra-ui/react';
-import { useMintingLimits } from '@/modules/defi-wrapper';
 import { MintTokenSwitch } from '@/shared/components/mint-token-switch';
 import { FormatPercent, FormatToken } from '@/shared/formatters';
 import { FormatTokenWithIcon } from '@/shared/formatters/format-token-with-icon';
@@ -20,28 +18,18 @@ export const MintEstimation = () => {
   });
 
   const { setValue } = useFormContext<DepositFormValues>();
-  const { data } = useMintingLimits();
 
+  // preview minted (w)steth and if they corresond to depsoit amount by RR (tokenToMint aware)
   const {
-    data: previewData,
+    data: mintData,
+    isLoading,
     shouldShowWarning,
     mintingSpread,
-    wrappedMintingSpread,
-    isLoading,
-    expectedMintedAmount,
+    expectedMint,
+    maxMint,
   } = usePreviewMint();
 
   const isPositiveMint = mintingSpread > 0n;
-
-  const maxMintableAmount = useMemo(() => {
-    return tokenToMint === 'STETH'
-      ? previewData?.maxToMintSteth || 0n
-      : previewData?.maxToMintShares || 0n;
-  }, [previewData, tokenToMint]);
-
-  const spread = useMemo(() => {
-    return tokenToMint === 'STETH' ? mintingSpread : wrappedMintingSpread;
-  }, [mintingSpread, tokenToMint, wrappedMintingSpread]);
 
   const onTokenChange = (newToken: MintableTokens) => {
     setValue('tokenToMint', newToken);
@@ -71,17 +59,17 @@ export const MintEstimation = () => {
             pr={1}
             token={tokenToMint}
             isLoading={isLoading}
-            amount={maxMintableAmount}
+            amount={maxMint}
           />
           <Text fontSize="sm" color={'fg.subtle'}>
             Reserve ratio{' '}
             <FormatPercent
               decimals="percent"
-              value={data?.reserveRatioPercent}
+              value={mintData?.reserveRatioPercent}
             />{' '}
             <ReserveRatioTooltip
               tokenToMint={tokenToMint}
-              reserveRatioPercent={data?.reserveRatioPercent}
+              reserveRatioPercent={mintData?.reserveRatioPercent}
             />
           </Text>
         </Flex>
@@ -96,7 +84,7 @@ export const MintEstimation = () => {
               <>
                 Extra{' '}
                 <FormatToken
-                  amount={spread}
+                  amount={mintingSpread}
                   token={tokenToMint}
                   showSymbolOnFallback={true}
                   fallback="N/A"
@@ -107,8 +95,8 @@ export const MintEstimation = () => {
             ) : (
               <MintEstimationWarning
                 tokenToMint={tokenToMint}
-                expectedMintedAmount={expectedMintedAmount}
-                maxMintableAmount={maxMintableAmount}
+                expectedMintedAmount={expectedMint}
+                maxMintableAmount={maxMint}
               />
             )}
           </Alert.Title>

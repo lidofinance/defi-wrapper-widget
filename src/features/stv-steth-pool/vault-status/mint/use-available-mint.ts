@@ -2,7 +2,7 @@ import { usePublicClient } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
 import { useStvSteth } from '@/modules/defi-wrapper';
-import { readWithReport, useVault } from '@/modules/vaults';
+import { readWithReport, useVault, getLidoV3Contract } from '@/modules/vaults';
 import { useDappStatus, useLidoSDK } from '@/modules/web3';
 import { minBN } from '@/utils/bn';
 
@@ -21,6 +21,8 @@ export const useAvailableMint = () => {
       invariant(wrapper, 'Wrapper is not defined');
       invariant(dashboard, 'Dashboard is not defined');
 
+      const lidoV3 = getLidoV3Contract(publicClient);
+
       const [
         totalMintedStethShares,
         remainingMintableVaultShares,
@@ -35,8 +37,17 @@ export const useAvailableMint = () => {
         ],
       });
 
+      const [maxMintableExternalShares, currentMintedExternalShares] =
+        await Promise.all([
+          lidoV3.read.getMaxMintableExternalShares(),
+          lidoV3.read.getExternalShares(),
+        ]);
+
       const mintableShares = minBN(
-        remainingMintableVaultShares,
+        minBN(
+          remainingMintableVaultShares,
+          maxMintableExternalShares - currentMintedExternalShares,
+        ),
         remainingMintableUserShares,
       );
 
