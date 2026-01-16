@@ -19,7 +19,6 @@ export const ReserveRatioTooltip = React.forwardRef<
   ref,
 ) {
   const content = (
-    // todo: dont hardcode width
     <VStack align="stretch" width="350px" maxWidth={'100vw'}>
       <Text fontSize="sm" fontWeight="bold">
         Reserve ratio{' '}

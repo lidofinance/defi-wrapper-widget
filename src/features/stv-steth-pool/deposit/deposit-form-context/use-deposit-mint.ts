@@ -81,7 +81,6 @@ export const useDepositMint = () => {
           ]);
 
         // TODO: check for roudning issues overstepping max minting capacity by 1 wei
-        // TOOD: limit by LIDO tvl
         let maxMintShares = minBN(
           remainingUserMintingCapacityShares,
           remainingVaultMintingCapacityShares,
