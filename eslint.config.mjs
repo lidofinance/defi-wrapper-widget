@@ -1,36 +1,72 @@
-import typescriptEslint from '@typescript-eslint/eslint-plugin';
-import typescriptParser from '@typescript-eslint/parser';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'eslint/config';
 import boundaries from 'eslint-plugin-boundaries';
 import importPlugin from 'eslint-plugin-import';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
-import prettier from 'eslint-plugin-prettier/recommended';
+import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
-export default [
-  prettier,
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default defineConfig(
   {
     ignores: ['node_modules/**', 'dist/**', 'build/**'],
   },
+  prettierRecommended,
   {
+    files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
     languageOptions: {
+      parser: tseslint.parser,
       ecmaVersion: 2022,
       sourceType: 'module',
-      parser: typescriptParser,
       parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
+        ecmaFeatures: { jsx: true },
+        projectService: {
+          allowDefaultProject: ['*.mjs', '*.cjs'],
         },
-        tsconfigRootDir: '.',
+        tsconfigRootDir: __dirname,
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
       },
     },
     plugins: {
-      '@typescript-eslint': typescriptEslint,
       'react-hooks': reactHooks,
-      react,
+      react: react,
       import: importPlugin,
       'jsx-a11y': jsxA11y,
-      boundaries,
+      boundaries: boundaries,
+      '@typescript-eslint': tseslint.plugin,
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+      'boundaries/elements': [
+        {
+          type: 'feature',
+          pattern: 'src/features/*',
+        },
+        {
+          type: 'global-feature',
+          pattern: '@/features/*',
+        },
+        {
+          type: 'shared',
+          pattern: '@/shared/*',
+        },
+      ],
+      'import/resolver': {
+        typescript: {
+          project: './tsconfig.json',
+        },
+      },
     },
     rules: {
       'prefer-const': 'error',
@@ -53,7 +89,6 @@ export default [
       '@typescript-eslint/no-shadow': 'off',
       'jsx-a11y/no-autofocus': 'off',
       'jsx-a11y/anchor-is-valid': 'off',
-      '@next/next/no-img-element': 'off',
       'no-console': ['error', { allow: ['warn', 'error', 'info', 'debug'] }],
       'react-hooks/exhaustive-deps': ['error'],
       '@typescript-eslint/no-unused-vars': [
@@ -133,30 +168,6 @@ export default [
         },
       ],
     },
-    settings: {
-      react: {
-        version: 'detect',
-      },
-      'boundaries/elements': [
-        {
-          type: 'feature',
-          pattern: 'src/features/*',
-        },
-        {
-          type: 'global-feature',
-          pattern: '@/features/*',
-        },
-        {
-          type: 'shared',
-          pattern: '@/shared/*',
-        },
-      ],
-      'import/resolver': {
-        typescript: {
-          project: './tsconfig.json',
-        },
-      },
-    },
   },
   {
     files: ['src/app.tsx'],
@@ -164,4 +175,4 @@ export default [
       'no-restricted-imports': 'off',
     },
   },
-];
+);

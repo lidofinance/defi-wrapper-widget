@@ -466,11 +466,9 @@ export const useGGVStrategyPosition = () => {
         metadata: request.metadata,
       });
 
-      const pendingGGVRequests =
-        withdrawalRequestsQuery.data.requests.openRequests.map(toRequest);
+      const pendingGGVRequests = requests.openRequests.map(toRequest);
 
-      const expiredGGVRequests =
-        withdrawalRequestsQuery.data.requests.expiredRequests.map(toRequest);
+      const expiredGGVRequests = requests.expiredRequests.map(toRequest);
 
       return {
         pendingGGVRequests,

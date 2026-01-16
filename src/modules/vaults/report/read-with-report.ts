@@ -10,10 +10,10 @@ import { getLazyOracleContract } from '../contracts';
 import type { VaultReportType } from '../types';
 
 type ReadWithReportArgs<
-  TContracts extends
-    readonly unknown[] = readonly (ContractFunctionParameters & {
-    from?: Address;
-  })[],
+  TContracts extends readonly unknown[] =
+    readonly (ContractFunctionParameters & {
+      from?: Address;
+    })[],
 > = {
   publicClient: RegisteredPublicClient;
   contracts: TContracts;
