@@ -180,12 +180,17 @@ export const useWithdrawalRepay = () => {
                 loadingDescription: DEFAULT_LOADING_DESCRIPTION,
               });
 
-              // todo: extreme share rate might cause amountInStv to be rightfully 0
               const amountInStv = await convertFromEthToStv(
                 publicClient,
                 activeVault.report,
                 amount,
               );
+
+              if (amountInStv <= 0n) {
+                throw new Error(
+                  `[useWithdrawalRepay] calculated amountInStv is 0 for requested ETH amount: ${requestedETHAmount}`,
+                );
+              }
 
               calls.push({
                 ...withdrawalQueue.encode.requestWithdrawal([

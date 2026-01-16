@@ -1,12 +1,12 @@
-import React from 'react';
+import { useMintingLimits } from '@/modules/defi-wrapper';
 import { FormatPercent } from '@/shared/formatters';
 import { DashboardVaultDetails } from '@/shared/wrapper/dashboard';
-import { useMintingLimits } from '@/modules/defi-wrapper';
 
 export const VaultDetails = () => {
   const { data: mintData } = useMintingLimits();
   return (
     <DashboardVaultDetails
+      showMaxTVL={true}
       showLiquidityFee={true}
       vaultDescription={
         <>

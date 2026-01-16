@@ -93,22 +93,35 @@ export const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
     };
   }, [defaultChainId, supportedChainIds]);
 
-  const backendRPC: Record<number, string> = useMemo(
-    () =>
-      supportedChainIds.reduce(
-        (res, curr) => ({
-          ...res,
-          //TODO: support multiple fallback urls
-          [curr]: publicElRpcUrls[curr as CHAINS]?.[0] || '',
-        }),
-        {},
-      ),
-    [supportedChainIds, publicElRpcUrls],
-  );
+  const {
+    rpcUrlsByChain,
+    singleRpcUrlByChain,
+  }: {
+    rpcUrlsByChain: Record<number, string[]>;
+    singleRpcUrlByChain: Record<number, string>;
+  } = useMemo(() => {
+    const rpcUrlsByChain = supportedChainIds.reduce(
+      (res, curr) => ({
+        ...res,
+        [curr]: publicElRpcUrls[curr as CHAINS] || [],
+      }),
+      {},
+    );
+
+    const singleRpcUrlByChain = supportedChainIds.reduce(
+      (res, curr) => ({
+        ...res,
+        [curr]: publicElRpcUrls[curr as CHAINS][0],
+      }),
+      {},
+    );
+
+    return { rpcUrlsByChain, singleRpcUrlByChain };
+  }, [supportedChainIds, publicElRpcUrls]);
 
   const { transportMap, onActiveConnection } = useWeb3Transport(
     supportedChains,
-    backendRPC,
+    rpcUrlsByChain,
   );
 
   // Separate wagmi config for readonly Mainnet (powers USD feeds, ENS and etc)
@@ -118,7 +131,7 @@ export const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
       batchSize: PROVIDER_MAX_BATCH,
     };
 
-    const rpcUrlMainnet = backendRPC[CHAINS.Mainnet];
+    const rpcUrlMainnet = rpcUrlsByChain[CHAINS.Mainnet] ?? [];
 
     const mainnetConfig = createConfig({
       chains: [WagmiChains.mainnet],
@@ -131,10 +144,12 @@ export const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
       transports: {
         [WagmiChains.mainnet.id]: fallback([
           // api/rpc
-          http(rpcUrlMainnet, {
-            batch: batchConfig,
-            name: rpcUrlMainnet,
-          }),
+          ...rpcUrlMainnet.map((url) =>
+            http(url, {
+              batch: batchConfig,
+              name: url,
+            }),
+          ),
           // fallback rpc from wagmi.chains like cloudfare-eth
           http(undefined, {
             batch: batchConfig,
@@ -151,12 +166,12 @@ export const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
       .extend(publicActions) as MainnetPublicClient;
 
     return { mainnetConfig, publicClientMainnet };
-  }, [backendRPC]);
+  }, [rpcUrlsByChain]);
 
   const { wagmiConfig, reefKnotConfig, walletsModalConfig } = useMemo(() => {
     return getDefaultConfig({
       // Reef-Knot config args
-      rpc: backendRPC,
+      rpc: singleRpcUrlByChain,
       defaultChain: defaultChain,
       walletconnectProjectId,
       walletsList: WalletsListEthereum,
@@ -177,7 +192,7 @@ export const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
       walletsShown: WALLETS_SHOWN,
     });
   }, [
-    backendRPC,
+    singleRpcUrlByChain,
     supportedChains,
     defaultChain,
     walletconnectProjectId,

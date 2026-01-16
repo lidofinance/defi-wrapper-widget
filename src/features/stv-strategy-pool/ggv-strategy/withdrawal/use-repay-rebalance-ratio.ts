@@ -3,13 +3,13 @@ import { usePublicClient } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
 import { useStvStrategy } from '@/modules/defi-wrapper';
-import { readWithReport, useVault } from '@/modules/vaults';
-import { VaultReportType } from '@/modules/vaults/types';
+import { readWithReport, useVault, VaultReportType } from '@/modules/vaults';
 import {
   RegisteredPublicClient,
   useDappStatus,
   useLidoSDK,
 } from '@/modules/web3';
+import { useDebouncedValue } from '@/shared/hooks';
 import { minBN, maxBN } from '@/utils/bn';
 
 const useRepayStaticData = () => {
@@ -100,28 +100,32 @@ export const useRepayRebalanceRatio = (amount?: bigint | null) => {
 
   const { data: repayStaticData } = useRepayStaticData();
 
-  // TODO: debounce amount
-  return useQuery({
+  const debouncedAmount = useDebouncedValue(amount, null, 500);
+
+  const isDebouncing = debouncedAmount !== amount;
+
+  const query = useQuery({
     queryKey: [
       ...queryKeys.state,
       'rebalance-ratio',
       {
-        amount: amount?.toString(),
+        amount: debouncedAmount?.toString(),
         // dependencies that don't need to be refetched on amount change
         sharesBalance: repayStaticData?.sharesBalance.toString(),
         unlockedUserEth: repayStaticData?.unlockedUserEth.toString(),
         mintedShares: repayStaticData?.mintedShares.toString(),
       },
     ],
-    enabled: !!activeVault && amount !== null && address && !!repayStaticData,
+    enabled:
+      !!activeVault && debouncedAmount !== null && address && !!repayStaticData,
     queryFn: async () => {
       invariant(activeVault, 'Active vault is required');
-      invariant(typeof amount == 'bigint', 'Amount is required');
+      invariant(typeof debouncedAmount == 'bigint', 'Amount is required');
       invariant(repayStaticData, 'Repay static data is required');
 
       const { sharesBalance, unlockedUserEth, mintedShares } = repayStaticData;
 
-      const lockedUserEth = amount - unlockedUserEth;
+      const lockedUserEth = debouncedAmount - unlockedUserEth;
 
       // no need to repay/rebalance if unlocked ETH covers the withdrawal amount
       if (lockedUserEth <= 0n) {
@@ -130,7 +134,7 @@ export const useRepayRebalanceRatio = (amount?: bigint | null) => {
           rebalanceableStethShares: 0n,
           repayableSteth: 0n,
           rebalanceableSteth: 0n,
-          remainingWithdrawEth: amount,
+          remainingWithdrawEth: debouncedAmount,
         };
       }
 
@@ -157,7 +161,7 @@ export const useRepayRebalanceRatio = (amount?: bigint | null) => {
         shares.convertToSteth(rebalanceableStethShares),
       ]);
 
-      const remainingWithdrawEth = amount - rebalanceableSteth;
+      const remainingWithdrawEth = debouncedAmount - rebalanceableSteth;
 
       return {
         repayableStethShares,
@@ -168,4 +172,10 @@ export const useRepayRebalanceRatio = (amount?: bigint | null) => {
       };
     },
   });
+
+  return {
+    ...query,
+    isPending: query.isPending || isDebouncing,
+    isLoading: query.isLoading || isDebouncing,
+  };
 };

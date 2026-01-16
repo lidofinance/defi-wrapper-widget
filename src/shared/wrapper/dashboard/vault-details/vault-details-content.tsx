@@ -3,20 +3,24 @@ import { Flex, Text, VStack } from '@chakra-ui/react';
 import { useDefiWrapper, useWrapperTvl } from '@/modules/defi-wrapper';
 import { useVaultApr, useVaultFees } from '@/modules/vaults';
 import { trimAddress } from '@/shared/components/address';
-import { InfoRow } from '@/shared/components/info-row/info-row';
+import { InfoRow } from '@/shared/components/info-row';
 import { FormatPercent, FormatPrice, FormatToken } from '@/shared/formatters';
 import { AddressLinkEtherscan } from '@/shared/wallet/components/address-link-etherscan';
 import { APYTooltip } from '@/shared/wrapper/apy-tooltip';
 
+import { MaxTvlRow } from './max-tvl-row';
+
 export type VaultDetailsContentProps = {
   showLiquidityFee: boolean;
   vaultDescription: ReactNode | string;
+  showMaxTVL?: boolean;
   additionalContent?: ReactNode;
 };
 
 export const VaultDetailsContent = ({
   showLiquidityFee,
   vaultDescription,
+  showMaxTVL,
   additionalContent,
 }: VaultDetailsContentProps) => {
   const { wrapper } = useDefiWrapper();
@@ -56,19 +60,7 @@ export const VaultDetailsContent = ({
             </>
           }
         />
-        {/*todo: add later*/}
-        {/*{showMaxTVL && (*/}
-        {/*  <InfoRow*/}
-        {/*    description={'Maximum TVL'}*/}
-        {/*    info={*/}
-        {/*      <>*/}
-        {/*        <FormatToken amount={maxTvlETH} symbol="ETH" />*/}
-        {/*        &nbsp;(*/}
-        {/*        <FormatPrice amount={msxTvlUSD} currency="USD" />)*/}
-        {/*      </>*/}
-        {/*    }*/}
-        {/*  />*/}
-        {/*)}*/}
+        {showMaxTVL && <MaxTvlRow />}
         <InfoRow
           description={'Contract address'}
           isLoading={false}

@@ -1,8 +1,7 @@
 import { useCallback } from 'react';
 import type { ContractFunctionParameters } from 'viem';
 import invariant from 'tiny-invariant';
-import { readWithReport } from '@/modules/vaults';
-import type { VaultReportType } from '@/modules/vaults/types';
+import { readWithReport, VaultReportType } from '@/modules/vaults';
 import type { RegisteredPublicClient } from '@/modules/web3';
 import { useDefiWrapper } from '../wrapper-provider';
 

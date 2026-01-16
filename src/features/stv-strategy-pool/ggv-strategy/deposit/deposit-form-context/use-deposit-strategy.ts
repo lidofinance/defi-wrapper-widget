@@ -21,7 +21,7 @@ import {
   useTransactionModal,
 } from '@/shared/components/transaction-modal';
 import { getReferralAddress } from '@/shared/wrapper/refferals/get-refferal-address';
-import { minBN, maxBN } from '@/utils/bn';
+import { minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
 import { useGGVStrategy } from '../../hooks/use-ggv-strategy';
@@ -96,6 +96,7 @@ export const useDepositStrategy = () => {
                 });
 
               // TODO: check for roudning issues overstepping max minting capacity by 1 wei
+              // TOOD: limit by LIDO tvl
               const maxMintShares = minBN(
                 proxyCapacityShares,
                 vaultCapacityShares,

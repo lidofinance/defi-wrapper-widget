@@ -3,8 +3,7 @@ import { usePublicClient } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
 import { useStvSteth } from '@/modules/defi-wrapper';
-import { readWithReport, useVault } from '@/modules/vaults';
-import { VaultReportType } from '@/modules/vaults/types';
+import { readWithReport, useVault, VaultReportType } from '@/modules/vaults';
 import {
   RegisteredPublicClient,
   useDappStatus,
