@@ -3,7 +3,7 @@ import { usePublicClient } from 'wagmi';
 import { LidoSDKWrap } from '@lidofinance/lido-ethereum-sdk/wrap';
 import { useQuery } from '@tanstack/react-query';
 import { useDappStatus } from '@/modules/web3';
-import { ONE_wstETH } from '@/modules/web3/untis';
+import { ONE_wstETH } from '@/modules/web3/units';
 
 import { useEthUsd } from './use-eth-usd';
 

@@ -4,8 +4,8 @@ import invariant from 'tiny-invariant';
 
 // Devnet deployments -- NONE
 // Main deployments
-import hoodiSet from '@/networks/hoodi.json' assert { type: 'json' };
-import mainnetSet from '@/networks/mainnet.json' assert { type: 'json' };
+import hoodiSet from '@/networks/hoodi.json';
+import mainnetSet from '@/networks/mainnet.json';
 
 import type { API_NAMES, CONTRACT_NAMES, NetworkConfig } from './const';
 import { USER_CONFIG } from '../user-config';

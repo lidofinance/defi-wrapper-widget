@@ -22,10 +22,8 @@ type ContractType = {
 
 type EncodableContract<
   TContract extends ContractType,
-  TSimulate extends
-    TContract['simulate'] = TContract['simulate'] extends undefined
-    ? never
-    : TContract['simulate'],
+  TSimulate extends TContract['simulate'] =
+    TContract['simulate'] extends undefined ? never : TContract['simulate'],
   TRead extends TContract['read'] = TContract['read'] extends undefined
     ? never
     : TContract['read'],

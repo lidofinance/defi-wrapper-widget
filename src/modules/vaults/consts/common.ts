@@ -6,7 +6,6 @@ export const LAZY_ORACLE_ROOT_HASH_SLOT =
 
 export const VAULT_REPORT_REFETCH_INTERVAL_MS = 60_000; // 1 minute
 
-// TOOD: remove in favor on bigint only calc
 export const VAULT_TOTAL_BASIS_POINTS = 10_000;
 export const VAULT_TOTAL_BASIS_POINTS_BN = 10_000n;
 

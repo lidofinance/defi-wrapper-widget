@@ -18,8 +18,7 @@ export const useReportCalls = () => {
     const lazyOracle = getLazyOracleContract(publicClient);
 
     lazyOracle.read.latestReportData().then((latestReport) => {
-      // eslint-disable-next-line no-console
-      console.log('DEBUGGING INFO, SCREENSHOT ME', {
+      console.debug('DEBUGGING INFO, SCREENSHOT ME', {
         latestReport,
         report,
         isReportFresh,

@@ -35,7 +35,8 @@ export const getReferralAddress = async (
 
     // the provided 'input' is not an Ethereum address, nor a ENS address, returning the fallback
     return fallback;
-  } catch (e) {
+  } catch (error) {
+    console.warn('getReferralAddress error:', error);
     // something went wrong during getting the address
     throw new ReferralAddressError();
   }

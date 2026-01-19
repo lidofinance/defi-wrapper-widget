@@ -36,12 +36,6 @@ export const DepositFormResolver: Resolver<
       100n,
       'Minimum deposit is 100 wei',
     );
-    validateBigintMax(
-      'amount',
-      values.amount,
-      tokenData.balance,
-      'Insufficient balance',
-    );
 
     tokenData.maxDeposit !== null &&
       validateBigintMax(
@@ -50,6 +44,13 @@ export const DepositFormResolver: Resolver<
         tokenData.maxDeposit,
         'Exceeds maximum deposit limit',
       );
+
+    validateBigintMax(
+      'amount',
+      values.amount,
+      tokenData.balance,
+      'Insufficient balance',
+    );
 
     return {
       values: {
