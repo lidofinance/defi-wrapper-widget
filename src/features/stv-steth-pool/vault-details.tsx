@@ -15,7 +15,7 @@ export const VaultDetails = () => {
           repaid on withdrawal according to the Reserve Ratio{' '}
           <FormatPercent
             decimals="percent"
-            // hide loading data
+            //this hides loading data
             fallback=""
             value={vaultCapacity?.reserveRatioPercent}
           />
