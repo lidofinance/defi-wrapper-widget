@@ -59,6 +59,8 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
     resolver: WithdrawalFormResolver,
   });
 
+  const isFormLoading = formObject.formState.isLoading;
+
   const onSubmit = useCallback(
     async (values: WithdrawalFormValidatedValues) => {
       const result = await withdrawal(values);
@@ -73,9 +75,9 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
   const value = useMemo<WithdrawalFormContextType>(() => {
     return {
       maxAvailable: assets,
-      isLoading,
+      isLoading: isLoading || isFormLoading,
     };
-  }, [assets, isLoading]);
+  }, [assets, isLoading, isFormLoading]);
 
   return (
     <WithdrawalFormContext.Provider value={value}>
