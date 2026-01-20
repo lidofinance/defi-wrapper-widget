@@ -5,20 +5,20 @@ import {
   VaultInfoEntry,
   VaultInfoSection,
 } from '@/shared/components/vault-info';
-import { MintableTokens } from '../../deposit/deposit-form-context/types';
+import { MINT_TOKENS_VALUE_TYPE } from '@/shared/hook-form/validation';
 import { useAvailableMint } from './use-available-mint';
 import { useMintRequest } from './use-mint-request';
 
 type MintedStethProps = {
   amount?: bigint;
-  token: MintableTokens;
-  onTokenChange: (t: MintableTokens) => void;
+  token: MINT_TOKENS_VALUE_TYPE;
+  onTokenChange: (t: MINT_TOKENS_VALUE_TYPE) => void;
 };
 
 type MintableStethProps = {
   amount?: bigint;
   amountStethShares?: bigint;
-  token: MintableTokens;
+  token: MINT_TOKENS_VALUE_TYPE;
 };
 
 const MintedSteth = ({ token, onTokenChange, amount }: MintedStethProps) => {
@@ -86,7 +86,7 @@ export const Mint = () => {
     isSustainableMint,
     isEmpty,
   } = useAvailableMint();
-  const [token, setToken] = useState<MintableTokens>('STETH');
+  const [token, setToken] = useState<MINT_TOKENS_VALUE_TYPE>('STETH');
 
   if (isEmpty) {
     return null;

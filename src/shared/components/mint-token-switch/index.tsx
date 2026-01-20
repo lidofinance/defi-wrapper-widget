@@ -1,15 +1,13 @@
 import React from 'react';
 import { Button, Span, Text } from '@chakra-ui/react';
-import type { Token } from '@/types/token';
+import { MINT_TOKENS_VALUE_TYPE } from '@/shared/hook-form/validation';
 import { tokenLabel } from '@/utils/token-label';
 import RepayIcon from 'assets/icons/repay.svg?react';
 
-type MintableTokens = Extract<Token, 'WSTETH' | 'STETH'>;
-
 type MintTokenSwitchProps = {
   label: string;
-  token: MintableTokens;
-  onTokenChange: (token: MintableTokens) => void;
+  token: MINT_TOKENS_VALUE_TYPE;
+  onTokenChange: (token: MINT_TOKENS_VALUE_TYPE) => void;
 };
 
 export const MintTokenSwitch: React.FC<MintTokenSwitchProps> = ({

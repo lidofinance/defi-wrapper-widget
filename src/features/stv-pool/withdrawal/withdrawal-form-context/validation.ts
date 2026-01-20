@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
 
-import { tokenAmountSchema } from '@/shared/hook-form/validation/zod-validation';
+import { tokenAmountSchema } from '@/shared/hook-form/validation';
 import { awaitWithTimeout } from '@/utils/await-with-timeout';
 
 import type {

@@ -1,4 +1,4 @@
-import type { DEPOSIT_TOKENS_VALUE_TYPE } from '@/shared/hook-form/validation/zod-validation';
+import type { DEPOSIT_TOKENS_VALUE_TYPE } from '@/shared/hook-form/validation';
 import type { depositFormValidationSchema } from './validation';
 import type z from 'zod';
 

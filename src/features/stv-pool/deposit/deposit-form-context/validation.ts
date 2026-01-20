@@ -6,7 +6,7 @@ import z from 'zod';
 import {
   depositTokenSchema,
   tokenAmountSchema,
-} from '@/shared/hook-form/validation/zod-validation';
+} from '@/shared/hook-form/validation';
 import { awaitWithTimeout } from '@/utils/await-with-timeout';
 
 import type {
