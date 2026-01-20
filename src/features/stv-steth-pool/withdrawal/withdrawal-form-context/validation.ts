@@ -1,68 +1,60 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import invariant from 'tiny-invariant';
-import { validateBigintMax } from '@/shared/hook-form/validation/validate-bigint-max';
-import { validateBigintMin } from '@/shared/hook-form/validation/validate-bigint-min';
-import { validateEtherAmount } from '@/shared/hook-form/validation/validate-ether-amount';
-import { handleResolverValidationError } from '@/shared/hook-form/validation/validation-error';
+import { z } from 'zod';
+
+import {
+  mintTokenSchema,
+  tokenAmountSchema,
+} from '@/shared/hook-form/validation/zod-validation';
 import { awaitWithTimeout } from '@/utils/await-with-timeout';
+
 import type {
   WithdrawalFormValidatedValues,
+  WithdrawalFormValidationAsyncContextType,
   WithdrawalFormValidationContextType,
   WithdrawalFormValues,
 } from './types';
 import type { Resolver } from 'react-hook-form';
 
+export const withdrawalFormValidationSchema = ({
+  balanceInEth,
+  maxWithdrawalInEth,
+  minWithdrawalInEth,
+}: WithdrawalFormValidationAsyncContextType) => {
+  let amountSchema = tokenAmountSchema(
+    balanceInEth,
+    maxWithdrawalInEth ?? undefined,
+    'Exceeds maximum withdrawal limit',
+  ).gte(100n, 'Minimum withdrawal is 100 wei');
+
+  if (minWithdrawalInEth !== null) {
+    amountSchema = amountSchema.gte(
+      minWithdrawalInEth,
+      'Exceeds minimum withdrawal limit',
+    );
+  }
+
+  return z.object({
+    token: z.literal('ETH'),
+    amount: amountSchema,
+    repayToken: mintTokenSchema,
+  });
+};
+
 export const WithdrawalFormResolver: Resolver<
   WithdrawalFormValues,
   WithdrawalFormValidationContextType,
   WithdrawalFormValidatedValues
-> = async (values, context) => {
+> = async (values, context, options) => {
   invariant(context, '[WithdrawalFormResolver] context is undefined');
-  try {
-    validateEtherAmount('amount', values.amount, 'ETH');
 
-    if (!context.isWalletConnected) {
-      throw new Error('Wallet is not connected');
-    }
+  const contextValue = await awaitWithTimeout(context.asyncContext, 4000);
 
-    const contextValue = await awaitWithTimeout(context.asyncContext, 4000);
+  const schema = withdrawalFormValidationSchema(contextValue);
 
-    validateBigintMin(
-      'amount',
-      values.amount,
-      100n,
-      'Minimum withdrawal is 100 wei',
-    );
-    validateBigintMax(
-      'amount',
-      values.amount,
-      contextValue.balanceInEth,
-      'Insufficient balance',
-    );
-
-    contextValue.maxWithdrawalInEth !== null &&
-      validateBigintMax(
-        'amount',
-        values.amount,
-        contextValue.maxWithdrawalInEth,
-        'Exceeds maximum withdrawal limit',
-      );
-
-    contextValue.minWithdrawalInEth !== null &&
-      validateBigintMin(
-        'amount',
-        values.amount,
-        contextValue.minWithdrawalInEth,
-        'Exceeds minimum withdrawal limit',
-      );
-
-    return {
-      values: {
-        ...values,
-        amount: values.amount,
-      },
-      errors: {},
-    };
-  } catch (error) {
-    return handleResolverValidationError(error, 'WithdrawalForm', 'token');
-  }
+  return zodResolver<
+    WithdrawalFormValues,
+    unknown,
+    WithdrawalFormValidatedValues
+  >(schema)(values, context, options);
 };

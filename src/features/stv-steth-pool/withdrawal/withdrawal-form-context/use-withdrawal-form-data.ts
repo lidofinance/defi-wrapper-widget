@@ -6,6 +6,7 @@ import { useAwaiter } from '@/shared/hooks';
 import {
   WithdrawalFormValidationAsyncContextType,
   WithdrawalFormValidationContextType,
+  WithdrawalFormValues,
 } from './types';
 
 export const useWithdrawalFormData = () => {
@@ -37,9 +38,20 @@ export const useWithdrawalFormData = () => {
 
   const asyncContext = useAwaiter(contextValue).awaiter;
 
+  const defaultValuesGenerator = useMemo(() => {
+    return () =>
+      asyncContext.then(
+        () =>
+          ({
+            token: 'ETH',
+            amount: null,
+            repayToken: 'STETH',
+          }) as WithdrawalFormValues,
+      );
+  }, [asyncContext]);
+
   const context: WithdrawalFormValidationContextType = useMemo(() => {
     return {
-      token: 'ETH',
       asyncContext,
       isWalletConnected,
     };
@@ -47,6 +59,7 @@ export const useWithdrawalFormData = () => {
 
   return {
     context,
+    defaultValuesGenerator,
     contextValue,
     isLoading: isWQLoading || isWrapperLoading,
   };
