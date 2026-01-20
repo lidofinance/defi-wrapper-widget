@@ -1,10 +1,13 @@
-import type { Token } from '@/types/token';
-
-export type DepositTokens = Extract<Token, 'ETH' | 'WETH'>;
+import type { DEPOSIT_TOKENS_VALUE_TYPE } from '@/shared/hook-form/validation/zod-validation';
+import type { depositFormValidationSchema } from './validation';
+import type z from 'zod';
 
 export type DepositFormValidationAsyncContextType = {
   tokens: {
-    [key in DepositTokens]: { balance: bigint; maxDeposit: bigint | null };
+    [key in DEPOSIT_TOKENS_VALUE_TYPE]: {
+      balance: bigint;
+      maxDeposit: bigint | null;
+    };
   };
 };
 
@@ -13,12 +16,10 @@ export type DepositFormValidationContextType = {
   isWalletConnected: boolean;
 };
 
-export type DepositFormValues = {
-  token: DepositTokens;
-  amount: bigint | null;
-  referral: string | null;
-};
+export type DepositFormValidatedValues = z.infer<
+  ReturnType<typeof depositFormValidationSchema>
+>;
 
-export type DepositFormValidatedValues = DepositFormValues & {
-  amount: NonNullable<DepositFormValues['amount']>;
+export type DepositFormValues = Omit<DepositFormValidatedValues, 'amount'> & {
+  amount: DepositFormValidatedValues['amount'] | null;
 };
