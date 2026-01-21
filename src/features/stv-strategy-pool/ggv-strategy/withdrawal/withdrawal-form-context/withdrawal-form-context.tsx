@@ -39,7 +39,8 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
   const invalidateWrapper = useInvalidateWrapper();
   const { isDappActive } = useDappStatus();
   const { withdrawStrategy } = useWithdrawStrategy();
-  const { context, contextValue, isLoading } = useWithdrawalFormData();
+  const { context, contextValue, isLoading, defaultValuesGenerator } =
+    useWithdrawalFormData();
   const { isWalletWhitelisted } = useWalletWhitelisted();
 
   const formObject = useForm<
@@ -47,19 +48,18 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
     WithdrawalFormValidationContextType,
     WithdrawalFormValidatedValues
   >({
-    defaultValues: {
-      token: 'ETH',
-      amount: null,
-    },
+    defaultValues: defaultValuesGenerator,
     mode: 'onTouched',
     disabled: !isDappActive || !isWalletWhitelisted,
     context,
     resolver: WithdrawalFormResolver,
   });
 
+  const isFormLoading = formObject.formState.isLoading;
+
   const onSubmit = useCallback(
     async (values: WithdrawalFormValidatedValues) => {
-      const result = await withdrawStrategy({ amount: values.amount });
+      const result = await withdrawStrategy(values);
       // partial update might be needed regardless of result
       // dues to possible report change in partial tx
       await invalidateWrapper();
@@ -71,9 +71,9 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
   const value = useMemo<WithdrawalFormContextType>(() => {
     return {
       maxAvailable: contextValue?.balanceInEth,
-      isLoading,
+      isLoading: isLoading || isFormLoading,
     };
-  }, [contextValue, isLoading]);
+  }, [contextValue, isLoading, isFormLoading]);
 
   return (
     <WithdrawalFormContext.Provider value={value}>

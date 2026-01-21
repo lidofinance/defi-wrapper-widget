@@ -43,29 +43,26 @@ export const DepositFormProvider: React.FC<React.PropsWithChildren> = ({
   const invalidateWrapper = useInvalidateWrapper();
   const { isDappActive } = useDappStatus();
   const { deposit } = useDepositMint();
-  const { context, contextValue, isLoading } = useDepositFormData();
+  const { context, contextValue, defaultValuesGenerator, isLoading } =
+    useDepositFormData();
   const { isWalletWhitelisted } = useWalletWhitelisted();
   const formObject = useForm<
     DepositFormValues,
     DepositFormValidationContextType,
     DepositFormValidatedValues
   >({
-    defaultValues: {
-      token: 'ETH',
-      amount: null,
-      referral: null,
-      tokenToMint: 'STETH',
-    },
+    defaultValues: defaultValuesGenerator,
     mode: 'onTouched',
     disabled: !isDappActive || !isWalletWhitelisted,
     context,
     resolver: DepositFormResolver,
   });
 
-  const { setValue } = formObject;
+  const { setValue, formState } = formObject;
   useQueryParamsReferralForm<DepositFormValues>({ setValue });
 
   const { token, tokenToMint } = formObject.watch();
+  const isFormLoading = formState.isLoading;
 
   const onSubmit = useCallback(
     async (values: DepositFormValidatedValues) => {
@@ -85,9 +82,9 @@ export const DepositFormProvider: React.FC<React.PropsWithChildren> = ({
       tokenToMint,
       maxAvailable:
         tokenValue && minBN(tokenValue.balance, tokenValue.maxDeposit),
-      isLoading,
+      isLoading: isLoading || isFormLoading,
     };
-  }, [token, tokenToMint, contextValue, isLoading]);
+  }, [token, tokenToMint, contextValue, isLoading, isFormLoading]);
 
   return (
     <DepositFormContext.Provider value={value}>

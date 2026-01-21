@@ -3,10 +3,8 @@ import { Alert, Flex, Text } from '@chakra-ui/react';
 import { MintTokenSwitch } from '@/shared/components/mint-token-switch';
 import { FormatPercent, FormatToken } from '@/shared/formatters';
 import { FormatTokenWithIcon } from '@/shared/formatters/format-token-with-icon';
-import {
-  DepositFormValues,
-  MintableTokens,
-} from './deposit-form-context/types';
+import { MINT_TOKENS_VALUE_TYPE } from '@/shared/hook-form/validation';
+import { DepositFormValues } from './deposit-form-context/types';
 
 import { usePreviewMint } from './hooks/use-preview-mint';
 import { MintEstimationWarning } from './mint-estimation-warning';
@@ -31,7 +29,7 @@ export const MintEstimation = () => {
 
   const isPositiveMint = mintingSpread > 0n;
 
-  const onTokenChange = (newToken: MintableTokens) => {
+  const onTokenChange = (newToken: MINT_TOKENS_VALUE_TYPE) => {
     setValue('tokenToMint', newToken);
   };
 

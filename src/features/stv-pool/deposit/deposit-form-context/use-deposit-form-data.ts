@@ -8,6 +8,7 @@ import { useAwaiter } from '@/shared/hooks';
 import {
   DepositFormValidationAsyncContextType,
   DepositFormValidationContextType,
+  DepositFormValues,
 } from './types';
 
 export const useDepositFormData = () => {
@@ -34,6 +35,18 @@ export const useDepositFormData = () => {
 
   const asyncContext = useAwaiter(contextValue).awaiter;
 
+  const devaultValuesGenerator = useMemo(() => {
+    return () =>
+      asyncContext.then(
+        () =>
+          ({
+            token: 'ETH',
+            amount: null,
+            referral: null,
+          }) as DepositFormValues,
+      );
+  }, [asyncContext]);
+
   const context: DepositFormValidationContextType = useMemo(() => {
     return {
       asyncContext,
@@ -43,6 +56,7 @@ export const useDepositFormData = () => {
 
   return {
     ethBalanceQuery,
+    devaultValuesGenerator,
     wethBalanceQuery,
     context,
     contextValue,

@@ -4,11 +4,11 @@ import { FiInfo } from 'react-icons/fi';
 import { Circle, HStack, Progress, Text, VStack } from '@chakra-ui/react';
 import { Tooltip } from '@/shared/components/tooltip/tooltip';
 import { FormatPercent } from '@/shared/formatters';
-import { MintableTokens } from '../deposit/deposit-form-context/types';
+import { MINT_TOKENS_VALUE_TYPE } from '@/shared/hook-form/validation';
 
 type ReserveRatioTooltipProps = {
   reserveRatioPercent?: number;
-  tokenToMint: MintableTokens;
+  tokenToMint: MINT_TOKENS_VALUE_TYPE;
 };
 
 export const ReserveRatioTooltip = React.forwardRef<

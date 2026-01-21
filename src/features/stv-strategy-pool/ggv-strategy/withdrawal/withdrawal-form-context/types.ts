@@ -1,4 +1,6 @@
 import type { Token } from '@/types/token';
+import type z from 'zod';
+import type { withdrawalFormValidationSchema } from './validation';
 
 // withdrawal can only be made in ETH
 export type WithdrawalTokens = Extract<Token, 'ETH'>;
@@ -7,7 +9,7 @@ export type WithdrawalFormValidationAsyncContextType = {
   balanceInEth: bigint;
 
   maxWithdrawalInEth: bigint | null;
-  minWithdrawalInEth: bigint;
+  minWithdrawalInEth: bigint | null; // Changed to bigint | null to match schema
 };
 
 export type WithdrawalFormValidationContextType = {
@@ -15,11 +17,13 @@ export type WithdrawalFormValidationContextType = {
   isWalletConnected: boolean;
 };
 
-export type WithdrawalFormValues = {
-  token: WithdrawalTokens;
-  amount: bigint | null;
-};
+export type WithdrawalFormValidatedValues = z.infer<
+  ReturnType<typeof withdrawalFormValidationSchema>
+>;
 
-export type WithdrawalFormValidatedValues = {
-  amount: NonNullable<WithdrawalFormValues['amount']>;
+export type WithdrawalFormValues = Omit<
+  WithdrawalFormValidatedValues,
+  'amount'
+> & {
+  amount: WithdrawalFormValidatedValues['amount'] | null;
 };
