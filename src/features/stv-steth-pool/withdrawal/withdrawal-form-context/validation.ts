@@ -30,7 +30,7 @@ export const withdrawalFormValidationSchema = ({
   if (minWithdrawalInEth !== null) {
     amountSchema = amountSchema.gte(
       minWithdrawalInEth,
-      'Exceeds minimum withdrawal limit',
+      'Below minimum withdrawal limit',
     );
   }
 

@@ -46,6 +46,7 @@ export const WillRepay = () => {
           isLoading={amount != null && isLoading}
           fontWeight="semibold"
           color="fg"
+          fallback="-"
           token={repayToken}
           amount={repayable}
         />
