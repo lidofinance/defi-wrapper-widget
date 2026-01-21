@@ -42,8 +42,7 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
   const invalidateWrapper = useInvalidateWrapper();
   const { isDappActive } = useDappStatus();
   const { withdrawal } = useWithdrawal();
-  const { context, isLoading, defaultValuesGenerator } =
-    useWithdrawalFormData();
+  const { context, isLoading } = useWithdrawalFormData();
   const { assets } = useWrapperBalance();
   const { isWalletWhitelisted } = useWalletWhitelisted();
 
@@ -52,7 +51,10 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
     WithdrawalFormValidationContextType,
     WithdrawalFormValidatedValues
   >({
-    defaultValues: defaultValuesGenerator,
+    defaultValues: {
+      token: 'ETH',
+      amount: null,
+    },
     mode: 'onTouched',
     disabled: !isDappActive || !isWalletWhitelisted,
     context,

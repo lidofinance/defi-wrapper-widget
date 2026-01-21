@@ -45,14 +45,17 @@ export const WithdrawalInputGroup = () => {
       />
       <WillRepay />
       <WaitingTime waitingTime="5 days" />
-      <PositionAfterWithdrawal
-        isLoading={isPositionAfterWithdrawalLoading}
-        vaultBalance={positionAfterWithdrawal?.vaultBalanceETHAfter}
-        mintedSteth={positionAfterWithdrawal?.stethMintedAfter}
-      />
+      {isWalletConnected && (
+        <PositionAfterWithdrawal
+          isLoading={isPositionAfterWithdrawalLoading}
+          vaultBalance={positionAfterWithdrawal?.vaultBalanceETHAfter}
+          mintedSteth={positionAfterWithdrawal?.stethMintedAfter}
+        />
+      )}
       <SubmitButton
         isLoading={
-          isRepayRebalanceRationLoading || isPositionAfterWithdrawalLoading
+          isWalletConnected &&
+          (isRepayRebalanceRationLoading || isPositionAfterWithdrawalLoading)
         }
       >
         Withdraw

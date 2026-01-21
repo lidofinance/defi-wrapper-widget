@@ -40,8 +40,7 @@ export const DepositFormProvider: React.FC<React.PropsWithChildren> = ({
   const invalidateWrapper = useInvalidateWrapper();
   const { isDappActive } = useDappStatus();
   const { deposit } = useDeposit();
-  const { context, contextValue, devaultValuesGenerator, isLoading } =
-    useDepositFormData();
+  const { context, contextValue, isLoading } = useDepositFormData();
   const { isWalletWhitelisted } = useWalletWhitelisted();
 
   const formObject = useForm<
@@ -49,7 +48,12 @@ export const DepositFormProvider: React.FC<React.PropsWithChildren> = ({
     DepositFormValidationContextType,
     DepositFormValidatedValues
   >({
-    defaultValues: devaultValuesGenerator,
+    defaultValues: {
+      token: 'ETH',
+      amount: null,
+      referral: null,
+    },
+
     mode: 'onTouched',
     disabled: !isDappActive || !isWalletWhitelisted,
     context,

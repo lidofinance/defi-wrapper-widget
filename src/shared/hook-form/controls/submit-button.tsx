@@ -70,7 +70,7 @@ export const SubmitButton = ({
       disabled={!isWalletWhitelisted || !isSupportedChain}
       type="submit"
       size={'2xl'}
-      loading={isValidating || isSubmitting || isLoading || isFormLoading}
+      loading={isValidating || isSubmitting || isLoading}
       onClick={handleClick}
     >
       {content}

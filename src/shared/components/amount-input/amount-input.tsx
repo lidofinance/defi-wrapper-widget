@@ -149,7 +149,6 @@ export const AmountInput: React.FC<TokenAmountInputProps> = forwardRef<
             type="text"
             inputMode="decimal"
           />
-          {value}
 
           <Field.Label
             htmlFor="city"
