@@ -1,25 +1,39 @@
-import { useCapabilities } from 'wagmi';
+import { useCapabilities, useConnectorClient } from 'wagmi';
 import { useDappStatus } from './use-dapp-status';
+import type { RegisteredConfig } from '../types';
 
 const isCapabilitySupported = (capability?: {
-  supported?: boolean;
-  status?: 'supported' | 'ready' | 'unsupported';
+  supported?: boolean; // deprecated,legacy
+  status?:
+    | 'ready' // already has smart account
+    | 'supported' // can promt user to swith to one
+    | 'unsupported'; // cannot use smart account
 }) => {
   if (!capability) return false;
 
   if (typeof capability.status === 'string') {
-    return capability.status != 'unsupported';
+    return capability.status === 'ready';
   }
 
   return !!capability.supported;
 };
 
+const scopeKey = (
+  client: ReturnType<typeof useConnectorClient<RegisteredConfig>>['data'],
+) => {
+  if (!client) return 'aa-not-connected';
+  return `aa-${client.uid ?? '<no-uid>'}-${client.account?.address ?? '<no-address>'}-${client.chain?.id ?? '<no-chain>'}-${client.key ?? '<no-key>'}-${client.name ?? '<no-name>'}`;
+};
+
 export const useAA = () => {
+  const { data: connectorClient } = useConnectorClient();
   const { chainId, isAccountActive } = useDappStatus();
   const capabilitiesQuery = useCapabilities({
     query: {
       enabled: isAccountActive,
     },
+    // this cachebuster ensures we re-fetch capabilities when wallet/account/chain changes on edgecases when 2 wallets share same account
+    scopeKey: scopeKey(connectorClient),
   });
 
   // merge capabilities per https://eips.ethereum.org/EIPS/eip-5792
