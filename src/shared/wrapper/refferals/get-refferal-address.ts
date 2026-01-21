@@ -18,7 +18,6 @@ export const getReferralAddress = async (
     // Not all ENS names end with .eth, so we can't detect ENS names easily.
     // The address is a http[s] link, return fallback instead
     if (/^https?:\/\//.test(input)) return fallback;
-    // todo: still need here?
     // Filter out *.lido.fi referrals, e.g. ref from blog.lido.fi
     // Assuming, that no one uses the 'lido.fi' ENS name
     if (input.endsWith('lido.fi')) return fallback;
@@ -36,7 +35,8 @@ export const getReferralAddress = async (
 
     // the provided 'input' is not an Ethereum address, nor a ENS address, returning the fallback
     return fallback;
-  } catch (e) {
+  } catch (error) {
+    console.warn('getReferralAddress error:', error);
     // something went wrong during getting the address
     throw new ReferralAddressError();
   }

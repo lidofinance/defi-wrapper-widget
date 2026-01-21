@@ -1,6 +1,5 @@
-import { useWrapperBalance } from '@/modules/defi-wrapper';
-import { useRequests } from '@/modules/defi-wrapper/hooks/use-requests';
-import { Navigation, TAB } from '@/shared/wrapper/navigation';
+import type { TAB } from '@/shared/wrapper/navigation';
+import { SimplePoolNavigation } from '@/shared/wrapper/simple-pool-navigation';
 
 import { Dashboard } from './dashboard';
 import { Deposit } from './deposit';
@@ -13,10 +12,5 @@ const TABS: TAB[] = [
 ];
 
 export const StvStethPool = () => {
-  const { data: requests } = useRequests();
-  const { assets } = useWrapperBalance();
-
-  const showDashboard = !!assets || requests?.isEmpty === false;
-
-  return <Navigation tabs={TABS} showDashboard={showDashboard} />;
+  return <SimplePoolNavigation tabs={TABS} />;
 };

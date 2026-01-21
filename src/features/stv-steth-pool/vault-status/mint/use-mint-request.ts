@@ -13,13 +13,13 @@ import {
   DEFAULT_SIGNING_DESCRIPTION,
   useTransactionModal,
 } from '@/shared/components/transaction-modal';
+import { MINT_TOKENS_VALUE_TYPE } from '@/shared/hook-form/validation';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
-import { MintableTokens } from '../../deposit/deposit-form-context/types';
 
 type MintRequestParams = {
   tokenAmount: bigint;
-  token: MintableTokens;
+  token: MINT_TOKENS_VALUE_TYPE;
   stethSharesToMint: bigint;
 };
 

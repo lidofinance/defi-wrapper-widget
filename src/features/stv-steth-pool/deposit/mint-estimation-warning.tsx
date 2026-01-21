@@ -1,12 +1,12 @@
 import React from 'react';
 import { FormatToken } from '@/shared/formatters';
+import { MINT_TOKENS_VALUE_TYPE } from '@/shared/hook-form/validation';
 import { tokenLabel } from '@/utils/token-label';
-import { MintableTokens } from './deposit-form-context/types';
 
 export type MintEstimationWarningProps = {
   expectedMintedAmount?: bigint | null;
   maxMintableAmount: bigint;
-  tokenToMint: MintableTokens;
+  tokenToMint: MINT_TOKENS_VALUE_TYPE;
 };
 export const MintEstimationWarning = ({
   expectedMintedAmount,

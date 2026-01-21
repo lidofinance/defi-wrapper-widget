@@ -20,6 +20,7 @@ export const DashboardVaultDetails: React.FC<
   showLiquidityFee,
   vaultDescription,
   additionalContent,
+  showMaxTVL,
   ...props
 }) => {
   const [value, setValue] = useState<string[]>([]);
@@ -56,6 +57,7 @@ export const DashboardVaultDetails: React.FC<
                   showLiquidityFee={showLiquidityFee}
                   vaultDescription={vaultDescription}
                   additionalContent={additionalContent}
+                  showMaxTVL={showMaxTVL}
                 />
               )}
             </Accordion.ItemBody>

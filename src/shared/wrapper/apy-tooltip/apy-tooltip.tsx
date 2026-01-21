@@ -15,8 +15,12 @@ type APYTooltipProps = {
 export const APYTooltip = React.forwardRef<HTMLDivElement, APYTooltipProps>(
   function APYTooltip({ isLoading, lastUpdate, APY, customContent }, ref) {
     const content = (
-      // todo: dont hardcode width
-      <VStack align="stretch" width="368px" background={'black'}>
+      <VStack
+        align="stretch"
+        width="368px"
+        maxWidth={'100%'}
+        background={'black'}
+      >
         <HStack justify="space-between" alignItems="center">
           <Text fontSize="sm" fontWeight="bold">
             Total APY

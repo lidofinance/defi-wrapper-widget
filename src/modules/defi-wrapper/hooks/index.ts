@@ -7,4 +7,3 @@ export * from './use-vault-capacity';
 export * from './use-claim';
 export * from './use-requests';
 export * from './use-withdrawal-queue';
-export * from './use-minting-limits';

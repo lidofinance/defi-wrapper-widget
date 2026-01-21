@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import invariant from 'tiny-invariant';
 import { useWrapperBalance } from '@/modules/defi-wrapper';
 import { useVault } from '@/modules/vaults';
 import { useDappStatus } from '@/modules/web3';

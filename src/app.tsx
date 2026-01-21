@@ -5,8 +5,6 @@ import { ModalProvider } from '@/providers/modal-provider';
 import { system } from '@/theme';
 import { usePostMessageAutoHeight } from '@/utils/use-iframe-resize';
 
-import './styles/App.css';
-
 const App: React.FC = () => {
   usePostMessageAutoHeight('#root');
 

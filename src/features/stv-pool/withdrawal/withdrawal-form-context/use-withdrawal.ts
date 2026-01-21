@@ -55,12 +55,17 @@ export const useWithdrawal = () => {
               const reportCalls = await prepareReportCalls();
               calls.push(...reportCalls);
 
-              // todo: extreme share rate might cause amountInStv to be rightfully 0
               const amountInStv = await convertFromEthToStv(
                 publicClient,
                 activeVault.report,
                 amount,
               );
+
+              if (amountInStv <= 0n) {
+                throw new Error(
+                  `[useWithdrawal] calculated amountInStv is 0 for requested ETH amount: ${requestedETHAmount}`,
+                );
+              }
 
               calls.push({
                 ...withdrawalQueue.encode.requestWithdrawal([

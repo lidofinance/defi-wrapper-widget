@@ -4,6 +4,7 @@ import invariant from 'tiny-invariant';
 import { useStvStrategy } from '@/modules/defi-wrapper';
 import {
   getWethContract,
+  getLidoV3Contract,
   readWithReport,
   useReportCalls,
   useVault,
@@ -21,7 +22,7 @@ import {
   useTransactionModal,
 } from '@/shared/components/transaction-modal';
 import { getReferralAddress } from '@/shared/wrapper/refferals/get-refferal-address';
-import { minBN, maxBN } from '@/utils/bn';
+import { minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
 import { useGGVStrategy } from '../../hooks/use-ggv-strategy';
@@ -61,6 +62,7 @@ export const useDepositStrategy = () => {
         );
 
         const wethContract = getWethContract(publicClient);
+        const lidoV3 = getLidoV3Contract(publicClient);
 
         const depositedETHAmount = formatBalance(amount).actual;
         const TXTitle = `Depositing ${depositedETHAmount} ${tokenLabel('ETH')} to the vault`;
@@ -95,10 +97,21 @@ export const useDepositStrategy = () => {
                   ],
                 });
 
+              const [maxMintableExternalShares, currentMintedExternalShares] =
+                await Promise.all([
+                  lidoV3.read.getMaxMintableExternalShares(),
+                  lidoV3.read.getExternalShares(),
+                ]);
+
               // TODO: check for roudning issues overstepping max minting capacity by 1 wei
-              const maxMintShares = minBN(
+              let maxMintShares = minBN(
                 proxyCapacityShares,
                 vaultCapacityShares,
+              );
+
+              maxMintShares = minBN(
+                maxMintShares,
+                maxMintableExternalShares - currentMintedExternalShares,
               );
 
               const reportCalls = await prepareReportCalls();
