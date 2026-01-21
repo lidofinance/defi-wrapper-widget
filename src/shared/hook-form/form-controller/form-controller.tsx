@@ -43,6 +43,9 @@ export const FormController = <
   // Bind submit action
   const doSubmit = useMemo(() => {
     return handleSubmit(async (args) => {
+      // return early if dapp is inactive
+      // prevents submission while dapps state is invalid
+      if (!isDappActive) return false;
       const success = await onSubmit(args);
       if (success && shouldReset)
         resetDefault(undefined, afterSubmitResetOptions || undefined);
@@ -53,6 +56,7 @@ export const FormController = <
     onSubmit,
     resetDefault,
     shouldReset,
+    isDappActive,
   ]);
 
   // Bind retry callback
