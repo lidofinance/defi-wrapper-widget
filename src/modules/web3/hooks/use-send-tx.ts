@@ -167,7 +167,7 @@ export const useSendTransaction = (
           }
 
           const transactionResult = {
-            isAA,
+            isAA: useSendCalls,
             callStatus,
             receipts: callStatus.receipts,
           } as TransactionResponse;
@@ -243,8 +243,6 @@ export const useSendTransaction = (
   return {
     mutation,
     sendTX: mutation.mutateAsync,
-    // retryEvent,
-    // retryFire,
   };
 };
 
