@@ -18,6 +18,7 @@ export const FormatTokenWithIcon: FC<
   adaptiveDecimals,
   isLoading = false,
   trimEllipsis = true,
+  fallback,
   ...rest
 }) => {
   return (
@@ -38,7 +39,7 @@ export const FormatTokenWithIcon: FC<
         isLoading={isLoading}
         skeletonWidth={skeletonWidth}
         showSymbolOnFallback={true}
-        fallback="N/A"
+        fallback={fallback}
       />
       <TokenIcon token={token} size={'20px'} />
     </Flex>

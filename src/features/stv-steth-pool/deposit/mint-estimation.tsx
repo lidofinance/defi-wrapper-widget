@@ -1,5 +1,6 @@
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Alert, Flex, Text } from '@chakra-ui/react';
+import { useVaultCapacity } from '@/modules/defi-wrapper';
 import { MintTokenSwitch } from '@/shared/components/mint-token-switch';
 import { FormatPercent, FormatToken } from '@/shared/formatters';
 import { FormatTokenWithIcon } from '@/shared/formatters/format-token-with-icon';
@@ -18,14 +19,9 @@ export const MintEstimation = () => {
   const { setValue } = useFormContext<DepositFormValues>();
 
   // preview minted (w)steth and if they corresond to depsoit amount by RR (tokenToMint aware)
-  const {
-    data: mintData,
-    isLoading,
-    shouldShowWarning,
-    mintingSpread,
-    expectedMint,
-    maxMint,
-  } = usePreviewMint();
+  const { isLoading, shouldShowWarning, mintingSpread, expectedMint, maxMint } =
+    usePreviewMint();
+  const { data: vaultCapacity } = useVaultCapacity();
 
   const isPositiveMint = mintingSpread > 0n;
 
@@ -63,11 +59,11 @@ export const MintEstimation = () => {
             Reserve ratio{' '}
             <FormatPercent
               decimals="percent"
-              value={mintData?.reserveRatioPercent}
+              value={vaultCapacity?.reserveRatioPercent}
             />{' '}
             <ReserveRatioTooltip
               tokenToMint={tokenToMint}
-              reserveRatioPercent={mintData?.reserveRatioPercent}
+              reserveRatioPercent={vaultCapacity?.reserveRatioPercent}
             />
           </Text>
         </Flex>
