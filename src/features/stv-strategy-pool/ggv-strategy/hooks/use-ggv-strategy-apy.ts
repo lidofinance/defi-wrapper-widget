@@ -34,15 +34,13 @@ export const useGGVStrategyApy = () => {
   const { data: ggvApr, isPending: isLoadingGgvApr } = useGGVApr();
   const { data: vaultCapacity, isPending: isLoadingVaultCapacity } =
     useVaultCapacity();
-  const { data: ggvPosition, isPending: isLoadingGgvPosition } =
-    useGGVStrategyPosition();
+  const { data: ggvPosition } = useGGVStrategyPosition();
 
   const isLoadingApr =
     isLoadingVaultApr ||
     isLoadingStethApr ||
     isLoadingGgvApr ||
-    isLoadingVaultCapacity ||
-    isLoadingGgvPosition;
+    isLoadingVaultCapacity;
 
   const data = useMemo(() => {
     if (!vaultApr || !stethApr || !ggvApr || !vaultCapacity) {
