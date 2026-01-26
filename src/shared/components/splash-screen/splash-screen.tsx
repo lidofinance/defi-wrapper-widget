@@ -24,7 +24,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
       right="0"
       bottom="0"
       bg="rgba(255, 255, 255, 0.9)"
-      zIndex="overlay"
+      zIndex="banner"
       justify="center"
       align="center"
     >
