@@ -1,6 +1,6 @@
 import type { Token } from '@/types/token';
-import type z from 'zod';
 import type { withdrawalFormValidationSchema } from './validation';
+import type z from 'zod';
 
 // withdrawal can only be made in ETH
 export type WithdrawalTokens = Extract<Token, 'ETH'>;
