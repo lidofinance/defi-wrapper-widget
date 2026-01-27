@@ -42,7 +42,7 @@ export const DepositFormProvider: React.FC<React.PropsWithChildren> = ({
   const { depositStrategy } = useDepositStrategy();
   const { context, contextValue, isLoading } = useDepositFormData();
   const { isWalletWhitelisted } = useWalletWhitelisted();
-
+  const { depositPaused } = useStvSteth();
   const formObject = useForm<
     DepositFormValues,
     DepositFormValidationContextType,
@@ -54,7 +54,7 @@ export const DepositFormProvider: React.FC<React.PropsWithChildren> = ({
       referral: null,
     },
     mode: 'onTouched',
-    disabled: !isDappActive || !isWalletWhitelisted,
+    disabled: !isDappActive || !isWalletWhitelisted || depositPaused,
     context,
     resolver: DepositFormResolver,
   });
