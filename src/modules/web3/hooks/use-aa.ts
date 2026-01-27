@@ -5,14 +5,14 @@ import type { RegisteredConfig } from '../types';
 const isCapabilitySupported = (capability?: {
   supported?: boolean; // deprecated,legacy
   status?:
-    | 'ready' // already has smart account
-    | 'supported' // can promt user to swith to one
+    | 'ready' // can promt user to swith to one
+    | 'supported' // already has smart account
     | 'unsupported'; // cannot use smart account
 }) => {
   if (!capability) return false;
 
   if (typeof capability.status === 'string') {
-    return capability.status === 'ready';
+    return capability.status === 'supported';
   }
 
   return !!capability.supported;
