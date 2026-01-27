@@ -48,9 +48,9 @@ export type WrapperContextValue = {
     isWhitelistEnabled: boolean;
   };
 
-  mintingPaused?: boolean;
-  withdrawalsPaused?: boolean;
-  depositsPaused?: boolean;
+  mintingPaused: boolean;
+  withdrawalsPaused: boolean;
+  depositsPaused: boolean;
 } & (
   | {
       wrapperType: Extract<DefiWrapperTypes, 'StvPool'>;

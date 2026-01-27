@@ -28,8 +28,8 @@ export const SubmitButton = ({
 
   const shouldConnectWallet = !isWalletConnected || !isDappActive;
   const buttonDisabled =
-    disabled ||
-    (isWalletConnected && (!isWalletWhitelisted || !isSupportedChain));
+    isWalletConnected &&
+    (disabled || !isWalletWhitelisted || !isSupportedChain);
 
   const content = useMemo(() => {
     if (!isSupportedChain) {
