@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
-import { useInvalidateWrapper } from '@/modules/defi-wrapper';
+import { useInvalidateWrapper, useStvStrategy } from '@/modules/defi-wrapper';
 import { useWalletWhitelisted } from '@/modules/defi-wrapper/hooks/use-wallet-whitelisted';
 import { useDappStatus } from '@/modules/web3';
 import { FormController } from '@/shared/hook-form/form-controller';
@@ -41,7 +41,7 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
   const { withdrawStrategy } = useWithdrawStrategy();
   const { context, contextValue, isLoading } = useWithdrawalFormData();
   const { isWalletWhitelisted } = useWalletWhitelisted();
-
+  const { withdrawalsPaused } = useStvStrategy();
   const formObject = useForm<
     WithdrawalFormValues,
     WithdrawalFormValidationContextType,
@@ -52,7 +52,7 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
       amount: null,
     },
     mode: 'onTouched',
-    disabled: !isDappActive || !isWalletWhitelisted,
+    disabled: !isDappActive || !isWalletWhitelisted || withdrawalsPaused,
     context,
     resolver: WithdrawalFormResolver,
   });
