@@ -4,7 +4,7 @@ import { FormatPercent, FormatPrice, FormatToken } from '@/shared/formatters';
 import { APYTooltip } from '@/shared/wrapper/apy-tooltip';
 
 type RewardEstimationProps = {
-  aprData?: { updatedAt: Date; aprSma: number };
+  aprData?: { updatedAt: Date; apySma: number };
   isLoadingAPR?: boolean;
   estimatedMonthlyRewardsETH?: bigint;
   estimatedMonthlyRewardsUSD?: number;
@@ -33,7 +33,7 @@ export const RewardEstimation = ({
             APY
           </Text>
           <APYTooltip
-            APY={aprData?.aprSma}
+            APY={aprData?.apySma}
             isLoading={isLoadingAPR}
             lastUpdate={aprData?.updatedAt}
             customContent={customAPYTooltipContent}
@@ -41,7 +41,7 @@ export const RewardEstimation = ({
         </Flex>
         <Box fontSize="md" fontWeight="bold" color="colorPalette.solid">
           <SkeletonText loading={isLoadingAPR} noOfLines={1}>
-            <FormatPercent decimals="percent" value={aprData?.aprSma} />
+            <FormatPercent decimals="percent" value={aprData?.apySma} />
           </SkeletonText>
         </Box>
       </Flex>

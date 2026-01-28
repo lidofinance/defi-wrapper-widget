@@ -1,6 +1,7 @@
 import type { Address } from 'viem';
 import { getApiURL } from '@/config';
 import type { RegisteredPublicClient } from '@/modules/web3';
+import { aprToApy } from '@/utils/aprt-to-apy';
 import { fromBlockChainTime } from '@/utils/blockchain-time';
 import { vaultApiRoutes } from '../consts';
 
@@ -9,7 +10,9 @@ export type FetchVaultSMAReturn = {
   count: number;
   updatedAt: Date;
   aprSma: number;
+  apySma: number;
   aprDaily: number;
+  apyDaily: number;
 
   range: {
     fromTimestamp: number;
@@ -57,14 +60,17 @@ export const fetchVaultSMA = async (
   }
 
   const data = await res.json();
+  const aprDaily =
+    data.netStakingApr.aprs.length > 0
+      ? data.netStakingApr.aprs[data.netStakingApr.aprs.length - 1]
+      : 0;
 
   return {
     ...data,
     updatedAt: fromBlockChainTime(data.range.toTimestamp),
     aprSma: data.netStakingApr.sma,
-    aprDaily:
-      data.netStakingApr.aprs.length > 0
-        ? data.netStakingApr.aprs[data.netStakingApr.aprs.length - 1]
-        : 0,
+    apySma: aprToApy(data.netStakingApr.sma),
+    aprDaily: aprDaily,
+    apyDaily: aprToApy(aprDaily),
   };
 };
