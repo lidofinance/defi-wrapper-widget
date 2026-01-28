@@ -16,6 +16,17 @@ export const DepositPausedAlert = ({
   return <PausedAlert title={title} />;
 };
 
+export const DepositPausedBecauseOfMintingAlert = ({
+  title = 'Deposit is currently unavailable',
+}: PausedAlertProps) => {
+  const { depositsPaused, mintingPaused } = useDefiWrapper();
+  // if deposit is paused, we show dedicated deposit alert
+  if (!mintingPaused || depositsPaused) {
+    return null;
+  }
+  return <PausedAlert title={title} />;
+};
+
 export const WithdrawalPausedAlert = ({
   title = 'Withdrawal is currently unavailable',
 }: PausedAlertProps) => {
