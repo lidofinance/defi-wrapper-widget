@@ -56,7 +56,7 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
       token: 'ETH',
       amount: null,
     },
-    mode: 'onTouched',
+    mode: 'onChange',
     disabled: !isDappActive || !isWalletWhitelisted || withdrawalsPaused,
     context,
     resolver: WithdrawalFormResolver,

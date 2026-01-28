@@ -58,7 +58,7 @@ export const DepositFormProvider: React.FC<React.PropsWithChildren> = ({
       referral: null,
       tokenToMint: 'STETH',
     },
-    mode: 'onTouched',
+    mode: 'onChange',
     disabled: !isDappActive || !isWalletWhitelisted || depositsPaused,
     context,
     resolver: DepositFormResolver,

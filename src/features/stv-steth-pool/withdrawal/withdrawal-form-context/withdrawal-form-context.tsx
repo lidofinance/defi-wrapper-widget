@@ -57,7 +57,7 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
       amount: null,
       repayToken: 'STETH',
     },
-    mode: 'onTouched',
+    mode: 'onChange',
     disabled: !isDappActive || !isWalletWhitelisted || withdrawalsPaused,
     context,
     resolver: WithdrawalFormResolver,

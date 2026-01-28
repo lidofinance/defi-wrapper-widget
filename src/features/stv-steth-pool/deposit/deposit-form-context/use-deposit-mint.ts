@@ -39,7 +39,7 @@ export const useDepositMint = () => {
   const publicClient = usePublicClient();
   const { shares } = useLidoSDK();
   const { activeVault } = useVault();
-  const { wrapper, dashboard } = useStvSteth();
+  const { wrapper, dashboard, mintingPaused } = useStvSteth();
   const { onTransactionStageChange } = useTransactionModal();
 
   const prepareReportCalls = useReportCalls();
@@ -61,48 +61,58 @@ export const useDepositMint = () => {
         invariant(dashboard, '[useDeposit] dashboard is undefined');
         const wethContract = getWethContract(publicClient);
         const lidoV3 = getLidoV3Contract(publicClient);
-
-        const [
-          remainingUserMintingCapacityShares,
-          remainingVaultMintingCapacityShares,
-        ] = await readWithReport({
-          publicClient,
-          report: activeVault?.report,
-          contracts: [
-            wrapper.prepare.remainingMintingCapacitySharesOf([address, amount]),
-            dashboard.prepare.remainingMintingCapacityShares([amount]),
-          ],
-        });
-
-        const [maxMintableExternalShares, currentMintedExternalShares] =
-          await Promise.all([
-            lidoV3.read.getMaxMintableExternalShares(),
-            lidoV3.read.getExternalShares(),
-          ]);
-
-        // TODO: check for roudning issues overstepping max minting capacity by 1 wei
-        let maxMintShares = minBN(
-          remainingUserMintingCapacityShares,
-          remainingVaultMintingCapacityShares,
-        );
-
-        maxMintShares = minBN(
-          maxMintShares,
-          maxMintableExternalShares - currentMintedExternalShares,
-        );
-
-        const maxMintSteth = await shares.convertToSteth(maxMintShares);
-
         const depositedAmount = formatBalance(amount).actual;
 
-        const mintedAmountBalance =
-          tokenToMint === 'STETH'
-            ? formatBalance(maxMintSteth).actual
-            : formatBalance(maxMintShares).actual;
+        let TXTitle = '';
+        let maxMintShares: bigint;
 
-        const TXTitle = `Depositing ${depositedAmount} ${tokenLabel(token)} to the vault and minting ${
-          mintedAmountBalance
-        } ${tokenLabel(tokenToMint)}`;
+        if (mintingPaused) {
+          TXTitle = `Depositing ${depositedAmount} ${tokenLabel(token)} to the vault`;
+          maxMintShares = 0n;
+        } else {
+          const [
+            remainingUserMintingCapacityShares,
+            remainingVaultMintingCapacityShares,
+          ] = await readWithReport({
+            publicClient,
+            report: activeVault?.report,
+            contracts: [
+              wrapper.prepare.remainingMintingCapacitySharesOf([
+                address,
+                amount,
+              ]),
+              dashboard.prepare.remainingMintingCapacityShares([amount]),
+            ],
+          });
+
+          const [maxMintableExternalShares, currentMintedExternalShares] =
+            await Promise.all([
+              lidoV3.read.getMaxMintableExternalShares(),
+              lidoV3.read.getExternalShares(),
+            ]);
+
+          // TODO: check for roudning issues overstepping max minting capacity by 1 wei
+          let maxMintShares = minBN(
+            remainingUserMintingCapacityShares,
+            remainingVaultMintingCapacityShares,
+          );
+
+          maxMintShares = minBN(
+            maxMintShares,
+            maxMintableExternalShares - currentMintedExternalShares,
+          );
+
+          const maxMintSteth = await shares.convertToSteth(maxMintShares);
+
+          const mintedAmountBalance =
+            tokenToMint === 'STETH'
+              ? formatBalance(maxMintSteth).actual
+              : formatBalance(maxMintShares).actual;
+
+          TXTitle = `Depositing ${depositedAmount} ${tokenLabel(token)} to the vault and minting ${
+            mintedAmountBalance
+          } ${tokenLabel(tokenToMint)}`;
+        }
 
         const { success } = await withSuccess(
           sendTX({
@@ -162,6 +172,7 @@ export const useDepositMint = () => {
         wrapper,
         sendTX,
         address,
+        mintingPaused,
       ],
     ),
     ...rest,
