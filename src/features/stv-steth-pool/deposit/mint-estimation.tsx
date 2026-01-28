@@ -1,6 +1,6 @@
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Alert, Flex, Text } from '@chakra-ui/react';
-import { useVaultCapacity } from '@/modules/defi-wrapper';
+import { useStvSteth, useVaultCapacity } from '@/modules/defi-wrapper';
 import { MintTokenSwitch } from '@/shared/components/mint-token-switch';
 import { FormatPercent, FormatToken } from '@/shared/formatters';
 import { FormatTokenWithIcon } from '@/shared/formatters/format-token-with-icon';
@@ -9,17 +9,62 @@ import { DepositFormValues } from './deposit-form-context/types';
 
 import { usePreviewMint } from './hooks/use-preview-mint';
 import { MintEstimationWarning } from './mint-estimation-warning';
+import { MintPausedWarning } from './mint-paused-warning';
 import { ReserveRatioTooltip } from './reserve-ratio-tooltip';
+
+const MintEstimationAlert = ({
+  tokenToMint,
+  isPositiveMint,
+  maxMint,
+  expectedMint,
+  mintingSpread,
+}: {
+  tokenToMint: MINT_TOKENS_VALUE_TYPE;
+  isPositiveMint: boolean;
+  maxMint: bigint;
+  expectedMint: bigint;
+  mintingSpread: bigint;
+}) => {
+  return (
+    <Alert.Root
+      status="info"
+      colorPalette={isPositiveMint ? 'green' : 'orange'}
+    >
+      <Alert.Title>
+        {isPositiveMint ? (
+          <>
+            Extra{' '}
+            <FormatToken
+              amount={mintingSpread}
+              token={tokenToMint}
+              showSymbolOnFallback={true}
+              fallback="N/A"
+              trimEllipsis={true}
+            />{' '}
+            will be minted due to existing minting capacity.
+          </>
+        ) : (
+          <MintEstimationWarning
+            tokenToMint={tokenToMint}
+            expectedMintedAmount={expectedMint}
+            maxMintableAmount={maxMint}
+          />
+        )}
+      </Alert.Title>
+    </Alert.Root>
+  );
+};
 
 export const MintEstimation = () => {
   const tokenToMint = useWatch<DepositFormValues, 'tokenToMint'>({
     name: 'tokenToMint',
   });
+  const { mintingPaused } = useStvSteth();
 
   const { setValue } = useFormContext<DepositFormValues>();
 
-  // preview minted (w)steth and if they corresond to depsoit amount by RR (tokenToMint aware)
-  const { isLoading, shouldShowWarning, mintingSpread, expectedMint, maxMint } =
+  // preview minted (w)steth and if they correspond to depsoit amount by RR (tokenToMint aware)
+  const { isLoading, shouldShowWarning, expectedMint, mintingSpread, maxMint } =
     usePreviewMint();
   const { data: vaultCapacity } = useVaultCapacity();
 
@@ -68,33 +113,17 @@ export const MintEstimation = () => {
           </Text>
         </Flex>
       </Flex>
-      {shouldShowWarning && (
-        <Alert.Root
-          status="info"
-          colorPalette={isPositiveMint ? 'green' : 'orange'}
-        >
-          <Alert.Title>
-            {isPositiveMint ? (
-              <>
-                Extra{' '}
-                <FormatToken
-                  amount={mintingSpread}
-                  token={tokenToMint}
-                  showSymbolOnFallback={true}
-                  fallback="N/A"
-                  trimEllipsis={true}
-                />{' '}
-                will be minted due to existing minting capacity.
-              </>
-            ) : (
-              <MintEstimationWarning
-                tokenToMint={tokenToMint}
-                expectedMintedAmount={expectedMint}
-                maxMintableAmount={maxMint}
-              />
-            )}
-          </Alert.Title>
-        </Alert.Root>
+      {mintingPaused ? <MintPausedWarning tokenToMint={tokenToMint} /> : <></>}
+      {!mintingPaused && shouldShowWarning ? (
+        <MintEstimationAlert
+          tokenToMint={tokenToMint}
+          mintingSpread={mintingSpread}
+          isPositiveMint={isPositiveMint}
+          maxMint={maxMint}
+          expectedMint={expectedMint}
+        />
+      ) : (
+        <></>
       )}
     </>
   );
