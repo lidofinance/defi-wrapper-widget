@@ -59,6 +59,8 @@ export const MintEstimation = () => {
   const tokenToMint = useWatch<DepositFormValues, 'tokenToMint'>({
     name: 'tokenToMint',
   });
+  const erros = useFormContext().formState.errors;
+
   const { mintingPaused } = useStvSteth();
 
   const { setValue } = useFormContext<DepositFormValues>();
@@ -74,6 +76,8 @@ export const MintEstimation = () => {
     setValue('tokenToMint', newToken);
   };
 
+  const showMintAmountWarnings =
+    shouldShowWarning && Object.keys(erros).length === 0;
   return (
     <>
       <Flex justify="space-between" align="flex-start" gap={1}>
@@ -114,7 +118,7 @@ export const MintEstimation = () => {
         </Flex>
       </Flex>
       {mintingPaused ? <MintPausedWarning tokenToMint={tokenToMint} /> : <></>}
-      {!mintingPaused && shouldShowWarning ? (
+      {!mintingPaused && showMintAmountWarnings ? (
         <MintEstimationAlert
           tokenToMint={tokenToMint}
           mintingSpread={mintingSpread}
