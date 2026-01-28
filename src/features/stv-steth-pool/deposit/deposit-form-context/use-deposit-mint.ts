@@ -91,14 +91,12 @@ export const useDepositMint = () => {
               lidoV3.read.getExternalShares(),
             ]);
 
-          // TODO: check for roudning issues overstepping max minting capacity by 1 wei
-          let maxMintShares = minBN(
-            remainingUserMintingCapacityShares,
-            remainingVaultMintingCapacityShares,
-          );
-
+          // TODO: check for rounding issues overstepping max minting capacity by 1 wei
           maxMintShares = minBN(
-            maxMintShares,
+            minBN(
+              remainingUserMintingCapacityShares,
+              remainingVaultMintingCapacityShares,
+            ),
             maxMintableExternalShares - currentMintedExternalShares,
           );
 
