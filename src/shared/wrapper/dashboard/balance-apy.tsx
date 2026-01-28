@@ -7,7 +7,7 @@ import { Token } from '@/types/token';
 type DashboardBalanceApyProps = {
   isAPYLoading?: boolean;
   isBalanceLoading?: boolean;
-  aprData?: { updatedAt: Date; aprSma: number };
+  aprData?: { updatedAt: Date; apySma: number };
   token: Token;
   balance?: bigint;
   usdAmount?: number;
@@ -63,7 +63,7 @@ export const DashboardBalanceApy = ({
         <Stat.Label>
           APY{' '}
           <APYTooltip
-            APY={aprData?.aprSma}
+            APY={aprData?.apySma}
             isLoading={isAPYLoading}
             lastUpdate={aprData?.updatedAt}
             customContent={customAPYTooltipContent}
@@ -77,7 +77,7 @@ export const DashboardBalanceApy = ({
           loading={isAPYLoading}
         >
           <Stat.ValueText fontSize="3xl">
-            <FormatPercent value={aprData?.aprSma} decimals="percent" />
+            <FormatPercent value={aprData?.apySma} decimals="percent" />
           </Stat.ValueText>
         </SkeletonText>
       </Stat.Root>
