@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo } from 'react';
-import { isAddressEqual, fromHex } from 'viem';
+import { isAddressEqual, fromHex, Address } from 'viem';
 import { usePublicClient } from 'wagmi';
+import { AddressZero } from '@ethersproject/constants';
 import { LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
@@ -46,6 +47,10 @@ export type WrapperContextValue = {
     assetDecimals: number;
     isWhitelistEnabled: boolean;
   };
+
+  mintingPaused: boolean;
+  withdrawalsPaused: boolean;
+  depositsPaused: boolean;
 } & (
   | {
       wrapperType: Extract<DefiWrapperTypes, 'StvPool'>;
@@ -208,6 +213,35 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
         `Wrapper stETH address (${stethAddress}) does not match canonical stETH address (${canonicalStethAddress}). Check your configuration.`,
       );
 
+      const withdrawalQueueContract = getWQContract(
+        withdrawalQueueAddress,
+        publicClient,
+      );
+
+      // read pause states
+      const [withdrawalsFeatureId, depositsFeatureId] = await Promise.all([
+        wrapper.read.DEPOSITS_FEATURE(),
+        withdrawalQueueContract.read.WITHDRAWALS_FEATURE(),
+      ]);
+
+      const canMint: boolean =
+        poolType === 'StvStrategyPool' || poolType === 'StvStETHPool';
+
+      const mintingFeatureId: Address = canMint
+        ? await (
+            wrapper as ReturnType<typeof getStvStethContract>
+          ).read.MINTING_FEATURE()
+        : AddressZero;
+
+      const mintingPaused: boolean = canMint
+        ? await wrapper.read.isFeaturePaused([mintingFeatureId])
+        : false;
+
+      const [withdrawalsPaused, depositsPaused] = await Promise.all([
+        withdrawalQueueContract.read.isFeaturePaused([withdrawalsFeatureId]),
+        wrapper.read.isFeaturePaused([depositsFeatureId]),
+      ]);
+
       return {
         name,
         symbol,
@@ -221,12 +255,16 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
           publicClient,
         ),
         distributor: getDistributorContract(distributorAddress, publicClient),
-        withdrawalQueue: getWQContract(withdrawalQueueAddress, publicClient),
+        withdrawalQueue: withdrawalQueueContract,
         strategy: strategyAddress
           ? getStrategyContract(strategyAddress, publicClient)
           : null,
         strategyId,
         stethAddress,
+        // injected pause states
+        mintingPaused,
+        withdrawalsPaused,
+        depositsPaused,
       };
     },
   });
@@ -260,6 +298,11 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
       strategy: wrapperStaticConfig.data?.strategy,
       strategyId: wrapperStaticConfig.data?.strategyId,
       distributor: wrapperStaticConfig.data?.distributor,
+
+      mintingPaused: !!wrapperStaticConfig.data?.mintingPaused,
+      withdrawalsPaused: !!wrapperStaticConfig.data?.withdrawalsPaused,
+      depositsPaused: !!wrapperStaticConfig.data?.depositsPaused,
+
       isLoading: wrapperStaticConfig.isLoading,
       error: wrapperStaticConfig.error,
     } as WrapperContextValue;

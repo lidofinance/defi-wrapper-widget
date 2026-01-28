@@ -1,14 +1,10 @@
 import { useMemo } from 'react';
 import { useVaultCapacity } from '@/modules/defi-wrapper';
 import { useStethApr, useVaultApr } from '@/modules/vaults';
+import { aprToApy } from '@/utils/aprt-to-apy';
 
 import { useGGVApr } from './use-ggv-apr';
 import { useGGVStrategyPosition } from './use-ggv-strategy-position';
-
-const aprToApy = (aprPercent: number) => {
-  const apr = aprPercent / 100;
-  return (Math.pow(1 + apr / 365, 365) - 1) * 100;
-};
 
 export const calculateStrategyApy = (
   ggvAprPercent: number, // percent
@@ -34,15 +30,13 @@ export const useGGVStrategyApy = () => {
   const { data: ggvApr, isPending: isLoadingGgvApr } = useGGVApr();
   const { data: vaultCapacity, isPending: isLoadingVaultCapacity } =
     useVaultCapacity();
-  const { data: ggvPosition, isPending: isLoadingGgvPosition } =
-    useGGVStrategyPosition();
+  const { data: ggvPosition } = useGGVStrategyPosition();
 
   const isLoadingApr =
     isLoadingVaultApr ||
     isLoadingStethApr ||
     isLoadingGgvApr ||
-    isLoadingVaultCapacity ||
-    isLoadingGgvPosition;
+    isLoadingVaultCapacity;
 
   const data = useMemo(() => {
     if (!vaultApr || !stethApr || !ggvApr || !vaultCapacity) {

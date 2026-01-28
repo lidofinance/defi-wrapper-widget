@@ -24,13 +24,12 @@ export const SubmitButton = ({
   } = useDappStatus();
 
   const { isWalletWhitelisted } = useWalletWhitelisted();
-  const {
-    isValidating,
-    isSubmitting,
-    isLoading: isFormLoading,
-  } = useFormState();
+  const { isValidating, isSubmitting, disabled } = useFormState();
 
   const shouldConnectWallet = !isWalletConnected || !isDappActive;
+  const buttonDisabled =
+    isWalletConnected &&
+    (disabled || !isWalletWhitelisted || !isSupportedChain);
 
   const content = useMemo(() => {
     if (!isSupportedChain) {
@@ -67,7 +66,7 @@ export const SubmitButton = ({
 
   return (
     <Button
-      disabled={!isWalletWhitelisted || !isSupportedChain}
+      disabled={buttonDisabled}
       type="submit"
       size={'2xl'}
       loading={isValidating || isSubmitting || isLoading}

@@ -17,7 +17,7 @@ export const DepositApy = () => {
     apySma && updatedAt
       ? {
           updatedAt,
-          aprSma: apySma,
+          apySma: apySma,
         }
       : undefined;
 

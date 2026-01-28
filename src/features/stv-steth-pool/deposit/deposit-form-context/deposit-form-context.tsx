@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
 import {
   useInvalidateWrapper,
+  useStvSteth,
   useWalletWhitelisted,
 } from '@/modules/defi-wrapper';
 import { useDappStatus } from '@/modules/web3';
@@ -45,6 +46,7 @@ export const DepositFormProvider: React.FC<React.PropsWithChildren> = ({
   const { deposit } = useDepositMint();
   const { context, contextValue, isLoading } = useDepositFormData();
   const { isWalletWhitelisted } = useWalletWhitelisted();
+  const { depositsPaused } = useStvSteth();
   const formObject = useForm<
     DepositFormValues,
     DepositFormValidationContextType,
@@ -56,12 +58,11 @@ export const DepositFormProvider: React.FC<React.PropsWithChildren> = ({
       referral: null,
       tokenToMint: 'STETH',
     },
-    mode: 'onTouched',
-    disabled: !isDappActive || !isWalletWhitelisted,
+    mode: 'onChange',
+    disabled: !isDappActive || !isWalletWhitelisted || depositsPaused,
     context,
     resolver: DepositFormResolver,
   });
-
   const { setValue, formState } = formObject;
   useQueryParamsReferralForm<DepositFormValues>({ setValue });
 

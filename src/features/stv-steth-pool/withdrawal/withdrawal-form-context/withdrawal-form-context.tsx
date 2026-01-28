@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
 import {
   useInvalidateWrapper,
+  useStvSteth,
   useWrapperBalance,
 } from '@/modules/defi-wrapper';
 import { useWalletWhitelisted } from '@/modules/defi-wrapper/hooks/use-wallet-whitelisted';
@@ -45,7 +46,7 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
   const { context, isLoading } = useWithdrawalFormData();
   const { assets } = useWrapperBalance();
   const { isWalletWhitelisted } = useWalletWhitelisted();
-
+  const { withdrawalsPaused } = useStvSteth();
   const formObject = useForm<
     WithdrawalFormValues,
     WithdrawalFormValidationContextType,
@@ -56,8 +57,8 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
       amount: null,
       repayToken: 'STETH',
     },
-    mode: 'onTouched',
-    disabled: !isDappActive || !isWalletWhitelisted,
+    mode: 'onChange',
+    disabled: !isDappActive || !isWalletWhitelisted || withdrawalsPaused,
     context,
     resolver: WithdrawalFormResolver,
   });

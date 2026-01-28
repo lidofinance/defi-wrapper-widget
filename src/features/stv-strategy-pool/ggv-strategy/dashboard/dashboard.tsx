@@ -17,7 +17,7 @@ export const Dashboard = () => {
     updatedAt && apySmaCurrent
       ? {
           updatedAt,
-          aprSma: apySmaCurrent,
+          apySma: apySmaCurrent,
         }
       : undefined;
 

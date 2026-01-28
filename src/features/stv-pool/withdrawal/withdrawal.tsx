@@ -1,4 +1,5 @@
 import { Flex, VStack } from '@chakra-ui/react';
+import { WithdrawalPausedAlert } from '@/shared/components/paused-alert';
 import { FormContainer } from '@/shared/hook-form/container';
 import { SubmitButton } from '@/shared/hook-form/controls';
 import { WaitingTime } from '@/shared/wrapper/withdrawal/waiting-time';
@@ -12,6 +13,7 @@ export const Withdrawal = () => {
   return (
     <WithdrawalFormProvider>
       <FormContainer>
+        <WithdrawalPausedAlert />
         <VStack align="stretch" gap={6}>
           <VaultStatus />
           <Flex direction="column" gap={3}>

@@ -1,7 +1,6 @@
 import { type Address, isAddress } from 'viem';
 import { z } from 'zod';
 import { formatBalance } from '@/utils/formatBalance';
-import { tokenLabel } from '@/utils/token-label';
 
 const validateAddress = (value: string | null) => !!(value && isAddress(value));
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { VStack } from '@chakra-ui/react';
+import { WithdrawalPausedAlert } from '@/shared/components/paused-alert';
 import { FormContainer } from '@/shared/hook-form/container';
 import { VaultStatus } from '../vault-status';
 import { WithdrawalFormProvider } from './withdrawal-form-context';
@@ -9,6 +10,7 @@ export const Withdrawal = () => {
   return (
     <WithdrawalFormProvider>
       <FormContainer>
+        <WithdrawalPausedAlert />
         <VStack align="stretch" gap={6}>
           <VaultStatus showWithdrawalRequests={true} />
           <WithdrawalInputGroup />
