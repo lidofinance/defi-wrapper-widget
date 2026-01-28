@@ -23,7 +23,7 @@ export const usePreviewMint = () => {
   });
   const { address } = useDappStatus();
   const publicClient = usePublicClient();
-  const { wrapper, dashboard } = useStvSteth();
+  const { wrapper, mintingPaused, dashboard } = useStvSteth();
   const { shares } = useLidoSDK();
   const { queryKeys, activeVault } = useVault();
 
@@ -41,6 +41,22 @@ export const usePreviewMint = () => {
         '[usePreviewMint] amount is not bigint',
       );
       invariant(dashboard, '[usePreviewMint] dashboard is undefined');
+
+      if (mintingPaused) {
+        return {
+          maxToMintShares: 0n,
+          remainingUserMintingCapacityShares: 0n,
+          remainingVaultMintingCapacityShares: 0n,
+
+          maxToMintSteth: 0n,
+          remainingUserMintingCapacitySteth: 0n,
+          remainingVaultMintingCapacitySteth: 0n,
+
+          expectedMintedSteth: 0n,
+          expectedMintedStethShares: 0n,
+          reserveRatioPercent: 0,
+        };
+      }
       const [
         remainingUserMintingCapacityShares,
         remainingVaultMintingCapacityShares,
