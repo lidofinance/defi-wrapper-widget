@@ -1,5 +1,5 @@
 import React from 'react';
-import { useFormContext, useFormState } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { Alert, Button, List } from '@chakra-ui/react';
 import { FormatToken } from '@/shared/formatters';
 import { tokenLabel } from '@/utils/token-label';
@@ -24,10 +24,7 @@ export const RepaymentAlert = ({
     useRepayRebalanceAmount(amount, repaymentToken);
 
   const { setValue } = useFormContext<WithdrawalFormValues>();
-  const { errors } = useFormState<WithdrawalFormValues>();
-  const formIsValid = Object.keys(errors).length === 0;
-
-  if (!formIsValid || !amount || !rebalanceable || rebalanceable <= 0n) {
+  if (!amount || !rebalanceable || rebalanceable <= 0n) {
     return null;
   }
 

@@ -7,13 +7,14 @@ import {
   tokenAmountSchema,
 } from '@/shared/hook-form/validation';
 import { awaitWithTimeout } from '@/utils/await-with-timeout';
-
 import type {
   WithdrawalFormValidatedValues,
   WithdrawalFormValidationAsyncContextType,
   WithdrawalFormValidationContextType,
   WithdrawalFormValues,
 } from './types';
+import { getMinWithdrawalError } from '../utils/min-withdrawal-error';
+
 import type { Resolver } from 'react-hook-form';
 
 export const withdrawalFormValidationSchema = ({
@@ -52,9 +53,37 @@ export const WithdrawalFormResolver: Resolver<
 
   const schema = withdrawalFormValidationSchema(contextValue);
 
-  return zodResolver<
+  const result = await zodResolver<
     WithdrawalFormValues,
     unknown,
     WithdrawalFormValidatedValues
   >(schema)(values, context, options);
+  if (
+    result.errors.amount ||
+    !values.amount ||
+    !contextValue.minWithdrawalValidationDeps
+  ) {
+    return result;
+  }
+
+  const { error } = await getMinWithdrawalError({
+    amount: values.amount,
+    repayToken: values.repayToken,
+    ...contextValue.minWithdrawalValidationDeps,
+  });
+
+  if (!error) {
+    return result;
+  }
+
+  return {
+    ...result,
+    errors: {
+      ...result.errors,
+      amount: {
+        type: 'custom',
+        message: error,
+      },
+    },
+  };
 };

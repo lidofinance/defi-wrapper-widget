@@ -10,7 +10,7 @@ import { getRepayRebalanceAmount } from './repay-rebalance';
 import type { RepayTokens } from '../withdrawal-form-context/types';
 
 export const MIN_WITHDRAWAL_ERROR_MESSAGE =
-  'Withdrawal amount is less than minimum withdrawal limit';
+  'withdrawal amount minus the rebalanced value is less then minimum allowed withdrawable value';
 
 export type WithdrawalQueueContract = {
   read: {
