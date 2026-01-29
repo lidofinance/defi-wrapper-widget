@@ -67,6 +67,7 @@ export const WithdrawalFormResolver: Resolver<
   }
 
   const { error } = await getMinWithdrawalError({
+    minWithdrawalAmountInEth: contextValue.minWithdrawalInEth,
     amount: values.amount,
     repayToken: values.repayToken,
     ...contextValue.minWithdrawalValidationDeps,

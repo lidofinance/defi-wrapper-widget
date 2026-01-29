@@ -4,7 +4,6 @@ import {
   LidoSDKstETH,
   LidoSDKwstETH,
 } from '@lidofinance/lido-ethereum-sdk/erc20';
-import { getWQContract } from '@/modules/defi-wrapper';
 import type { VaultReportType } from '@/modules/vaults';
 import type { RegisteredPublicClient } from '@/modules/web3';
 import type { Wrapper } from './repay-rebalance';
@@ -21,7 +20,7 @@ export const getMinWithdrawalErrorFromData = ({
 }: {
   amount: bigint | null;
   rebalanceableSteth: bigint | undefined;
-  minWithdrawalAmountInEth: bigint | undefined;
+  minWithdrawalAmountInEth: bigint | null;
 }) => {
   if (
     !amount ||
@@ -44,18 +43,18 @@ export const getMinWithdrawalError = async ({
   publicClient,
   report,
   wrapper,
-  withdrawalQueue,
   address,
   shares,
   wstETH,
   stETH,
+  minWithdrawalAmountInEth,
 }: {
+  minWithdrawalAmountInEth: bigint | null;
   amount: bigint | null;
   repayToken: RepayTokens;
   publicClient: RegisteredPublicClient;
   report: VaultReportType | null | undefined;
   wrapper: Wrapper;
-  withdrawalQueue: ReturnType<typeof getWQContract>;
   address: Address;
   shares: LidoSDKShares;
   wstETH: LidoSDKwstETH;
@@ -69,20 +68,17 @@ export const getMinWithdrawalError = async ({
     };
   }
 
-  const [minWithdrawalAmountInEth, repayData] = await Promise.all([
-    withdrawalQueue.read.MIN_WITHDRAWAL_VALUE(),
-    getRepayRebalanceAmount({
-      amount,
-      repayToken,
-      publicClient,
-      report,
-      wrapper,
-      address,
-      shares,
-      wstETH,
-      stETH,
-    }),
-  ]);
+  const repayData = await getRepayRebalanceAmount({
+    amount,
+    repayToken,
+    publicClient,
+    report,
+    wrapper,
+    address,
+    shares,
+    wstETH,
+    stETH,
+  });
 
   const rebalanceableSteth = repayData.rebalanceable;
   const error = getMinWithdrawalErrorFromData({

@@ -1,14 +1,14 @@
 import type { Address } from 'viem';
+import { LidoSDKShares } from '@lidofinance/lido-ethereum-sdk';
+import {
+  LidoSDKstETH,
+  LidoSDKwstETH,
+} from '@lidofinance/lido-ethereum-sdk/erc20';
+import { useStvSteth } from '@/modules/defi-wrapper';
 import type { VaultReportType } from '@/modules/vaults';
 import type { RegisteredPublicClient } from '@/modules/web3';
 import type { Token } from '@/types/token';
 import type { withdrawalFormValidationSchema } from './validation';
-import type { WithdrawalQueueContract } from '../utils/min-withdrawal-error';
-import type {
-  RepayRebalanceWrapper,
-  SharesContract,
-  TokenContract,
-} from '../utils/repay-rebalance';
 import type z from 'zod';
 
 // withdrawal can only be made in ETH
@@ -22,12 +22,11 @@ export type WithdrawalFormValidationAsyncContextType = {
   minWithdrawalValidationDeps?: {
     publicClient: RegisteredPublicClient;
     report: VaultReportType | null | undefined;
-    wrapper: RepayRebalanceWrapper;
-    withdrawalQueue: WithdrawalQueueContract;
+    wrapper: ReturnType<typeof useStvSteth>['wrapper'];
     address: Address;
-    shares: SharesContract;
-    wstETH: TokenContract;
-    stETH: TokenContract;
+    shares: LidoSDKShares;
+    wstETH: LidoSDKwstETH;
+    stETH: LidoSDKstETH;
   };
 };
 

@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import {
-  useDefiWrapper,
   useStvSteth,
   useWrapperBalance,
   useWithdrawalQueue,
@@ -25,7 +24,6 @@ export const useWithdrawalFormData = () => {
   const { publicClient, shares, wstETH, stETH } = useLidoSDK();
   const { activeVault } = useVault();
   const { wrapper } = useStvSteth();
-  const { withdrawalQueue } = useDefiWrapper();
 
   const contextValue: WithdrawalFormValidationAsyncContextType | undefined =
     useMemo(() => {
@@ -33,12 +31,11 @@ export const useWithdrawalFormData = () => {
         return undefined;
       }
       const minWithdrawalValidationDeps =
-        address && wrapper && withdrawalQueue && activeVault
+        address && wrapper && activeVault
           ? {
               publicClient,
               report: activeVault.report,
               wrapper,
-              withdrawalQueue,
               address,
               shares,
               wstETH,
@@ -62,7 +59,6 @@ export const useWithdrawalFormData = () => {
       shares,
       stETH,
       wstETH,
-      withdrawalQueue,
       wrapper,
       isWrapperLoading,
       isWQLoading,
