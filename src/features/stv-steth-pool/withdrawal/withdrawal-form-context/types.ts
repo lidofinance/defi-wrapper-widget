@@ -4,6 +4,7 @@ import {
   LidoSDKstETH,
   LidoSDKwstETH,
 } from '@lidofinance/lido-ethereum-sdk/erc20';
+import { QueryClient } from '@tanstack/query-core';
 import { useStvSteth } from '@/modules/defi-wrapper';
 import type { VaultReportType } from '@/modules/vaults';
 import type { RegisteredPublicClient } from '@/modules/web3';
@@ -27,6 +28,7 @@ export type WithdrawalFormValidationAsyncContextType = {
     shares: LidoSDKShares;
     wstETH: LidoSDKwstETH;
     stETH: LidoSDKstETH;
+    queryClient: QueryClient;
   };
 };
 

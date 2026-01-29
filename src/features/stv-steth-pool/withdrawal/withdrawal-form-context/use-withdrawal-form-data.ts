@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   useStvSteth,
   useWrapperBalance,
@@ -24,6 +25,7 @@ export const useWithdrawalFormData = () => {
   const { publicClient, shares, wstETH, stETH } = useLidoSDK();
   const { activeVault } = useVault();
   const { wrapper } = useStvSteth();
+  const queryClient = useQueryClient();
 
   const contextValue: WithdrawalFormValidationAsyncContextType | undefined =
     useMemo(() => {
@@ -40,6 +42,7 @@ export const useWithdrawalFormData = () => {
               shares,
               wstETH,
               stETH,
+              queryClient,
             }
           : undefined;
 
@@ -56,6 +59,7 @@ export const useWithdrawalFormData = () => {
       maxWithdrawalAmountInEth,
       minWithdrawalAmountInEth,
       publicClient,
+      queryClient,
       shares,
       stETH,
       wstETH,
