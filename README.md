@@ -25,6 +25,16 @@ Based on your deployment of Stv Pool you must fill in variables in `.env` file:
 - serve build from `/dist` as static HTML via your web server of choice
 - you can serve app as is or embedded via iframe inside other websites
 
+### Running with Docker
+
+1. Fill in `.env` (see `.env.example`). Required for build: `VITE_POOL_TYPE`, `VITE_POOL_ADDRESS`, `VITE_DEFAULT_CHAIN`, `VITE_SUPPORTED_CHAINS`, `VITE_PUBLIC_EL_RPC_URLS_*`, `VITE_WALLETCONNECT_PROJECT_ID`.
+   2Build and run:
+
+```bash
+docker compose build --no-cache
+docker compose up
+```
+
 ### Customizing/Developing
 
 For dev server and install dependcies and fill envs and run `yarn dev`
