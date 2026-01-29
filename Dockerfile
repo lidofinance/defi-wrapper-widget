@@ -1,8 +1,8 @@
 # Stage 1: Build
 FROM node:22-alpine3.20 AS builder
 
-# Install compatibility libraries and common build tools if necessary
-RUN apk add --no-cache libc6-compat
+# Install compatibility libraries and build tools for native deps
+RUN apk add --no-cache libc6-compat python3 make g++
 
 WORKDIR /app
 
