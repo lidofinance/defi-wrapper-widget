@@ -15,7 +15,7 @@ import type {
 } from './types';
 import { getMinWithdrawalError } from '../utils/min-withdrawal-error';
 
-import type { Resolver } from 'react-hook-form';
+import type { Resolver, ResolverResult } from 'react-hook-form';
 
 export const withdrawalFormValidationSchema = ({
   balanceInEth,
@@ -85,5 +85,5 @@ export const WithdrawalFormResolver: Resolver<
         message: error,
       },
     },
-  };
+  } as ResolverResult<WithdrawalFormValues, WithdrawalFormValidatedValues>;
 };

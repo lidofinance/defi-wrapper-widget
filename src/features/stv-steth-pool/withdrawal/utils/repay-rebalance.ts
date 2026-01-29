@@ -74,14 +74,14 @@ export const fetchMaximumAvailableRepay = async ({
   maxRepayableWsteth = minBN(maxRepayableWsteth, mintedStethSharesOf);
 
   const [withdrawalbeEthNoRebalanceSteth, withdrawalbeEthNoRebalanceWsteth] =
-    await readWithReport({
+    (await readWithReport({
       publicClient,
       report,
       contracts: [
         wrapper.prepare.unlockedAssetsOf([address, maxRepayableStethShares]),
         wrapper.prepare.unlockedAssetsOf([address, maxRepayableWsteth]),
       ],
-    });
+    })) as [bigint, bigint];
 
   return {
     maxEthForRepayableSteth: withdrawalbeEthNoRebalanceSteth,
@@ -114,11 +114,11 @@ export const fetchRepayStaticData = async ({
       wrapper.read.mintedStethSharesOf([address]),
     ]);
 
-  const [unlockedUserEth] = await readWithReport({
+  const [unlockedUserEth] = (await readWithReport({
     publicClient,
     report,
     contracts: [wrapper.prepare.unlockedAssetsOf([address, 0n])],
-  });
+  })) as bigint[];
 
   return {
     sharesBalance,
@@ -163,13 +163,13 @@ export const calculateRepayRebalanceRatio = async ({
   }
 
   // steth shares needed to repay for the locked portion of withdrawal
-  const [stethSharesToRepayAmount] = await readWithReport({
+  const [stethSharesToRepayAmount] = (await readWithReport({
     publicClient,
     report,
     contracts: [
       wrapper.prepare.calcStethSharesToMintForAssets([lockedUserEth]),
     ],
-  });
+  })) as [bigint];
 
   // amount entered could exceed user balance and total repay must be capped at minted shares
   const stethSharesToRepay = minBN(stethSharesToRepayAmount, mintedShares);
