@@ -1,32 +1,17 @@
 import type { Address } from 'viem';
-import type { VaultReportType } from '@/modules/vaults';
+import { LidoSDKShares } from '@lidofinance/lido-ethereum-sdk';
+import {
+  LidoSDKstETH,
+  LidoSDKwstETH,
+} from '@lidofinance/lido-ethereum-sdk/erc20';
+import { useStvSteth } from '@/modules/defi-wrapper';
+import { VaultReportType } from '@/modules/vaults';
 import { readWithReport } from '@/modules/vaults';
 import type { RegisteredPublicClient } from '@/modules/web3';
 import { minBN } from '@/utils/bn';
 import type { RepayTokens } from '../withdrawal-form-context/types';
 
-type PreparedCall = Parameters<typeof readWithReport>[0]['contracts'][number];
-
-export type RepayRebalanceWrapper = {
-  read: {
-    mintedStethSharesOf: (params: [Address]) => Promise<bigint>;
-  };
-  prepare: {
-    unlockedAssetsOf: (params: [Address, bigint]) => PreparedCall;
-    mintedStethSharesOf: (params: [Address]) => PreparedCall;
-    assetsOf: (params: [Address]) => PreparedCall;
-    calcStethSharesToMintForAssets: (params: [bigint]) => PreparedCall;
-  };
-};
-
-export type SharesContract = {
-  balance: (address: Address) => Promise<bigint>;
-  convertToSteth: (amount: bigint) => Promise<bigint>;
-};
-
-export type TokenContract = {
-  balance: (address: Address) => Promise<bigint>;
-};
+export type Wrapper = ReturnType<typeof useStvSteth>['wrapper'];
 
 export type RepayStaticData = {
   sharesBalance: bigint;
@@ -54,10 +39,10 @@ export const fetchMaximumAvailableRepay = async ({
 }: {
   publicClient: RegisteredPublicClient;
   report: VaultReportType | null | undefined;
-  wrapper: RepayRebalanceWrapper;
+  wrapper: Wrapper;
   address: Address;
-  shares: SharesContract;
-  wstETH: TokenContract;
+  shares: LidoSDKShares;
+  wstETH: LidoSDKwstETH;
 }) => {
   const [wstethAmount, stethShares, mintedStethSharesOf] = await Promise.all([
     wstETH.balance(address),
@@ -100,11 +85,11 @@ export const fetchRepayStaticData = async ({
 }: {
   publicClient: RegisteredPublicClient;
   report: VaultReportType | null | undefined;
-  wrapper: RepayRebalanceWrapper;
+  wrapper: Wrapper;
   address: Address;
-  shares: SharesContract;
-  wstETH: TokenContract;
-  stETH: TokenContract;
+  shares: LidoSDKShares;
+  wstETH: LidoSDKwstETH;
+  stETH: LidoSDKstETH;
 }): Promise<RepayStaticData> => {
   const [sharesBalance, wstethBalance, stethBalance, mintedShares] =
     await Promise.all([
@@ -140,8 +125,8 @@ export const calculateRepayRebalanceRatio = async ({
 }: {
   publicClient: RegisteredPublicClient;
   report: VaultReportType | null | undefined;
-  wrapper: RepayRebalanceWrapper;
-  shares: SharesContract;
+  wrapper: Wrapper;
+  shares: LidoSDKShares;
   repayToken: RepayTokens;
   amount: bigint;
   repayStaticData: RepayStaticData;
@@ -241,11 +226,11 @@ export const getRepayRebalanceAmount = async ({
   repayToken: RepayTokens;
   publicClient: RegisteredPublicClient;
   report: VaultReportType | null | undefined;
-  wrapper: RepayRebalanceWrapper;
+  wrapper: Wrapper;
   address: Address;
-  shares: SharesContract;
-  wstETH: TokenContract;
-  stETH: TokenContract;
+  shares: LidoSDKShares;
+  wstETH: LidoSDKwstETH;
+  stETH: LidoSDKstETH;
 }) => {
   const [maxAvailableRepay, repayStaticData] = await Promise.all([
     fetchMaximumAvailableRepay({
