@@ -23,7 +23,7 @@ export const RepaymentAlert = ({
   const { maxEthForRepayableToken, rebalanceable, repayable } =
     useRepayRebalanceAmount(amount, repaymentToken);
 
-  const { setValue } = useFormContext<WithdrawalFormValues>();
+  const { setValue, trigger } = useFormContext<WithdrawalFormValues>();
   if (!amount || !rebalanceable || rebalanceable <= 0n) {
     return null;
   }
@@ -73,6 +73,7 @@ export const RepaymentAlert = ({
             size={'xs'}
             onClick={() => {
               setValue('amount', maxEthForRepayableToken || null);
+              trigger('amount');
             }}
           >
             Withdraw only repayable part
