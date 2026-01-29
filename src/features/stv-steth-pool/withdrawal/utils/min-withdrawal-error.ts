@@ -1,40 +1,18 @@
 import type { Address } from 'viem';
+import { LidoSDKShares } from '@lidofinance/lido-ethereum-sdk';
+import {
+  LidoSDKstETH,
+  LidoSDKwstETH,
+} from '@lidofinance/lido-ethereum-sdk/erc20';
+import { getWQContract } from '@/modules/defi-wrapper';
 import type { VaultReportType } from '@/modules/vaults';
 import type { RegisteredPublicClient } from '@/modules/web3';
-import type {
-  RepayRebalanceWrapper,
-  SharesContract,
-  TokenContract,
-} from './repay-rebalance';
+import type { Wrapper } from './repay-rebalance';
 import { getRepayRebalanceAmount } from './repay-rebalance';
 import type { RepayTokens } from '../withdrawal-form-context/types';
 
 export const MIN_WITHDRAWAL_ERROR_MESSAGE =
-  'withdrawal amount minus the rebalanced value is less then minimum allowed withdrawable value';
-
-export type WithdrawalQueueContract = {
-  read: {
-    MIN_WITHDRAWAL_VALUE: () => Promise<bigint>;
-    MAX_WITHDRAWAL_ASSETS: () => Promise<bigint>;
-  };
-};
-
-export const fetchWithdrawalQueueLimits = async ({
-  withdrawalQueue,
-}: {
-  withdrawalQueue: WithdrawalQueueContract;
-}) => {
-  const [minWithdrawalAmountInEth, maxWithdrawalAmountInEth] =
-    await Promise.all([
-      withdrawalQueue.read.MIN_WITHDRAWAL_VALUE(),
-      withdrawalQueue.read.MAX_WITHDRAWAL_ASSETS(),
-    ]);
-
-  return {
-    minWithdrawalAmountInEth,
-    maxWithdrawalAmountInEth,
-  };
-};
+  'Withdrawal amount minus the rebalanced value is less then minimum allowed withdrawable value';
 
 export const getMinWithdrawalErrorFromData = ({
   amount,
@@ -76,12 +54,12 @@ export const getMinWithdrawalError = async ({
   repayToken: RepayTokens;
   publicClient: RegisteredPublicClient;
   report: VaultReportType | null | undefined;
-  wrapper: RepayRebalanceWrapper;
-  withdrawalQueue: WithdrawalQueueContract;
+  wrapper: Wrapper;
+  withdrawalQueue: ReturnType<typeof getWQContract>;
   address: Address;
-  shares: SharesContract;
-  wstETH: TokenContract;
-  stETH: TokenContract;
+  shares: LidoSDKShares;
+  wstETH: LidoSDKwstETH;
+  stETH: LidoSDKstETH;
 }) => {
   if (!amount) {
     return {
@@ -91,8 +69,8 @@ export const getMinWithdrawalError = async ({
     };
   }
 
-  const [{ minWithdrawalAmountInEth }, repayData] = await Promise.all([
-    fetchWithdrawalQueueLimits({ withdrawalQueue }),
+  const [minWithdrawalAmountInEth, repayData] = await Promise.all([
+    withdrawalQueue.read.MIN_WITHDRAWAL_VALUE(),
     getRepayRebalanceAmount({
       amount,
       repayToken,
@@ -115,8 +93,5 @@ export const getMinWithdrawalError = async ({
 
   return {
     error,
-    minWithdrawalAmountInEth,
-    rebalanceableSteth,
-    repayData,
   };
 };
