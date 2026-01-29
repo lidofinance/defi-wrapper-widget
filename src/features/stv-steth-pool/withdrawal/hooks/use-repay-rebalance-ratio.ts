@@ -10,7 +10,11 @@ import {
   useLidoSDK,
 } from '@/modules/web3';
 import { useDebouncedValue } from '@/shared/hooks';
-import { maxBN, minBN } from '@/utils/bn';
+import { maxBN } from '@/utils/bn';
+import {
+  calculateRepayRebalanceRatio,
+  fetchRepayStaticData,
+} from '../utils/repay-rebalance';
 import { RepayTokens } from '../withdrawal-form-context/types';
 
 const useRepayStaticData = () => {
@@ -26,27 +30,15 @@ const useRepayStaticData = () => {
     queryFn: async () => {
       invariant(activeVault, '[useRepayStaticData] Active vault is required');
       invariant(address, '[useRepayStaticData] Address is required');
-
-      const [sharesBalance, wstethBalance, stethBalance, mintedShares] =
-        await Promise.all([
-          shares.balance(address),
-          wstETH.balance(address),
-          stETH.balance(address),
-          wrapper.read.mintedStethSharesOf([address]),
-        ]);
-      const [unlockedUserEth] = await readWithReport({
+      return fetchRepayStaticData({
         publicClient,
         report: activeVault.report,
-        contracts: [wrapper.prepare.unlockedAssetsOf([address, 0n])],
+        wrapper,
+        address,
+        shares,
+        wstETH,
+        stETH,
       });
-
-      return {
-        sharesBalance,
-        wstethBalance,
-        stethBalance,
-        unlockedUserEth,
-        mintedShares,
-      };
     },
   });
 };
@@ -134,62 +126,15 @@ export const useRepayRebalanceRatio = (
       invariant(activeVault, 'Active vault is required');
       invariant(typeof debouncedAmount == 'bigint', 'Amount is required');
       invariant(repayStaticData, 'Repay static data is required');
-
-      const { unlockedUserEth, mintedShares, sharesBalance, wstethBalance } =
-        repayStaticData;
-
-      const lockedUserEth = debouncedAmount - unlockedUserEth;
-
-      // no need to repay/rebalance if unlocked ETH covers the withdrawal amount
-      if (lockedUserEth <= 0n) {
-        return {
-          repayableStethShares: 0n,
-          rebalanceableStethShares: 0n,
-          repayableSteth: 0n,
-          rebalanceableSteth: 0n,
-          remainingWithdrawEth: debouncedAmount,
-        };
-      }
-
-      // steth shares needed to repay for the locked portion of withdrawal
-      const [stethSharesToRepayAmount] = await readWithReport({
+      return calculateRepayRebalanceRatio({
         publicClient,
         report: activeVault.report,
-        contracts: [
-          wrapper.prepare.calcStethSharesToMintForAssets([lockedUserEth]),
-        ],
+        wrapper,
+        shares,
+        repayToken,
+        amount: debouncedAmount,
+        repayStaticData,
       });
-
-      // amount entered could exceed user balance and total repay must be capped at minted shares
-      const stethSharesToRepay = minBN(stethSharesToRepayAmount, mintedShares);
-
-      const userRepayTokenBalanceInStethShares =
-        repayToken === 'WSTETH'
-          ? await shares.convertToSteth(
-              await shares.convertToSteth(wstethBalance),
-            )
-          : sharesBalance;
-
-      // steth shares user can repay with their current balance
-      const repayableStethShares = minBN(
-        stethSharesToRepay,
-        userRepayTokenBalanceInStethShares,
-      );
-      // steth shares that will be forgiven when rebalancing
-      const rebalanceableStethShares =
-        stethSharesToRepay - repayableStethShares;
-
-      const [repayableSteth, rebalanceableSteth] = await Promise.all([
-        shares.convertToSteth(repayableStethShares),
-        shares.convertToSteth(rebalanceableStethShares),
-      ]);
-
-      return {
-        repayableStethShares,
-        repayableSteth,
-        rebalanceableStethShares,
-        rebalanceableSteth,
-      };
     },
   });
 

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useWithdrawalQueue } from '@/modules/defi-wrapper';
 import { useRepayRebalanceAmount } from './use-repay-rebalance-amount';
+import { getMinWithdrawalErrorFromData } from '../utils/min-withdrawal-error';
 import type {
   RepayTokens,
   WithdrawalFormValues,
@@ -18,30 +19,27 @@ export const useMinWithdrawalError = (
 
   const rebalanceableSteth = displayData?.rebalanceable;
 
-  useEffect(() => {
-    if (
-      !amount ||
-      rebalanceableSteth === undefined ||
-      !minWithdrawalAmountInEth ||
-      displayData.isLoading
-    ) {
-      return;
-    }
-
-    if (amount - rebalanceableSteth <= minWithdrawalAmountInEth) {
-      setError('root', {
-        type: 'custom',
-        message: 'Withdrawal amount is less than minimum withdrawal limit',
-      });
-    } else {
-      clearErrors('root');
-    }
-  }, [
-    displayData,
+  const error = getMinWithdrawalErrorFromData({
     amount,
     rebalanceableSteth,
     minWithdrawalAmountInEth,
-    setError,
-    clearErrors,
-  ]);
+  });
+  const canValidate =
+    !!amount && rebalanceableSteth !== undefined && !!minWithdrawalAmountInEth;
+
+  useEffect(() => {
+    if (!canValidate || displayData.isLoading) {
+      return;
+    }
+
+    if (error) {
+      setError('root', {
+        type: 'custom',
+        message: error,
+      });
+      return;
+    }
+
+    clearErrors('root');
+  }, [canValidate, displayData.isLoading, error, setError, clearErrors]);
 };
