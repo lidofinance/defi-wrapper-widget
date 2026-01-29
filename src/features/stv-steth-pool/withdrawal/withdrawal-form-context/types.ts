@@ -1,3 +1,13 @@
+import type { Address } from 'viem';
+import { LidoSDKShares } from '@lidofinance/lido-ethereum-sdk';
+import {
+  LidoSDKstETH,
+  LidoSDKwstETH,
+} from '@lidofinance/lido-ethereum-sdk/erc20';
+import { QueryClient } from '@tanstack/query-core';
+import { useStvSteth } from '@/modules/defi-wrapper';
+import type { VaultReportType } from '@/modules/vaults';
+import type { RegisteredPublicClient } from '@/modules/web3';
 import type { Token } from '@/types/token';
 import type { withdrawalFormValidationSchema } from './validation';
 import type z from 'zod';
@@ -10,6 +20,16 @@ export type WithdrawalFormValidationAsyncContextType = {
   balanceInEth: bigint;
   maxWithdrawalInEth: bigint | null;
   minWithdrawalInEth: bigint | null;
+  minWithdrawalValidationDeps?: {
+    publicClient: RegisteredPublicClient;
+    report: VaultReportType | null | undefined;
+    wrapper: ReturnType<typeof useStvSteth>['wrapper'];
+    address: Address;
+    shares: LidoSDKShares;
+    wstETH: LidoSDKwstETH;
+    stETH: LidoSDKstETH;
+    queryClient: QueryClient;
+  };
 };
 
 export type WithdrawalFormValidationContextType = {

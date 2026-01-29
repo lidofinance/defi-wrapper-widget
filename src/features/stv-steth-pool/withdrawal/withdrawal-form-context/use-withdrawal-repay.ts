@@ -171,14 +171,16 @@ export const useWithdrawalRepay = () => {
                 )),
               );
 
-              calls.push({
-                ...(repayToken === 'WSTETH'
-                  ? wrapper.encode.burnWsteth([repayableStethShares])
-                  : wrapper.encode.burnStethShares([repayableStethShares])),
-                loadingText: `Repaying ${formatBalance(repayableAmount).actual} ${tokenLabel(repayToken)}`,
-                signingDescription: DEFAULT_SIGNING_DESCRIPTION,
-                loadingDescription: DEFAULT_LOADING_DESCRIPTION,
-              });
+              if (repayableAmount > 0n) {
+                calls.push({
+                  ...(repayToken === 'WSTETH'
+                    ? wrapper.encode.burnWsteth([repayableStethShares])
+                    : wrapper.encode.burnStethShares([repayableStethShares])),
+                  loadingText: `Repaying ${formatBalance(repayableAmount).actual} ${tokenLabel(repayToken)}`,
+                  signingDescription: DEFAULT_SIGNING_DESCRIPTION,
+                  loadingDescription: DEFAULT_LOADING_DESCRIPTION,
+                });
+              }
 
               const amountInStv = await convertFromEthToStv(
                 publicClient,
@@ -192,17 +194,19 @@ export const useWithdrawalRepay = () => {
                 );
               }
 
+              const rebalancingText = `${formatBalance(rebalanceableAmount).actual} ${tokenLabel(repayToken)}`;
+              let loadingText = `Requesting ${requestedETHAmount} ${tokenLabel('ETH')} from the vault. `;
+              if (rebalanceableAmount > 0n) {
+                loadingText += `Rebalancing ${rebalancingText}`;
+              }
+
               calls.push({
                 ...withdrawalQueue.encode.requestWithdrawal([
                   address, // receiver
                   amountInStv, // stvAmount to withdraw
                   rebalanceableStethShares, // steth shares to rebalance
                 ]),
-                loadingText: `Requesting ${requestedETHAmount} ${tokenLabel('ETH')} from the vault. Repaying ${
-                  formatBalance(repayableAmount).actual
-                } ${tokenLabel(repayToken)} and rebalancing ${
-                  formatBalance(rebalanceableAmount).actual
-                } ${tokenLabel(repayToken)}`,
+                loadingText,
                 signingDescription: DEFAULT_SIGNING_DESCRIPTION,
                 loadingDescription: DEFAULT_LOADING_DESCRIPTION,
               });
