@@ -3,7 +3,6 @@ services:
     build:
       context: .
       args:
-        VITE_BASE_URL: ""
         VITE_POOL_TYPE: ${VITE_POOL_TYPE}
         VITE_POOL_ADDRESS: ${VITE_POOL_ADDRESS}
         VITE_STRATEGY_ADDRESS: ${VITE_STRATEGY_ADDRESS}
