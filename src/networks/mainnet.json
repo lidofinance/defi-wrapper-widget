@@ -11,5 +11,9 @@
     "weth": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     "ensUniversalResolver": "0xeEeEEEeE14D718C2B47D9923Deab1335E144EeEe"
   },
-  "api": {}
+  "api": {
+    "vaultsApi": "https://stvaults-api.lido.fi",
+    "ethApi": "https://eth-api.lido.fi",
+    "ggvApi": "https://api.sevenseas.capital"
+  }
 }
