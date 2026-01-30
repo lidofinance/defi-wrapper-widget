@@ -13,7 +13,7 @@ const TOKENS = {
 
 const amountSchema = z
   .bigint({ message: 'Amount is required' })
-  .gt(0n, 'Amount must be at least 1');
+  .gt(0n, 'Amount must be greater than 0');
 
 const maxBalanceSchema = (balance: bigint) =>
   amountSchema.lte(balance, `Amount must not be larger then your balance`);

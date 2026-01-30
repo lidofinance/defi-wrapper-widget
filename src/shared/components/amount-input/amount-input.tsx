@@ -174,7 +174,14 @@ export const AmountInput: React.FC<TokenAmountInputProps> = forwardRef<
 
       {isError && (
         <Field.Root invalid>
-          <Field.ErrorText position={'absolute'} right="0" top={1}>
+          <Field.ErrorText
+            mt={1}
+            alignSelf="flex-end"
+            textAlign="right"
+            maxW="full"
+            whiteSpace="normal"
+            lineHeight="shorter"
+          >
             {error}
           </Field.ErrorText>
         </Field.Root>

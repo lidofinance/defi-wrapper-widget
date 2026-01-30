@@ -8,6 +8,7 @@ type AvailableMaxProps = {
   availableAmount?: bigint;
   onMaxClick?: () => void;
   disabled?: boolean;
+  dedication?: string;
 };
 
 export const AvailableMax = ({
@@ -15,6 +16,7 @@ export const AvailableMax = ({
   availableAmount,
   onMaxClick,
   disabled,
+  dedication,
 }: AvailableMaxProps) => {
   const hasAvailableAmount = typeof availableAmount === 'bigint';
   return (
@@ -27,7 +29,8 @@ export const AvailableMax = ({
       >
         <Flex alignItems="center" gap={2}>
           <Text fontSize="xs" color="fg" aria-hidden="true">
-            <FormatToken amount={availableAmount} token={token} /> available
+            <FormatToken amount={availableAmount} token={token} /> available{' '}
+            {dedication && <span>{dedication} </span>}
           </Text>
 
           {onMaxClick && (

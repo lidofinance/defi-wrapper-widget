@@ -23,6 +23,7 @@ import {
   useTransactionModal,
 } from '@/shared/components/transaction-modal';
 import { getReferralAddress } from '@/shared/wrapper/refferals/get-refferal-address';
+import { Token } from '@/types/token';
 import { minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
@@ -33,6 +34,26 @@ const createTxMetadata = (loadingText: string) => ({
   loadingDescription: DEFAULT_LOADING_DESCRIPTION,
   loadingText,
 });
+
+const combineTxTitles = ({
+  depositedAmount,
+  token,
+  mintedAmountBalance,
+  tokenToMint,
+}: {
+  depositedAmount: string;
+  token: Token;
+  mintedAmountBalance?: string;
+  tokenToMint: Extract<Token, 'WSTETH' | 'STETH'>;
+}) => {
+  if (mintedAmountBalance) {
+    return `Depositing ${depositedAmount} ${tokenLabel(token)} to the vault and minting ${
+      mintedAmountBalance
+    } ${tokenLabel(tokenToMint)}`;
+  }
+
+  return `Depositing ${depositedAmount} ${tokenLabel(token)} to the vault`;
+};
 
 export const useDepositMint = () => {
   const { address } = useDappStatus();
@@ -63,11 +84,10 @@ export const useDepositMint = () => {
         const lidoV3 = getLidoV3Contract(publicClient);
         const depositedAmount = formatBalance(amount).actual;
 
-        let TXTitle = '';
         let maxMintShares: bigint;
+        let mintedAmountBalance: string | undefined = undefined;
 
         if (mintingPaused) {
-          TXTitle = `Depositing ${depositedAmount} ${tokenLabel(token)} to the vault`;
           maxMintShares = 0n;
         } else {
           const [
@@ -102,15 +122,18 @@ export const useDepositMint = () => {
 
           const maxMintSteth = await shares.convertToSteth(maxMintShares);
 
-          const mintedAmountBalance =
+          mintedAmountBalance =
             tokenToMint === 'STETH'
               ? formatBalance(maxMintSteth).actual
               : formatBalance(maxMintShares).actual;
-
-          TXTitle = `Depositing ${depositedAmount} ${tokenLabel(token)} to the vault and minting ${
-            mintedAmountBalance
-          } ${tokenLabel(tokenToMint)}`;
         }
+
+        const TXTitle = combineTxTitles({
+          depositedAmount,
+          token,
+          mintedAmountBalance,
+          tokenToMint,
+        });
 
         const { success } = await withSuccess(
           sendTX({
@@ -151,7 +174,14 @@ export const useDepositMint = () => {
                   maxMintShares, // max mint shares
                 ]),
                 value: amount,
-                ...createTxMetadata(TXTitle),
+                ...createTxMetadata(
+                  combineTxTitles({
+                    depositedAmount,
+                    token: 'ETH',
+                    mintedAmountBalance,
+                    tokenToMint,
+                  }),
+                ),
               });
 
               return calls;

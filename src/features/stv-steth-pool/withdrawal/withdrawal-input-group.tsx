@@ -41,6 +41,7 @@ export const WithdrawalInputGroup = () => {
         renderMaxAmount={isWalletConnected}
         amountUsd={usdQuery.usdAmount}
         token={'ETH'}
+        dedication={'for withdrawal'}
         mb={3}
       />
       <WillRepay />
