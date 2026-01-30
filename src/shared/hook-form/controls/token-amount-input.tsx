@@ -18,6 +18,7 @@ type TokenAmountInputProps = FlexProps & {
   groupLabel?: React.ReactNode;
   tokenOptions: OptionItem[];
   maxAmount?: bigint;
+  dedication?: string;
 };
 
 export const TokenAmountInput = ({
@@ -28,6 +29,7 @@ export const TokenAmountInput = ({
   groupLabel,
   tokenOptions,
   maxAmount,
+  dedication,
   ...rest
 }: TokenAmountInputProps) => {
   const tokenValue = useWatch({ name: tokenFieldName }) as Token;
@@ -70,6 +72,7 @@ export const TokenAmountInput = ({
             token={tokenValue}
             availableAmount={maxAmount}
             onMaxClick={onMaxClick}
+            dedication={dedication}
           />
         </Flex>
       )}

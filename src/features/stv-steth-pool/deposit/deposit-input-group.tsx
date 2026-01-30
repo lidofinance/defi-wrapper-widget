@@ -24,6 +24,7 @@ export const DepositInputGroup = () => {
       renderMaxAmount={isWalletConnected}
       amountUsd={usdQuery.usdAmount}
       tokenOptions={DEPOSIT_OPTIONS}
+      dedication={'for deposit'}
     />
   );
 };
