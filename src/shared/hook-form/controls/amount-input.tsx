@@ -11,6 +11,7 @@ type AmountInputProps = FlexProps & {
   token: Token;
   groupLabel?: React.ReactNode;
   maxAmount?: bigint;
+  dedication?: string;
 };
 
 export const AmountInput = ({
@@ -20,6 +21,7 @@ export const AmountInput = ({
   renderMaxAmount,
   groupLabel,
   maxAmount,
+  dedication,
   ...rest
 }: AmountInputProps) => {
   const { setValue, trigger } = useFormContext();
@@ -52,6 +54,7 @@ export const AmountInput = ({
             token={token}
             availableAmount={maxAmount}
             onMaxClick={onMaxClick}
+            dedication={dedication}
           />
         </Flex>
       )}

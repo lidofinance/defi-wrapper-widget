@@ -39,7 +39,7 @@ export const VaultDetailsContent = ({
             <Flex gap={1} alignItems="center">
               APY{' '}
               <APYTooltip
-                APY={aprData?.aprSma}
+                APY={aprData?.apySma}
                 isLoading={isLoadingApr}
                 lastUpdate={aprData?.updatedAt}
                 customContent={additionalContent}
@@ -47,7 +47,7 @@ export const VaultDetailsContent = ({
             </Flex>
           }
           isLoading={isLoadingApr}
-          info={<FormatPercent value={aprData?.aprSma} decimals="percent" />}
+          info={<FormatPercent value={aprData?.apySma} decimals="percent" />}
         />
         <InfoRow
           description={'TVL'}
