@@ -27,13 +27,7 @@ Based on your deployment of Stv Pool you must fill in variables in `.env` file:
 
 ### Running with Docker
 
-1. Fill in `.env` (see `.env.example`). Required for build: `VITE_POOL_TYPE`, `VITE_POOL_ADDRESS`, `VITE_DEFAULT_CHAIN`, `VITE_SUPPORTED_CHAINS`, `VITE_PUBLIC_EL_RPC_URLS_*`, `VITE_WALLETCONNECT_PROJECT_ID`.
-   2Build and run:
-
-```bash
-docker compose build --no-cache
-docker compose up
-```
+See `DOCKER.md` for Docker and Nginx setup, build, and run instructions.
 
 ### Customizing/Developing
 
