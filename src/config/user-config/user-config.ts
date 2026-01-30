@@ -64,7 +64,8 @@ export const USER_CONFIG: UserConfigDefaultType = {
   walletconnectProjectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID,
   devnetOverrides: import.meta.env.VITE_DEVNET_OVERRIDES,
   defaultReferralAddress:
-    import.meta.env.VITE_DEFAULT_REFERRAL_ADDRESS === undefined
+    import.meta.env.VITE_DEFAULT_REFERRAL_ADDRESS === undefined ||
+    import.meta.env.VITE_DEFAULT_REFERRAL_ADDRESS === ''
       ? undefined
       : assertAddress(
           import.meta.env.VITE_DEFAULT_REFERRAL_ADDRESS,
