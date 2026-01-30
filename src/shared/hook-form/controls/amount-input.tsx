@@ -22,7 +22,7 @@ export const AmountInput = ({
   maxAmount,
   ...rest
 }: AmountInputProps) => {
-  const { setValue } = useFormContext();
+  const { setValue, trigger } = useFormContext();
   const {
     field,
     fieldState: { error },
@@ -31,6 +31,7 @@ export const AmountInput = ({
   const onMaxClick = () => {
     if (maxAmount) {
       setValue(amountFieldName, maxAmount);
+      trigger(amountFieldName);
     }
   };
 

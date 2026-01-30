@@ -25,9 +25,13 @@ Based on your deployment of Stv Pool you must fill in variables in `.env` file:
 - serve build from `/dist` as static HTML via your web server of choice
 - you can serve app as is or embedded via iframe inside other websites
 
+### Running with Docker
+
+See `DOCKER.md` for Docker and Nginx setup, build, and run instructions.
+
 ### Customizing/Developing
 
-For dev server and install dependcies and fill envs and run `yarn dev`
+For dev server and install dependencies and fill envs and run `yarn dev`
 
 The dapp widget is a Single Page React App build with Chakra UI and Wagmi/Viem/React-query.
 You can adjust any part of the UI as you see fit.
@@ -40,6 +44,25 @@ You can adjust any part of the UI as you see fit.
 - Assets are stored in `/assets`
 - `/public` contents will be copied into build directory
 - for more info see [Vite Docs](https://vite.dev/)
+
+#### Updating the header logo
+
+The header logo is an SVG imported from `assets/icons/header_logo.svg` and rendered in `src/shared/wrapper/layout/header.tsx`.
+
+To change it:
+
+1. Replace `assets/icons/header_logo.svg` with your SVG (keep the same filename), or
+2. Add a new SVG file in `assets/icons/` and update the import in `src/shared/wrapper/layout/header.tsx`:
+
+```tsx
+import MainLogo from 'assets/icons/your_logo.svg?react';
+```
+
+You can also adjust the rendered size in the same component:
+
+```tsx
+<MainLogo width="94px" height="23px" />
+```
 
 ### Iframe Demo App
 

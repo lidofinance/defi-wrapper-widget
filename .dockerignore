@@ -12,7 +12,6 @@ _.log
 .env
 .env.\*.local
 tsconfig.tsbuildinfo
-nginx.conf
 Dockerfile
 docker-compose.yml
 README.md

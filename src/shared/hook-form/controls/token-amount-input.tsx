@@ -32,7 +32,7 @@ export const TokenAmountInput = ({
 }: TokenAmountInputProps) => {
   const tokenValue = useWatch({ name: tokenFieldName }) as Token;
   const tokenLabel = getTokenLabel(tokenValue);
-  const { setValue } = useFormContext();
+  const { setValue, trigger } = useFormContext();
   const {
     field,
     fieldState: { error },
@@ -49,6 +49,7 @@ export const TokenAmountInput = ({
   const onMaxClick = () => {
     if (maxAmount) {
       setValue(amountFieldName, maxAmount);
+      trigger(amountFieldName);
     }
   };
 

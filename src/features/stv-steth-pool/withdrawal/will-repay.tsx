@@ -3,7 +3,6 @@ import { useFormContext, useWatch } from 'react-hook-form';
 import { Flex } from '@chakra-ui/react';
 import { MintTokenSwitch } from '@/shared/components/mint-token-switch';
 import { FormatTokenWithIcon } from '@/shared/formatters/format-token-with-icon';
-import { useMinWithdrawalError } from './hooks/use-min-withdrawal-error';
 import { useRepayRebalanceAmount } from './hooks/use-repay-rebalance-amount';
 import { useRepayRebalanceRatio } from './hooks/use-repay-rebalance-ratio';
 import { RepaymentAlert } from './repayment-alert';
@@ -31,8 +30,6 @@ export const WillRepay = () => {
   const amountToCalcFor = amount || 0n;
   const { isLoading } = useRepayRebalanceRatio(amountToCalcFor, repayToken);
   const { repayable } = useRepayRebalanceAmount(amountToCalcFor, repayToken);
-
-  useMinWithdrawalError(amount, repayToken);
 
   return (
     <>
