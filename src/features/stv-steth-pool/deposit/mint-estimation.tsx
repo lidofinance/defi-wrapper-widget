@@ -12,19 +12,25 @@ import { MintEstimationWarning } from './mint-estimation-warning';
 import { MintPausedWarning } from './mint-paused-warning';
 import { ReserveRatioTooltip } from './reserve-ratio-tooltip';
 
+type MintEstimationAlertProps = {
+  isLimitedByLiability?: boolean;
+  isLimitedByVaultCapacity?: boolean;
+  tokenToMint: MINT_TOKENS_VALUE_TYPE;
+  isPositiveMint: boolean;
+  maxMint: bigint;
+  expectedMint: bigint;
+  mintingSpread: bigint;
+};
+
 const MintEstimationAlert = ({
   tokenToMint,
   isPositiveMint,
   maxMint,
   expectedMint,
   mintingSpread,
-}: {
-  tokenToMint: MINT_TOKENS_VALUE_TYPE;
-  isPositiveMint: boolean;
-  maxMint: bigint;
-  expectedMint: bigint;
-  mintingSpread: bigint;
-}) => {
+  isLimitedByLiability,
+  isLimitedByVaultCapacity,
+}: MintEstimationAlertProps) => {
   return (
     <Alert.Root
       status="info"
@@ -48,6 +54,8 @@ const MintEstimationAlert = ({
             tokenToMint={tokenToMint}
             expectedMintedAmount={expectedMint}
             maxMintableAmount={maxMint}
+            isLimitedByLiability={isLimitedByLiability}
+            isLimitedByVaultCapacity={isLimitedByVaultCapacity}
           />
         )}
       </Alert.Title>
@@ -59,15 +67,21 @@ export const MintEstimation = () => {
   const tokenToMint = useWatch<DepositFormValues, 'tokenToMint'>({
     name: 'tokenToMint',
   });
-  const erros = useFormContext().formState.errors;
+  const errors = useFormContext().formState.errors;
 
   const { mintingPaused } = useStvSteth();
 
   const { setValue } = useFormContext<DepositFormValues>();
 
   // preview minted (w)steth and if they correspond to depsoit amount by RR (tokenToMint aware)
-  const { isLoading, shouldShowWarning, expectedMint, mintingSpread, maxMint } =
-    usePreviewMint();
+  const {
+    isLoading,
+    shouldShowWarning,
+    expectedMint,
+    mintingSpread,
+    maxMint,
+    data,
+  } = usePreviewMint();
   const { data: vaultCapacity } = useVaultCapacity();
 
   const isPositiveMint = mintingSpread > 0n;
@@ -77,7 +91,7 @@ export const MintEstimation = () => {
   };
 
   const showMintAmountWarnings =
-    shouldShowWarning && Object.keys(erros).length === 0;
+    shouldShowWarning && Object.keys(errors).length === 0;
   return (
     <>
       <Flex justify="space-between" align="flex-start" gap={1}>
@@ -123,6 +137,8 @@ export const MintEstimation = () => {
           tokenToMint={tokenToMint}
           mintingSpread={mintingSpread}
           isPositiveMint={isPositiveMint}
+          isLimitedByLiability={data?.isLimitedByLiability}
+          isLimitedByVaultCapacity={data?.isLimitedByVaultCapacity}
           maxMint={maxMint}
           expectedMint={expectedMint}
         />
