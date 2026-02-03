@@ -48,8 +48,8 @@ const supportedChains =
   import.meta.env.VITE_SUPPORTED_CHAINS?.split(',').map(Number) || [];
 
 const supportedChainsWithMainnet = supportedChains.includes(CHAINS.Mainnet)
-  ? [CHAINS.Mainnet, ...supportedChains]
-  : supportedChains;
+  ? [...supportedChains]
+  : [CHAINS.Mainnet, ...supportedChains];
 
 const poolType = assertPoolType(
   import.meta.env.VITE_POOL_TYPE,
@@ -74,7 +74,9 @@ export const USER_CONFIG: UserConfigDefaultType = {
   publicElRpcUrls: supportedChainsWithMainnet.reduce(
     (acc: { [key: string]: string[] }, chain: number) => {
       acc[`${chain}`] =
-        import.meta.env[`VITE_PUBLIC_EL_RPC_URLS_${chain}`]?.split(',') ?? [];
+        import.meta.env[`VITE_PUBLIC_EL_RPC_URLS_${chain}`]
+          ?.split(',')
+          .filter(Boolean) ?? [];
       return acc;
     },
     {},

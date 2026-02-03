@@ -102,7 +102,13 @@ export const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
     rpcUrlsByChain: Record<number, string[]>;
     singleRpcUrlByChain: Record<number, string>;
   } = useMemo(() => {
-    const rpcUrlsByChain = supportedChainIds.reduce(
+    const supportedChainIdsWithMainnet = supportedChainIds.includes(
+      CHAINS.Mainnet,
+    )
+      ? supportedChainIds
+      : [CHAINS.Mainnet, ...supportedChainIds];
+
+    const rpcUrlsByChain = supportedChainIdsWithMainnet.reduce(
       (res, curr) => ({
         ...res,
         [curr]: publicElRpcUrls[curr as CHAINS] || [],
@@ -110,7 +116,7 @@ export const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
       {},
     );
 
-    const singleRpcUrlByChain = supportedChainIds.reduce(
+    const singleRpcUrlByChain = supportedChainIdsWithMainnet.reduce(
       (res, curr) => ({
         ...res,
         [curr]: publicElRpcUrls[curr as CHAINS][0],
