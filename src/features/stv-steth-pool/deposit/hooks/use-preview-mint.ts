@@ -3,14 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useWatch } from 'react-hook-form';
 import invariant from 'tiny-invariant';
 import { useStvSteth } from '@/modules/defi-wrapper';
-import {
-  readWithReport,
-  useVault,
-  VAULT_TOTAL_BASIS_POINTS,
-} from '@/modules/vaults';
+import { readWithReport, useVault, getLidoV3Contract } from '@/modules/vaults';
 import { useDappStatus, useLidoSDK } from '@/modules/web3';
 
-import { factorMulBN, isEqualEpsilonBN, minBN } from '@/utils/bn';
+import { isEqualEpsilonBN, maxBN, minBN } from '@/utils/bn';
 
 import { DepositFormValues } from '../deposit-form-context/types';
 
@@ -57,60 +53,79 @@ export const usePreviewMint = () => {
           reserveRatioPercent: 0,
         };
       }
+
+      const lidoV3 = getLidoV3Contract(publicClient);
+
       const [
         remainingUserMintingCapacityShares,
         remainingVaultMintingCapacityShares,
+        expectedMintedStethShares,
+        userAssets,
+        userMintedShares,
       ] = await readWithReport({
         publicClient,
         report: activeVault?.report,
         contracts: [
           wrapper.prepare.remainingMintingCapacitySharesOf([address, amount]),
           dashboard.prepare.remainingMintingCapacityShares([amount]),
+          wrapper.prepare.calcStethSharesToMintForAssets([amount]),
+          wrapper.prepare.assetsOf([address]),
+          wrapper.prepare.mintedStethSharesOf([address]),
         ],
       });
 
-      const [
-        remainingUserMintingCapacitySteth,
-        remainingVaultMintingCapacitySteth,
-        reserveRatioBP,
-      ] = await Promise.all([
-        shares.convertToSteth(remainingUserMintingCapacityShares),
-        shares.convertToSteth(remainingVaultMintingCapacityShares),
-        wrapper.read.poolReserveRatioBP(),
-      ]);
+      const [maxMintableExternalShares, currentMintedExternalShares] =
+        await Promise.all([
+          lidoV3.read.getMaxMintableExternalShares(),
+          lidoV3.read.getExternalShares(),
+        ]);
 
-      const reserveRatioPercent =
-        (Number(reserveRatioBP) / VAULT_TOTAL_BASIS_POINTS) * 100;
+      const remainingLidoCapacityShares = maxBN(
+        maxMintableExternalShares - currentMintedExternalShares,
+        0n,
+      );
+
+      const [actualUserLiability] = await readWithReport({
+        publicClient,
+        report: activeVault?.report,
+        contracts: [
+          wrapper.prepare.calcStethSharesToMintForAssets([userAssets]),
+        ],
+      });
+
+      // how much of capacity of the user is taken by existing liability
+      const takenMintingCapacity = maxBN(
+        userMintedShares - actualUserLiability,
+        0n,
+      );
 
       const maxToMintShares = minBN(
         remainingUserMintingCapacityShares,
-        remainingVaultMintingCapacityShares,
-      );
-      const maxToMintSteth = minBN(
-        remainingUserMintingCapacitySteth,
-        remainingVaultMintingCapacitySteth,
+        minBN(remainingVaultMintingCapacityShares, remainingLidoCapacityShares),
       );
 
-      const expectedMintedSteth = factorMulBN(
-        amount,
-        1 - reserveRatioPercent / 100,
-      );
+      const isLimitedByVaultCapacity =
+        remainingUserMintingCapacityShares >=
+        minBN(remainingVaultMintingCapacityShares, remainingLidoCapacityShares);
 
-      const expectedMintedStethShares =
-        await shares.convertToShares(expectedMintedSteth);
+      const isLimitedByLiability = takenMintingCapacity > 0n;
+
+      const maxToMintSteth = await shares.convertToSteth(maxToMintShares);
+      const expectedMintedSteth = await shares.convertToSteth(
+        expectedMintedStethShares,
+      );
 
       return {
         maxToMintShares,
         remainingUserMintingCapacityShares,
         remainingVaultMintingCapacityShares,
+        isLimitedByVaultCapacity,
+        isLimitedByLiability,
 
         maxToMintSteth,
-        remainingUserMintingCapacitySteth,
-        remainingVaultMintingCapacitySteth,
 
         expectedMintedSteth,
         expectedMintedStethShares,
-        reserveRatioPercent,
       };
     },
   });
