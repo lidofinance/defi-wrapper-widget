@@ -28,7 +28,6 @@ export const MintEstimationWarning = ({
 
   return (
     <>
-      Your minting capacity is{' '}
       <FormatToken
         amount={expectedMintedAmount}
         token={tokenToMint}
@@ -36,7 +35,7 @@ export const MintEstimationWarning = ({
         fallback="N/A"
         trimEllipsis={true}
       />{' '}
-      , but due to {reason},
+      should be minted, but due to {reason},
       {maxMintableAmount > 0n ? (
         <>
           {' '}
@@ -48,7 +47,7 @@ export const MintEstimationWarning = ({
             fallback="N/A"
             trimEllipsis={true}
           />{' '}
-          can be minted.
+          will be minted.
         </>
       ) : (
         <>{tokenLabel(tokenToMint)} can not be minted.</>
