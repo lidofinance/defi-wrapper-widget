@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { getContract, Address } from 'viem';
-import { CHAINS } from '@lidofinance/lido-ethereum-sdk';
+import { CHAINS } from '@lidofinance/lido-ethereum-sdk/common';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
 

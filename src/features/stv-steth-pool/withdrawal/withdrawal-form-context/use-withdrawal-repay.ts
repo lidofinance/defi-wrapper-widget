@@ -1,7 +1,11 @@
 import { useCallback } from 'react';
 import { usePublicClient } from 'wagmi';
 import invariant from 'tiny-invariant';
-import { useConvert, useStvSteth } from '@/modules/defi-wrapper';
+import {
+  useConvert,
+  useStvSteth,
+  calculateStethSharesToRepay,
+} from '@/modules/defi-wrapper';
 import { useReportCalls, useVault } from '@/modules/vaults';
 import {
   TransactionEntry,
@@ -19,7 +23,6 @@ import { maxBN, minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
 import type { RepayTokens, WithdrawalFormValidatedValues } from './types';
-import { calculateStethSharesToRepay } from '../hooks/use-repay-rebalance-ratio';
 
 export const useWithdrawalRepay = () => {
   const { address } = useDappStatus();

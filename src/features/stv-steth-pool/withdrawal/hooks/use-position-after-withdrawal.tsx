@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
-import { useWrapperBalance } from '@/modules/defi-wrapper';
+import {
+  useWrapperBalance,
+  useRepayRebalanceRatio,
+} from '@/modules/defi-wrapper';
 import { useVault } from '@/modules/vaults';
 import { useDappStatus } from '@/modules/web3';
 import { maxBN } from '@/utils/bn';
 import { useAvailableMint } from '../../vault-status/mint/use-available-mint';
-import { useRepayRebalanceRatio } from './use-repay-rebalance-ratio';
 
 export const usePositionAfterWithdrawal = (
   widthdrawalAmountInEth: bigint | null,
@@ -13,7 +15,7 @@ export const usePositionAfterWithdrawal = (
   const { activeVault } = useVault();
   const { assets, isBalanceLoading } = useWrapperBalance();
   const { data: availableMintData } = useAvailableMint();
-  const { data: repayRatioData } = useRepayRebalanceRatio(
+  const { rebalanceRatio } = useRepayRebalanceRatio(
     widthdrawalAmountInEth || 0n,
     'STETH',
   );
@@ -24,14 +26,14 @@ export const usePositionAfterWithdrawal = (
       !address ||
       !availableMintData ||
       isBalanceLoading ||
-      !repayRatioData ||
+      !rebalanceRatio ||
       typeof assets !== 'bigint'
     ) {
       return undefined;
     }
 
     const { totalMintedSteth } = availableMintData;
-    const { repayableSteth, rebalanceableSteth } = repayRatioData;
+    const { repayableSteth, rebalancableSteth } = rebalanceRatio;
 
     // allowing UI to render like user inputed 0 if input is empty
     const vaultBalanceETHAfter = maxBN(
@@ -39,7 +41,7 @@ export const usePositionAfterWithdrawal = (
       0n,
     );
     const stethMintedAfter = maxBN(
-      totalMintedSteth - (repayableSteth + rebalanceableSteth),
+      totalMintedSteth - (repayableSteth + rebalancableSteth),
       0n,
     );
 
@@ -52,14 +54,13 @@ export const usePositionAfterWithdrawal = (
     address,
     availableMintData,
     isBalanceLoading,
-    repayRatioData,
+    rebalanceRatio,
     assets,
     widthdrawalAmountInEth,
   ]);
 
   return {
     data,
-    isLoading:
-      isBalanceLoading || availableMintData == null || repayRatioData == null,
+    isLoading: isBalanceLoading || !availableMintData || !rebalanceRatio,
   };
 };

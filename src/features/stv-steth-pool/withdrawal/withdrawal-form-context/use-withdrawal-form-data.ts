@@ -1,12 +1,11 @@
 import { useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import {
-  useStvSteth,
   useWrapperBalance,
   useWithdrawalQueue,
+  useRepayRebalanceRatio,
 } from '@/modules/defi-wrapper';
-import { useVault } from '@/modules/vaults';
-import { useDappStatus, useLidoSDK } from '@/modules/web3';
+
+import { useDappStatus } from '@/modules/web3';
 import { useAwaiter } from '@/shared/hooks';
 
 import {
@@ -15,57 +14,43 @@ import {
 } from './types';
 
 export const useWithdrawalFormData = () => {
-  const { isWalletConnected, address } = useDappStatus();
+  const { isWalletConnected } = useDappStatus();
   const {
     maxWithdrawalAmountInEth,
     minWithdrawalAmountInEth,
     isPending: isWQLoading,
   } = useWithdrawalQueue();
   const { assets, isPending: isWrapperLoading } = useWrapperBalance();
-  const { publicClient, shares, wstETH, stETH } = useLidoSDK();
-  const { activeVault } = useVault();
-  const { wrapper } = useStvSteth();
-  const queryClient = useQueryClient();
+  const {
+    calcWithdrawalRepayRebalanceRatio,
+    isPending: isRepayRebalanceRatioLoading,
+  } = useRepayRebalanceRatio();
 
   const contextValue: WithdrawalFormValidationAsyncContextType | undefined =
     useMemo(() => {
-      if (isWrapperLoading || isWQLoading) {
+      if (
+        isWrapperLoading ||
+        isWQLoading ||
+        isRepayRebalanceRatioLoading ||
+        !calcWithdrawalRepayRebalanceRatio
+      ) {
         return undefined;
       }
-      const minWithdrawalValidationDeps =
-        address && wrapper && activeVault
-          ? {
-              publicClient,
-              report: activeVault.report,
-              wrapper,
-              address,
-              shares,
-              wstETH,
-              stETH,
-              queryClient,
-            }
-          : undefined;
 
       return {
         balanceInEth: assets ?? 0n,
         minWithdrawalInEth: minWithdrawalAmountInEth ?? 0n,
         maxWithdrawalInEth: maxWithdrawalAmountInEth ?? 0n,
-        minWithdrawalValidationDeps,
+        calcWithdrawalRepayRebalanceRatio,
       };
     }, [
-      activeVault,
-      address,
-      assets,
-      maxWithdrawalAmountInEth,
-      minWithdrawalAmountInEth,
-      publicClient,
-      queryClient,
-      shares,
-      stETH,
-      wstETH,
-      wrapper,
       isWrapperLoading,
       isWQLoading,
+      isRepayRebalanceRatioLoading,
+      assets,
+      minWithdrawalAmountInEth,
+      maxWithdrawalAmountInEth,
+      calcWithdrawalRepayRebalanceRatio,
     ]);
 
   const asyncContext = useAwaiter(contextValue).awaiter;

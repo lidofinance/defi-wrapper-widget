@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { http, publicActions } from 'viem';
 import { createConfig, fallback, useConnections, WagmiProvider } from 'wagmi';
-import { CHAINS } from '@lidofinance/lido-ethereum-sdk';
+import { CHAINS } from '@lidofinance/lido-ethereum-sdk/common';
 // @ts-expect-error lido ui has old package.json
 import { CookieThemeProvider } from '@lidofinance/lido-ui';
 import {

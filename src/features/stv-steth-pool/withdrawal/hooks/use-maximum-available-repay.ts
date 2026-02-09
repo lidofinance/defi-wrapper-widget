@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
 import { useStvSteth } from '@/modules/defi-wrapper';
-import { useVault } from '@/modules/vaults';
+import { readWithReport, useVault } from '@/modules/vaults';
 import { useDappStatus, useLidoSDK } from '@/modules/web3';
-import { fetchMaximumAvailableRepay } from '../utils/repay-rebalance';
+import { minBN } from '@/utils/bn';
 
 export const useMaximumAvailableRepay = () => {
   const { publicClient } = useLidoSDK();
@@ -22,14 +22,37 @@ export const useMaximumAvailableRepay = () => {
       );
       invariant(address, '[useMaximumAvailableRepay] address is required');
 
-      return fetchMaximumAvailableRepay({
+      const [wstethAmount, stethShares, mintedStethSharesOf] =
+        await Promise.all([
+          wstETH.balance(address),
+          shares.balance(address),
+          wrapper.read.mintedStethSharesOf([address]),
+        ]);
+
+      const maxRepayableStethShares = minBN(stethShares, mintedStethSharesOf);
+
+      // doing the trick to deduct 1wei lost on conversion in contract
+      let maxRepayableWsteth = await shares.convertToShares(
+        await shares.convertToSteth(wstethAmount),
+      );
+      maxRepayableWsteth = minBN(maxRepayableWsteth, mintedStethSharesOf);
+
+      const [
+        withdrawalbeEthNoRebalanceSteth,
+        withdrawalbeEthNoRebalanceWsteth,
+      ] = await readWithReport({
         publicClient,
         report: activeVault.report,
-        wrapper,
-        address,
-        shares,
-        wstETH,
+        contracts: [
+          wrapper.prepare.unlockedAssetsOf([address, maxRepayableStethShares]),
+          wrapper.prepare.unlockedAssetsOf([address, maxRepayableWsteth]),
+        ],
       });
+
+      return {
+        maxEthForRepayableSteth: withdrawalbeEthNoRebalanceSteth,
+        maxEthForRepayableWSteth: withdrawalbeEthNoRebalanceWsteth,
+      };
     },
   });
 

@@ -8,31 +8,43 @@ import {
 } from '@/shared/hook-form/validation';
 import { awaitWithTimeout } from '@/utils/await-with-timeout';
 import type {
+  RepayTokens,
   WithdrawalFormValidatedValues,
   WithdrawalFormValidationAsyncContextType,
   WithdrawalFormValidationContextType,
   WithdrawalFormValues,
 } from './types';
-import { getMinWithdrawalError } from '../utils/min-withdrawal-error';
 
-import type { Resolver, ResolverResult } from 'react-hook-form';
+import type { Resolver } from 'react-hook-form';
 
-export const withdrawalFormValidationSchema = ({
-  balanceInEth,
-  maxWithdrawalInEth,
-  minWithdrawalInEth,
-}: WithdrawalFormValidationAsyncContextType) => {
+export const withdrawalFormValidationSchema = (
+  repayToken: RepayTokens,
+  {
+    balanceInEth,
+    maxWithdrawalInEth,
+    minWithdrawalInEth,
+    calcWithdrawalRepayRebalanceRatio,
+  }: WithdrawalFormValidationAsyncContextType,
+) => {
   let amountSchema = tokenAmountSchema(
     balanceInEth,
     maxWithdrawalInEth ?? undefined,
     'Exceeds maximum withdrawal limit',
-  ).gte(100n, 'Minimum withdrawal is 100 wei');
+  );
 
   if (minWithdrawalInEth !== null) {
     amountSchema = amountSchema.gte(
       minWithdrawalInEth,
       'Below minimum withdrawal limit',
     );
+
+    amountSchema = amountSchema.refine((value) => {
+      const { withdrawalValue } = calcWithdrawalRepayRebalanceRatio(
+        value,
+        repayToken,
+      );
+      return withdrawalValue >= minWithdrawalInEth;
+    }, 'Withdrawal amount minus the rebalanced value is less then minimum allowed withdrawable value');
   }
 
   return z.object({
@@ -51,40 +63,14 @@ export const WithdrawalFormResolver: Resolver<
 
   const contextValue = await awaitWithTimeout(context.asyncContext, 4000);
 
-  const schema = withdrawalFormValidationSchema(contextValue);
+  const schema = withdrawalFormValidationSchema(
+    values.repayToken,
+    contextValue,
+  );
 
-  const result = await zodResolver<
+  return zodResolver<
     WithdrawalFormValues,
     unknown,
     WithdrawalFormValidatedValues
   >(schema)(values, context, options);
-  if (
-    result.errors.amount ||
-    !values.amount ||
-    !contextValue.minWithdrawalValidationDeps
-  ) {
-    return result;
-  }
-
-  const { error } = await getMinWithdrawalError({
-    minWithdrawalAmountInEth: contextValue.minWithdrawalInEth,
-    amount: values.amount,
-    repayToken: values.repayToken,
-    ...contextValue.minWithdrawalValidationDeps,
-  });
-
-  if (!error) {
-    return result;
-  }
-
-  return {
-    ...result,
-    errors: {
-      ...result.errors,
-      amount: {
-        type: 'custom',
-        message: error,
-      },
-    },
-  } as ResolverResult<WithdrawalFormValues, WithdrawalFormValidatedValues>;
 };

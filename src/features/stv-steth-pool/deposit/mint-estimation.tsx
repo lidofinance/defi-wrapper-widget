@@ -1,5 +1,5 @@
 import { useFormContext, useWatch } from 'react-hook-form';
-import { Alert, Flex, Text } from '@chakra-ui/react';
+import { Alert, Flex, Skeleton, Text } from '@chakra-ui/react';
 import { useStvSteth, useVaultCapacity } from '@/modules/defi-wrapper';
 import { MintTokenSwitch } from '@/shared/components/mint-token-switch';
 import { FormatPercent, FormatToken } from '@/shared/formatters';
@@ -82,7 +82,8 @@ export const MintEstimation = () => {
     maxMint,
     data,
   } = usePreviewMint();
-  const { data: vaultCapacity } = useVaultCapacity();
+  const { data: vaultCapacity, isPending: isVaultCapacityLoading } =
+    useVaultCapacity();
 
   const isPositiveMint = mintingSpread > 0n;
 
@@ -120,14 +121,20 @@ export const MintEstimation = () => {
           />
           <Text fontSize="sm" color={'fg.subtle'}>
             Reserve ratio{' '}
-            <FormatPercent
-              decimals="percent"
-              value={vaultCapacity?.reserveRatioPercent}
-            />{' '}
-            <ReserveRatioTooltip
-              tokenToMint={tokenToMint}
-              reserveRatioPercent={vaultCapacity?.reserveRatioPercent}
-            />
+            <Skeleton
+              as={'span'}
+              width={'68px'}
+              loading={isVaultCapacityLoading}
+            >
+              <FormatPercent
+                decimals="percent"
+                value={vaultCapacity?.reserveRatioPercent}
+              />{' '}
+              <ReserveRatioTooltip
+                tokenToMint={tokenToMint}
+                reserveRatioPercent={vaultCapacity?.reserveRatioPercent}
+              />
+            </Skeleton>
           </Text>
         </Flex>
       </Flex>
