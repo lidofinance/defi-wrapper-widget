@@ -1,5 +1,5 @@
 import { Address, getContract } from 'viem';
-import { erc20abi } from '@lidofinance/lido-ethereum-sdk/';
+import { erc20abi } from '@lidofinance/lido-ethereum-sdk/erc20';
 import { QueryClient } from '@tanstack/query-core';
 import type { RegisteredPublicClient } from '@/modules/web3';
 
