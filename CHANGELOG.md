@@ -1,4 +1,4 @@
-# 0.3.0
+# 0.2.1
 - Fixed a bug for StvStethPool withdrawals where rebalance ration was calculated incorrectly
 - Reworked min withdrawal value validation to be sync and be more optimized
 
