@@ -29,14 +29,6 @@ Based on your deployment of Stv Pool you must fill in variables in `.env` file:
 
 See `DOCKER.md` for Docker and Nginx setup, build, and run instructions.
 
-### Release notifications
-
-To get notified about new GitHub releases, subscribe to releases for this repository in GitHub. The official step-by-step guide is here:
-
-```
-https://docs.github.com/en/subscriptions-and-notifications/how-tos/managing-subscriptions-for-activity-on-github/viewing-your-subscriptions
-```
-
 ### Customizing/Developing
 
 For dev server and install dependencies and fill envs and run `yarn dev`
@@ -83,3 +75,7 @@ yarn build:iframe
 ### Syncing the latest upstream commit
 
 If you maintain a fork, run `bash sync-with-fork.sh ${RELEASE_TAG_NAME}` to fetch a tag you specify from source repo and merge it into your current branch.
+
+### Release notifications
+
+To get notified about new GitHub releases and be up to date with latest updates, subscribe to releases for this repository in GitHub. [The official step-by-step guide is here](https://docs.github.com/en/subscriptions-and-notifications/how-tos/managing-subscriptions-for-activity-on-github/viewing-your-subscriptions)
