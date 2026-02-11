@@ -4,7 +4,6 @@ import { Flex } from '@chakra-ui/react';
 import { MintTokenSwitch } from '@/shared/components/mint-token-switch';
 import { FormatTokenWithIcon } from '@/shared/formatters/format-token-with-icon';
 import { useRepayRebalanceAmount } from './hooks/use-repay-rebalance-amount';
-import { useRepayRebalanceRatio } from './hooks/use-repay-rebalance-ratio';
 import { RepaymentAlert } from './repayment-alert';
 import type {
   RepayTokens,
@@ -28,8 +27,10 @@ export const WillRepay = () => {
 
   // allowing UI to render like user inputed 0 if input is empty
   const amountToCalcFor = amount || 0n;
-  const { isLoading } = useRepayRebalanceRatio(amountToCalcFor, repayToken);
-  const { repayable } = useRepayRebalanceAmount(amountToCalcFor, repayToken);
+  const { repayable, isLoading } = useRepayRebalanceAmount(
+    amountToCalcFor,
+    repayToken,
+  );
 
   return (
     <>

@@ -6,12 +6,12 @@ import {
   useSwitchChain,
   useWalletClient,
 } from 'wagmi';
-import { LidoSDKShares } from '@lidofinance/lido-ethereum-sdk';
 import { CHAINS, LidoSDKCore } from '@lidofinance/lido-ethereum-sdk/core';
 import {
   LidoSDKstETH,
   LidoSDKwstETH,
 } from '@lidofinance/lido-ethereum-sdk/erc20';
+import { LidoSDKShares } from '@lidofinance/lido-ethereum-sdk/shares';
 import { LidoSDKStake } from '@lidofinance/lido-ethereum-sdk/stake';
 import { LidoSDKStatistics } from '@lidofinance/lido-ethereum-sdk/statistics';
 import { LidoSDKWithdraw } from '@lidofinance/lido-ethereum-sdk/withdraw';

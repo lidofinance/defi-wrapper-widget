@@ -44,6 +44,23 @@ export const numberToBN = (
   return BigInt(Math.floor(value * 10 ** precision));
 };
 
+export const bnCeilDiv = (numerator: bigint, denominator: bigint): bigint => {
+  if (denominator === 0n) {
+    throw new RangeError('Division by zero');
+  }
+
+  const quotient = numerator / denominator;
+  const remainder = numerator % denominator;
+
+  // If there is a remainder and the result is positive, add 1 to round up.
+  // We check if inputs have the same sign to determine if the result is positive.
+  if (remainder !== 0n && numerator > 0n === denominator > 0n) {
+    return quotient + 1n;
+  }
+
+  return quotient;
+};
+
 export const divideBN = (
   a: bigint,
   b: bigint,

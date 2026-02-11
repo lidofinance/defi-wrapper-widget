@@ -1,5 +1,5 @@
 import { type Address, isAddress } from 'viem';
-import { CHAINS } from '@lidofinance/lido-ethereum-sdk';
+import { CHAINS } from '@lidofinance/lido-ethereum-sdk/common';
 import { type DefiWrapperTypes } from '@/modules/defi-wrapper';
 
 export type UserConfigDefaultType = {

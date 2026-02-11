@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo } from 'react';
 import { isAddressEqual, fromHex, Address } from 'viem';
 import { usePublicClient } from 'wagmi';
 import { AddressZero } from '@ethersproject/constants';
-import { LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk';
+import { LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk/common';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
 import { USER_CONFIG } from '@/config';
