@@ -1,6 +1,6 @@
+import { useMemo } from 'react';
+import { useRepayRebalanceRatio } from '@/modules/defi-wrapper';
 import { useMaximumAvailableRepay } from './use-maximum-available-repay';
-import { useRepayRebalanceRatio } from './use-repay-rebalance-ratio';
-import { getRepayRebalanceAmountFromData } from '../utils/repay-rebalance';
 import type { RepayTokens } from '../withdrawal-form-context/types';
 
 export const useRepayRebalanceAmount = (
@@ -10,19 +10,34 @@ export const useRepayRebalanceAmount = (
   const { maxEthForRepayableWSteth, maxEthForRepayableSteth } =
     useMaximumAvailableRepay();
 
-  const { data, isPending, isLoading } = useRepayRebalanceRatio(
+  const { rebalanceRatio, isPending, isLoading } = useRepayRebalanceRatio(
     amount,
     repayToken,
   );
   const isLoadingAll = isPending || isLoading;
 
+  const result = useMemo(() => {
+    if (repayToken === 'WSTETH')
+      return {
+        maxEthForRepayableToken: maxEthForRepayableWSteth,
+        repayable: rebalanceRatio?.repayableStethShares,
+        rebalanceable: rebalanceRatio?.rebalancableStethShares,
+      };
+
+    return {
+      maxEthForRepayableToken: maxEthForRepayableSteth,
+      repayable: rebalanceRatio?.repayableSteth,
+      rebalanceable: rebalanceRatio?.rebalancableSteth,
+    };
+  }, [
+    repayToken,
+    rebalanceRatio,
+    maxEthForRepayableSteth,
+    maxEthForRepayableWSteth,
+  ]);
+
   return {
-    ...getRepayRebalanceAmountFromData({
-      repayToken,
-      repayRatioData: data,
-      maxEthForRepayableSteth,
-      maxEthForRepayableWSteth,
-    }),
     isLoading: isLoadingAll,
+    ...result,
   };
 };
