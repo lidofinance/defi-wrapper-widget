@@ -9,10 +9,10 @@ import type { RegisteredPublicClient } from '@/modules/web3';
 import { getEncodable } from '@/utils/encodable';
 
 export class LidoSDKwETH extends AbstractLidoSDKErc20 {
-  public async contractAddress() {
+  public contractAddress() {
     const contractAddress = getContractAddress(this.core.chainId, 'weth');
     invariant(contractAddress, '[LidoSDKwETH] Contract address is not defined');
-    return contractAddress;
+    return Promise.resolve(contractAddress);
   }
 }
 
