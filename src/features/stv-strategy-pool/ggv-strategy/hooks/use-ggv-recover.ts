@@ -45,20 +45,13 @@ export const useGGVRecover = () => {
             AATitleText: `Claiming rewards`,
             AASigningDescription: DEFAULT_SIGNING_DESCRIPTION,
             AALoadingDescription: DEFAULT_LOADING_DESCRIPTION,
-            transactions: async () => {
-              const calls: TransactionEntry[] = [];
-
-              // recover ERC20
-              calls.push({
-                ...ggvStrategyContract.encode.safeTransferERC20([
-                  assetToRecover,
-                  address,
-                  amountToRecover,
-                ]),
-              });
-
-              return calls;
-            },
+            transactions: [
+              ggvStrategyContract.encode.safeTransferERC20([
+                assetToRecover,
+                address,
+                amountToRecover,
+              ]),
+            ],
           }),
         );
 

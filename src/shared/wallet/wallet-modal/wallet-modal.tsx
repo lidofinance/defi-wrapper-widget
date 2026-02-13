@@ -13,7 +13,6 @@ import {
 } from '@chakra-ui/react';
 import { USER_CONFIG } from '@/config';
 import { useDappStatus } from '@/modules/web3';
-import type { ModalComponentType } from '@/providers/modal-provider';
 import { Address } from '@/shared/components/address';
 import { Identicon } from '@/shared/components/identicon';
 import { Toaster } from '@/shared/components/toaster/toaster';
@@ -23,7 +22,7 @@ import { getEtherscanAddressLink } from '@/utils/etherscan';
 import { openWindow } from '@/utils/open-window';
 import styles from './wallet-modal.module.css';
 
-export const WalletModal: ModalComponentType = ({ ...props }) => {
+export const WalletModal = ({ ...props }) => {
   const { address, walletChainId } = useDappStatus();
   const { connectorName } = useConnectorInfo();
   const { disconnect } = useDisconnect();

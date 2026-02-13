@@ -43,10 +43,8 @@ export const useGGVCancelRequest = () => {
             AASigningDescription: DEFAULT_SIGNING_DESCRIPTION,
             AALoadingDescription: DEFAULT_LOADING_DESCRIPTION,
             flow: 'claim',
-            transactions: async () => {
-              const calls: TransactionEntry[] = [];
-
-              calls.push({
+            transactions: [
+              {
                 ...ggvStrategyContract.encode.cancelGGVOnChainWithdraw([
                   {
                     nonce: BigInt(requestMetadata.nonce),
@@ -66,10 +64,8 @@ export const useGGVCancelRequest = () => {
                 loadingText: `Cancelling strategy withdrawal request`,
                 signingDescription: DEFAULT_SIGNING_DESCRIPTION,
                 loadingDescription: DEFAULT_LOADING_DESCRIPTION,
-              });
-
-              return calls;
-            },
+              },
+            ],
           }),
         );
 

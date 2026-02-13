@@ -1,14 +1,15 @@
-import { RewardEstimation } from '@/shared/wrapper/reward-estimation/reward-estimation';
-import { ApyTooltipContent } from '../apy-tooltip-content';
-import { useGGVStrategyApy } from '../hooks/use-ggv-strategy-apy';
 import { useEstimatedRewards } from '@/modules/defi-wrapper';
 
 import { useWatch } from 'react-hook-form';
 
+import { RewardEstimation } from '@/shared/wrapper/reward-estimation/reward-estimation';
+
 import type { DepositFormValues } from './deposit-form-context/types';
+import { ApyTooltipContent } from '../apy-tooltip-content';
 
 export const DepositApy = () => {
-  const { apySma, isLoadingApr, updatedAt } = useGGVStrategyApy();
+  // const { apySma, isLoadingApr, updatedAt } = useGGVStrategyApy();
+
   const amountETH = useWatch<DepositFormValues, 'amount'>({ name: 'amount' });
   const {
     estimatedMonthlyRewardsETH,
@@ -16,25 +17,25 @@ export const DepositApy = () => {
     estimatedYearlyRewardsETH,
     estimatedYearlyRewardsUSD,
     isLoadingUSD,
-  } = useEstimatedRewards(apySma, amountETH);
+  } = useEstimatedRewards(undefined);
 
-  const aprData =
-    apySma && updatedAt
-      ? {
-          updatedAt,
-          apySma: apySma,
-        }
-      : undefined;
+  // const aprData =
+  //   apySma && updatedAt
+  //     ? {
+  //         updatedAt,
+  //         apySma: apySma,
+  //       }
+  //     : undefined;
 
   return (
     <RewardEstimation
-      aprData={aprData}
-      isLoadingAPR={isLoadingApr}
+      aprData={undefined}
+      isLoadingAPR={false}
       estimatedMonthlyRewardsETH={estimatedMonthlyRewardsETH ?? 0n}
       estimatedMonthlyRewardsUSD={estimatedMonthlyRewardsUSD}
       estimatedYearlyRewardsETH={estimatedYearlyRewardsETH ?? 0n}
       estimatedYearlyRewardsUSD={estimatedYearlyRewardsUSD}
-      isLoadingRewards={isLoadingApr || isLoadingUSD}
+      isLoadingRewards={isLoadingUSD}
       customAPYTooltipContent={<ApyTooltipContent />}
     />
   );

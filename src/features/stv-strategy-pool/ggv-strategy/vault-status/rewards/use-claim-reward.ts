@@ -57,18 +57,14 @@ export const useClaimReward = () => {
           flow: 'claim',
           AASigningDescription: DEFAULT_SIGNING_DESCRIPTION,
           AALoadingDescription: DEFAULT_LOADING_DESCRIPTION,
-          transactions: async () => {
-            const calls: TransactionEntry[] = [];
-
-            calls.push({
+          transactions: [
+            {
               ...distributor.encode.claim([address, token, amount, proofData]),
               loadingText: `Claiming ${formattedAmount} ${symbol}`,
               signingDescription: DEFAULT_SIGNING_DESCRIPTION,
               loadingDescription: DEFAULT_LOADING_DESCRIPTION,
-            });
-
-            return calls;
-          },
+            },
+          ],
         }),
       );
 
