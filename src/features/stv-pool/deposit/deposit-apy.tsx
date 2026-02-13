@@ -1,17 +1,22 @@
 import { useVaultApr } from '@/modules/vaults';
 
+import { useWatch } from 'react-hook-form';
+
 import { RewardEstimation } from '@/shared/wrapper/reward-estimation/reward-estimation';
-import { useEstimatedRewards } from './hooks/use-estimated-rewards';
+
+import { useEstimatedRewards } from '@/modules/defi-wrapper';
+import type { DepositFormValues } from './deposit-form-context/types';
 
 export const DepositApy = () => {
   const { data: vaultApr, isPending: isLoadingAPR } = useVaultApr();
+  const amountETH = useWatch<DepositFormValues, 'amount'>({ name: 'amount' });
   const {
     estimatedMonthlyRewardsETH,
     estimatedMonthlyRewardsUSD,
     estimatedYearlyRewardsETH,
     estimatedYearlyRewardsUSD,
     isLoadingUSD,
-  } = useEstimatedRewards(vaultApr?.aprSma);
+  } = useEstimatedRewards(vaultApr?.aprSma, amountETH);
 
   return (
     <RewardEstimation

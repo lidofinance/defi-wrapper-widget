@@ -8,3 +8,4 @@ export * from './use-claim';
 export * from './use-requests';
 export * from './use-withdrawal-queue';
 export * from './use-repay-rebalance-ratio';
+export * from './use-estimated-rewards';

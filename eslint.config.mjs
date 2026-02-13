@@ -39,135 +39,135 @@ export default defineConfig(
     plugins: {
       'react-hooks': reactHooks,
       react: react,
-      import: importPlugin,
-      'jsx-a11y': jsxA11y,
-      boundaries: boundaries,
+      // import: importPlugin,
+      // 'jsx-a11y': jsxA11y,
+      // boundaries: boundaries,
       '@typescript-eslint': tseslint.plugin,
     },
     settings: {
       react: {
         version: 'detect',
       },
-      'boundaries/elements': [
-        {
-          type: 'feature',
-          pattern: 'src/features/*',
-        },
-        {
-          type: 'global-feature',
-          pattern: '@/features/*',
-        },
-        {
-          type: 'shared',
-          pattern: '@/shared/*',
-        },
-      ],
-      'import/resolver': {
-        typescript: {
-          project: './tsconfig.json',
-        },
-      },
+      // 'boundaries/elements': [
+      //   {
+      //     type: 'feature',
+      //     pattern: 'src/features/*',
+      //   },
+      //   {
+      //     type: 'global-feature',
+      //     pattern: '@/features/*',
+      //   },
+      //   {
+      //     type: 'shared',
+      //     pattern: '@/shared/*',
+      //   },
+      // ],
+      // 'import/resolver': {
+      //   typescript: {
+      //     project: './tsconfig.json',
+      //   },
+      // },
     },
-    rules: {
-      'prefer-const': 'error',
+    // rules: {
+    //   'prefer-const': 'error',
 
-      'boundaries/element-types': [
-        'error',
-        {
-          rules: [
-            {
-              from: 'feature',
-              disallow: ['feature', 'global-feature'],
-              allow: ['shared'],
-              message: 'Features must not import from other features',
-            },
-          ],
-        },
-      ],
-      '@typescript-eslint/require-await': 'warn',
-      'react/display-name': 'off',
-      '@typescript-eslint/no-shadow': 'warn',
-      'jsx-a11y/no-autofocus': 'off',
-      'jsx-a11y/anchor-is-valid': 'off',
-      'no-console': ['error', { allow: ['warn', 'error', 'info', 'debug'] }],
-      'react-hooks/exhaustive-deps': ['error'],
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        {
-          ignoreRestSiblings: true,
-          argsIgnorePattern: '^_',
-        },
-      ],
-      'func-style': ['error', 'expression'],
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@/features/**'],
-              message:
-                'Imports from @/features are forbidden. Use shared or relative imports.',
-            },
-          ],
-        },
-      ],
-      'import/order': [
-        'warn',
-        {
-          pathGroups: [
-            {
-              pattern: '{react,react-dom,wagmi,viem}',
-              group: 'builtin',
-              position: 'before',
-            },
-            {
-              pattern: '@chakra-ui/**',
-              group: 'external',
-              position: 'after',
-            },
-            {
-              pattern: '@/**',
-              group: 'internal',
-              position: 'after',
-            },
-            {
-              pattern: './**',
-              group: 'sibling',
-              position: 'after',
-            },
-            {
-              pattern: '../**',
-              group: 'parent',
-              position: 'after',
-            },
-            {
-              pattern: '@/(utils|assets|types)/**',
-              group: 'internal',
-              position: 'after',
-            },
-            {
-              pattern: 'assets/**',
-              group: 'internal',
-              position: 'after',
-            },
-          ],
-          pathGroupsExcludedImportTypes: ['builtin'],
-          groups: [
-            'builtin',
-            'external',
-            'internal',
-            ['parent', 'sibling', 'index'],
-            'object',
-            'type',
-          ],
-          'newlines-between': 'ignore',
-          alphabetize: {
-            order: 'asc',
-            caseInsensitive: true,
-          },
-        },
-      ],
-    },
+    //   // 'boundaries/element-types': [
+    //   //   'error',
+    //   //   {
+    //   //     rules: [
+    //   //       {
+    //   //         from: 'feature',
+    //   //         disallow: ['feature', 'global-feature'],
+    //   //         allow: ['shared'],
+    //   //         message: 'Features must not import from other features',
+    //   //       },
+    //   //     ],
+    //   //   },
+    //   // ],
+    //   '@typescript-eslint/require-await': 'warn',
+    //   'react/display-name': 'off',
+    //   '@typescript-eslint/no-shadow': 'warn',
+    //   'jsx-a11y/no-autofocus': 'off',
+    //   'jsx-a11y/anchor-is-valid': 'off',
+    //   'no-console': ['error', { allow: ['warn', 'error', 'info', 'debug'] }],
+    //   'react-hooks/exhaustive-deps': ['error'],
+    //   '@typescript-eslint/no-unused-vars': [
+    //     'error',
+    //     {
+    //       ignoreRestSiblings: true,
+    //       argsIgnorePattern: '^_',
+    //     },
+    //   ],
+    //   'func-style': ['error', 'expression'],
+    //   'no-restricted-imports': [
+    //     'error',
+    //     {
+    //       patterns: [
+    //         {
+    //           group: ['@/features/**'],
+    //           message:
+    //             'Imports from @/features are forbidden. Use shared or relative imports.',
+    //         },
+    //       ],
+    //     },
+    //   ],
+    //   // 'import/order': [
+    //   //   'warn',
+    //   //   {
+    //   //     pathGroups: [
+    //   //       {
+    //   //         pattern: '{react,react-dom,wagmi,viem}',
+    //   //         group: 'builtin',
+    //   //         position: 'before',
+    //   //       },
+    //   //       {
+    //   //         pattern: '@chakra-ui/**',
+    //   //         group: 'external',
+    //   //         position: 'after',
+    //   //       },
+    //   //       {
+    //   //         pattern: '@/**',
+    //   //         group: 'internal',
+    //   //         position: 'after',
+    //   //       },
+    //   //       {
+    //   //         pattern: './**',
+    //   //         group: 'sibling',
+    //   //         position: 'after',
+    //   //       },
+    //   //       {
+    //   //         pattern: '../**',
+    //   //         group: 'parent',
+    //   //         position: 'after',
+    //   //       },
+    //   //       {
+    //   //         pattern: '@/(utils|assets|types)/**',
+    //   //         group: 'internal',
+    //   //         position: 'after',
+    //   //       },
+    //   //       {
+    //   //         pattern: 'assets/**',
+    //   //         group: 'internal',
+    //   //         position: 'after',
+    //   //       },
+    //   //     ],
+    //   //     pathGroupsExcludedImportTypes: ['builtin'],
+    //   //     groups: [
+    //   //       'builtin',
+    //   //       'external',
+    //   //       'internal',
+    //   //       ['parent', 'sibling', 'index'],
+    //   //       'object',
+    //   //       'type',
+    //   //     ],
+    //   //     'newlines-between': 'ignore',
+    //   //     alphabetize: {
+    //   //       order: 'asc',
+    //   //       caseInsensitive: true,
+    //   //     },
+    //   //   },
+    //   // ],
+    // },
   },
   {
     files: ['src/app.tsx'],

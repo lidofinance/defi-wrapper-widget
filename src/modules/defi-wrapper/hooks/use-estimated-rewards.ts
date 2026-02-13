@@ -1,14 +1,13 @@
 import { useMemo } from 'react';
-import { useWatch } from 'react-hook-form';
 import { useEthUsd } from '@/modules/web3';
 import { factorMulBN } from '@/utils/bn';
-import type { DepositFormValues } from '../deposit-form-context/types';
 
 const MONTHS_IN_YEAR = 12;
 
-export const useEstimatedRewards = (aprPercent?: number) => {
-  const amountETH = useWatch<DepositFormValues, 'amount'>({ name: 'amount' });
-
+export const useEstimatedRewards = (
+  aprPercent?: number,
+  amountETH?: bigint | null,
+) => {
   const { estimatedMonthlyRewardsETH, estimatedYearlyRewardsETH } =
     useMemo(() => {
       if (typeof amountETH !== 'bigint' || typeof aprPercent != 'number')
