@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build:iframe": "vite build --config vite.config.iframe.js",
+    "build:iframe": "vite build --config vite.iframe.config.js",
     "build": "vite build",
     "build:preview": "vite build && vite preview",
     "build:all": "yarn build && yarn build:iframe ",
@@ -44,7 +44,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "4.6.0",
     "autoprefixer": "^10.4.21",
-    "eslint": "^9.39.2",
+    "eslint": "^10.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-node": "^0.3.6",
     "eslint-import-resolver-typescript": "^4.4.4",
@@ -59,7 +59,7 @@
     "lint-staged": "16.2.7",
     "prettier": "^3.8.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.55.0",
+    "typescript-eslint": "^8.56.0",
     "vite": "^7.3.1",
     "vite-plugin-checker": "^0.12.0",
     "vite-plugin-svgr": "^4.5.0"

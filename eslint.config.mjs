@@ -15,7 +15,13 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig(
   {
-    ignores: ['node_modules/**', 'dist/**', 'build/**'],
+    ignores: [
+      'node_modules/**',
+      'dist/**',
+      'build/**',
+      '*.config.js',
+      '*.config.mjs',
+    ],
   },
   {
     files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
@@ -25,9 +31,7 @@ export default defineConfig(
       sourceType: 'module',
       parserOptions: {
         ecmaFeatures: { jsx: true },
-        projectService: {
-          allowDefaultProject: ['*.mjs', '*.cjs'],
-        },
+        projectService: true,
         tsconfigRootDir: __dirname,
       },
       globals: {

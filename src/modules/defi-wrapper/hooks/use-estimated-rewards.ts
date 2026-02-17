@@ -16,18 +16,12 @@ export const useEstimatedRewards = (
           estimatedMonthlyRewardsETH: null,
         };
 
-      const estimatedYearlyRewardsETH = factorMulBN(
-        amountETH,
-        aprPercent / 100,
-      );
-      const estimatedMonthlyRewardsETH = factorMulBN(
-        amountETH,
-        aprPercent / MONTHS_IN_YEAR / 100,
-      );
-
       return {
-        estimatedYearlyRewardsETH,
-        estimatedMonthlyRewardsETH,
+        estimatedYearlyRewardsETH: factorMulBN(amountETH, aprPercent / 100),
+        estimatedMonthlyRewardsETH: factorMulBN(
+          amountETH,
+          aprPercent / MONTHS_IN_YEAR / 100,
+        ),
       };
     }, [amountETH, aprPercent]);
 
