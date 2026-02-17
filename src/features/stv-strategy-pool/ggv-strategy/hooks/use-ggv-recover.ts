@@ -2,12 +2,7 @@ import { useCallback } from 'react';
 import { Address } from 'viem';
 import invariant from 'tiny-invariant';
 import { useInvalidateWrapper } from '@/modules/defi-wrapper';
-import {
-  TransactionEntry,
-  useDappStatus,
-  useSendTransaction,
-  withSuccess,
-} from '@/modules/web3';
+import { useDappStatus, useSendTransaction, withSuccess } from '@/modules/web3';
 import {
   DEFAULT_LOADING_DESCRIPTION,
   DEFAULT_SIGNING_DESCRIPTION,

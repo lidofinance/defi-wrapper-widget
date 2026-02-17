@@ -1,9 +1,8 @@
+import { useWatch } from 'react-hook-form';
+import { useEstimatedRewards } from '@/modules/defi-wrapper';
 import { RewardEstimation } from '@/shared/wrapper/reward-estimation/reward-estimation';
 import { ApyTooltipContent } from '../apy-tooltip-content';
 import { useGGVStrategyApy } from '../hooks/use-ggv-strategy-apy';
-import { useEstimatedRewards } from '@/modules/defi-wrapper';
-
-import { useWatch } from 'react-hook-form';
 
 import type { DepositFormValues } from './deposit-form-context/types';
 

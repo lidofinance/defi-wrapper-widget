@@ -1,11 +1,12 @@
-import invariant from 'tiny-invariant';
-import { useQuery } from '@tanstack/react-query';
-import { useEarnStrategy } from './use-earn-strategy';
 import { maxUint128 } from 'viem';
+import { useQuery } from '@tanstack/react-query';
+import invariant from 'tiny-invariant';
+import { useEthUsd } from '@/modules/web3';
 import { useStrategyPosition } from '../../shared';
+import { useEarnStrategy } from './use-earn-strategy';
 
 const useEarnPositionData = () => {
-  const { isPending, data: earnStrategy } = useEarnStrategy();
+  const { data: earnStrategy } = useEarnStrategy();
 
   return useQuery({
     queryKey: [
@@ -27,7 +28,6 @@ const useEarnPositionData = () => {
         asyncDepositQueue,
         asyncRedeemQueue,
         lidoEarnStrategy,
-        earnVault,
         shareManager,
       } = earnStrategy;
 
@@ -57,6 +57,7 @@ const useEarnPositionData = () => {
         0n,
       );
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [[_, balanceInWsteth], [__, claimableDepositInWsteth]] =
         await Promise.all([
           lidoEarnStrategy.read.previewRedeem([balanceInEarnShares]),
@@ -93,9 +94,15 @@ export const useEarnPosition = () => {
       earnPositionData?.pendingWithdrawalsInWsteth,
   });
 
+  const { usdAmount: totalUserValueInUsd, isPending: isUsdAmountLoading } =
+    useEthUsd(positionQuery.data?.totalUserValueInEth);
+
   return {
     positionQuery,
     ...(earnPositionData ?? {}),
     ...(positionQuery.data ?? {}),
+    isPositionLoading: positionQuery.isPending,
+    totalUserValueInUsd,
+    isUsdAmountLoading,
   };
 };

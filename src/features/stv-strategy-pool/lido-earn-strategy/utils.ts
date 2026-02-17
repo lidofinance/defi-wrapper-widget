@@ -1,11 +1,5 @@
 import { encodeAbiParameters, Hex } from 'viem';
 
-type Params = {
-  discount: number; // - only for Withdrawals
-  minimumMint: number; // - of GGV shares, can be zero
-  secondsToDeadline: number; // secondsToDeadline - only for Withdrawals
-};
-
 type SupplyParams = {
   isSync: boolean;
   merkleProof: Hex[];

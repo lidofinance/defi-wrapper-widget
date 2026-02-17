@@ -25,9 +25,9 @@ import { getReferralAddress } from '@/shared/wrapper/refferals/get-refferal-addr
 import { minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
-import type { DepositFormValidatedValues } from './types';
 import { useEarnStrategy } from '../../hooks/use-earn-strategy';
 import { encodeEarnSupplyParams } from '../../utils';
+import type { DepositFormValidatedValues } from './types';
 
 export const useDepositStrategy = () => {
   const { address } = useDappStatus();
@@ -138,14 +138,15 @@ export const useDepositStrategy = () => {
         return success;
       },
       [
-        activeVault,
+        wrapper,
         address,
-        prepareReportCalls,
+        strategy,
+        dashboard,
+        earnStrategy,
         publicClient,
         sendTX,
-        dashboard,
-        strategy,
-        wrapper,
+        activeVault?.report,
+        prepareReportCalls,
       ],
     ),
     ...rest,

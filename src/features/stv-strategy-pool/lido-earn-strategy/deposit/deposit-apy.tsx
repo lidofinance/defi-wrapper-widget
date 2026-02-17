@@ -1,14 +1,14 @@
-import { useEstimatedRewards } from '@/modules/defi-wrapper';
-
 import { useWatch } from 'react-hook-form';
+import { useEstimatedRewards } from '@/modules/defi-wrapper';
 
 import { RewardEstimation } from '@/shared/wrapper/reward-estimation/reward-estimation';
 
-import type { DepositFormValues } from './deposit-form-context/types';
 import { ApyTooltipContent } from '../apy-tooltip-content';
+import { useEarnStrategyApy } from '../hooks';
+import type { DepositFormValues } from './deposit-form-context/types';
 
 export const DepositApy = () => {
-  // const { apySma, isLoadingApr, updatedAt } = useGGVStrategyApy();
+  const { apySma, isLoadingApr, updatedAt } = useEarnStrategyApy();
 
   const amountETH = useWatch<DepositFormValues, 'amount'>({ name: 'amount' });
   const {
@@ -17,20 +17,20 @@ export const DepositApy = () => {
     estimatedYearlyRewardsETH,
     estimatedYearlyRewardsUSD,
     isLoadingUSD,
-  } = useEstimatedRewards(undefined);
+  } = useEstimatedRewards(apySma, amountETH);
 
-  // const aprData =
-  //   apySma && updatedAt
-  //     ? {
-  //         updatedAt,
-  //         apySma: apySma,
-  //       }
-  //     : undefined;
+  const aprData =
+    apySma && updatedAt
+      ? {
+          updatedAt,
+          apySma: apySma,
+        }
+      : undefined;
 
   return (
     <RewardEstimation
-      aprData={undefined}
-      isLoadingAPR={false}
+      aprData={aprData}
+      isLoadingAPR={isLoadingApr}
       estimatedMonthlyRewardsETH={estimatedMonthlyRewardsETH ?? 0n}
       estimatedMonthlyRewardsUSD={estimatedMonthlyRewardsUSD}
       estimatedYearlyRewardsETH={estimatedYearlyRewardsETH ?? 0n}

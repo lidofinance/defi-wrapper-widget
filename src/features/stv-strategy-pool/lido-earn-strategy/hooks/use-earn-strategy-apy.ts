@@ -1,54 +1,41 @@
 import { useMemo } from 'react';
 import { useVaultCapacity } from '@/modules/defi-wrapper';
 import { useStethApr, useVaultApr } from '@/modules/vaults';
+
 import { aprToApy } from '@/utils/apr-to-apy';
+import { calculateStrategyApy } from '../../shared';
 
-import { useGGVApr } from './use-ggv-apr';
-import { useGGVStrategyPosition } from './use-ggv-strategy-position';
+import { useEarnApy } from './use-earn-apy';
+import { useEarnPosition } from './use-earn-position';
 
-export const calculateStrategyApy = (
-  ggvAprPercent: number, // percent
-  stethAprPercent: number, // percent
-  vaultNetAprPercent: number, // percent
-  utilizationRate: number, // 0 - 1, POOL RR for new deposits,  utilizationRate for existing deposits
-) => {
-  const ggvPureAprPercent = ggvAprPercent - stethAprPercent;
-  const strategyApr = utilizationRate * ggvPureAprPercent;
-  const netApr = strategyApr + vaultNetAprPercent;
-
-  return {
-    netApr,
-    netApy: aprToApy(netApr),
-    strategyApr,
-    strategyApy: aprToApy(strategyApr),
-  };
-};
-
-export const useGGVStrategyApy = () => {
+export const useEarnStrategyApy = () => {
   const { data: vaultApr, isPending: isLoadingVaultApr } = useVaultApr();
   const { data: stethApr, isPending: isLoadingStethApr } = useStethApr();
-  const { data: ggvApr, isPending: isLoadingGgvApr } = useGGVApr();
+  const { data: mellowApy, isPending: isLoadingMellowApy } = useEarnApy();
   const { data: vaultCapacity, isPending: isLoadingVaultCapacity } =
     useVaultCapacity();
-  const { data: ggvPosition } = useGGVStrategyPosition();
+  const { currentUtilizationBP, isPositionLoading } = useEarnPosition();
 
   const isLoadingApr =
     isLoadingVaultApr ||
     isLoadingStethApr ||
-    isLoadingGgvApr ||
+    isLoadingMellowApy ||
+    isPositionLoading ||
     isLoadingVaultCapacity;
 
   const data = useMemo(() => {
-    if (!vaultApr || !stethApr || !ggvApr || !vaultCapacity) {
+    if (!vaultApr || !stethApr || !mellowApy || !vaultCapacity) {
       return undefined;
     }
 
     const defaultUtilizationRate = 1 - vaultCapacity.reserveRationUnit;
 
     const currentUtilizationRate =
-      ggvPosition?.currentUtilizationBP !== undefined
-        ? Number(ggvPosition.currentUtilizationBP) / 10000
+      currentUtilizationBP !== undefined
+        ? Number(currentUtilizationBP) / 10000
         : undefined;
+
+    const mellowApr = aprToApy(mellowApy.apy);
 
     const {
       netApr: aprSma,
@@ -56,21 +43,9 @@ export const useGGVStrategyApy = () => {
       strategyApr: strategyAprSma,
       strategyApy: strategyApySma,
     } = calculateStrategyApy(
-      ggvApr.averageApr,
+      mellowApr,
       stethApr.smaApr,
       vaultApr.aprSma,
-      defaultUtilizationRate,
-    );
-
-    const {
-      netApr: aprDaily,
-      netApy: apyDaily,
-      strategyApr: strategyAprDaily,
-      strategyApy: strategyApyDaily,
-    } = calculateStrategyApy(
-      ggvApr.dailyApr,
-      stethApr.latestApr,
-      vaultApr.aprDaily,
       defaultUtilizationRate,
     );
 
@@ -81,7 +56,7 @@ export const useGGVStrategyApy = () => {
       strategyApy: strategyApySmaCurrent,
     } = currentUtilizationRate !== undefined
       ? calculateStrategyApy(
-          ggvApr.averageApr,
+          mellowApr,
           stethApr.smaApr,
           vaultApr.aprSma,
           currentUtilizationRate,
@@ -96,10 +71,6 @@ export const useGGVStrategyApy = () => {
     return {
       aprSma,
       apySma,
-      aprDaily,
-      apyDaily,
-      strategyAprDaily,
-      strategyApyDaily,
       strategyAprSma,
       strategyApySma,
 
@@ -108,7 +79,7 @@ export const useGGVStrategyApy = () => {
       strategyAprSmaCurrent,
       strategyApySmaCurrent,
     };
-  }, [vaultApr, stethApr, ggvApr, vaultCapacity, ggvPosition]);
+  }, [vaultApr, stethApr, mellowApy, vaultCapacity, currentUtilizationBP]);
 
   return { ...data, updatedAt: vaultApr?.updatedAt, isLoadingApr };
 };

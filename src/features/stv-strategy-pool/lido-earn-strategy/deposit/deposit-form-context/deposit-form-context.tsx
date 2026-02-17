@@ -7,6 +7,7 @@ import { useDappStatus } from '@/modules/web3';
 import { FormController } from '@/shared/hook-form/form-controller';
 import { useQueryParamsReferralForm } from '@/shared/hooks/use-query-values-form';
 import { minBN } from '@/utils/bn';
+import { useEarnStrategy } from '../../hooks/use-earn-strategy';
 import {
   DepositFormValidatedValues,
   DepositFormValidationContextType,
@@ -15,7 +16,6 @@ import {
 import { useDepositFormData } from './use-deposit-form-data';
 import { useDepositStrategy } from './use-deposit-strategy';
 import { DepositFormResolver } from './validation';
-import { useEarnStrategy } from '../../hooks/use-earn-strategy';
 
 type DepositFormContextType = {
   token: DepositFormValues['token'];

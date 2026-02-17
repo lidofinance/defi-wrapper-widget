@@ -1,10 +1,9 @@
-import { useVaultApr } from '@/modules/vaults';
-
 import { useWatch } from 'react-hook-form';
+import { useEstimatedRewards } from '@/modules/defi-wrapper';
+import { useVaultApr } from '@/modules/vaults';
 
 import { RewardEstimation } from '@/shared/wrapper/reward-estimation/reward-estimation';
 
-import { useEstimatedRewards } from '@/modules/defi-wrapper';
 import type { DepositFormValues } from './deposit-form-context/types';
 
 export const DepositApy = () => {

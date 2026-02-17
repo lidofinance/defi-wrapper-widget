@@ -1,4 +1,5 @@
-import { defineConfig } from '@chakra-ui/react';
+import { defineConfig, createSystem, defaultConfig } from '@chakra-ui/react';
+
 import { animationStyles } from './animation-styles';
 import { breakpoints } from './breakpoints';
 import { globalCss } from './global-css';
@@ -27,3 +28,5 @@ export const ChakraThemeConfig = defineConfig({
     animationStyles,
   },
 });
+
+export const system = createSystem(defaultConfig, ChakraThemeConfig);

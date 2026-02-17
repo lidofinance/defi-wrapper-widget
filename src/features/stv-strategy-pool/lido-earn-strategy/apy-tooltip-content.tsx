@@ -2,11 +2,12 @@ import React from 'react';
 import { HStack, Skeleton, Text, VStack } from '@chakra-ui/react';
 import { useVaultApr } from '@/modules/vaults';
 import { FormatPercent } from '@/shared/formatters';
+import { useEarnStrategyApy } from './hooks';
 
 export const ApyTooltipContent = () => {
   const { data: vaultAPRData, isLoading } = useVaultApr();
-  // const { strategyApySma } = useGGVStrategyApy();
-  const strategyApySma = undefined;
+  const { strategyApySma } = useEarnStrategyApy();
+
   return (
     <VStack gap={2} width={'full'} mb={2}>
       <HStack justify="space-between" alignItems="center" width={'full'}>

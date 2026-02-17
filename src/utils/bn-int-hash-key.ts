@@ -1,5 +1,5 @@
 // Copied from: https://github.com/jonschlinkert/is-plain-object
-function isPlainObject(o: any): o is Record<PropertyKey, unknown> {
+const isPlainObject = (o: any): o is Record<PropertyKey, unknown> => {
   if (!hasObjectPrototype(o)) {
     return false;
   }
@@ -28,11 +28,11 @@ function isPlainObject(o: any): o is Record<PropertyKey, unknown> {
 
   // Most likely a plain Object
   return true;
-}
+};
 
-function hasObjectPrototype(o: any): boolean {
+const hasObjectPrototype = (o: any): boolean => {
   return Object.prototype.toString.call(o) === '[object Object]';
-}
+};
 
 // Copy of react-query's default hash function with support for BigInt
 export const bigIntHashKey = (queryKey: unknown) =>

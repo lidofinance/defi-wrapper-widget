@@ -1,7 +1,6 @@
-import { useVaultApr } from '@/modules/vaults';
-import { useEstimatedRewards } from '@/modules/defi-wrapper';
-
 import { useWatch } from 'react-hook-form';
+import { useEstimatedRewards } from '@/modules/defi-wrapper';
+import { useVaultApr } from '@/modules/vaults';
 
 import { RewardEstimation } from '@/shared/wrapper/reward-estimation/reward-estimation';
 

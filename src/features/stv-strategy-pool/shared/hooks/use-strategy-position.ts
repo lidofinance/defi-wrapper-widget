@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { Address } from 'viem';
 import { useQuery } from '@tanstack/react-query';
 
@@ -229,7 +228,7 @@ export const getStrategyPosition = async ({
   });
 
   const [
-    strategyVaultBalanceInSteth,
+    totalStrategyBalanceInSteth,
     stethOnBalance,
     totalMintedSteth,
     strategyVaultStethExcess,
@@ -322,7 +321,7 @@ export const getStrategyPosition = async ({
     unlockedStv,
     // available in strategy vault
     totalStrategyBalanceInStethShares,
-    strategyVaultBalanceInSteth,
+    totalStrategyBalanceInSteth,
     // returned to proxy
     stethOnBalance,
     stethSharesOnBalance,

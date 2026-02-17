@@ -1,16 +1,17 @@
 import React from 'react';
 import { Navigation, TAB } from '@/shared/wrapper/navigation';
-import { useEarnPosition } from './hooks/use-earn-position';
 
 // import { Withdrawal } from './withdrawal';
-//import { Dashboard } from './dashboard';
+import { Dashboard } from './dashboard';
 import { Deposit } from './deposit';
+import { useEarnPosition } from './hooks/use-earn-position';
+
 const TABS: TAB[] = [
-  // {
-  //   label: 'Dashboard',
-  //   value: 'dashboard',
-  //   component: Dashboard,
-  //},
+  {
+    label: 'Dashboard',
+    value: 'dashboard',
+    component: Dashboard,
+  },
   {
     label: 'Deposit',
     value: 'deposit',

@@ -14,6 +14,7 @@
   "api": {
     "vaultsApi": "https://stvaults-api.lido.fi",
     "ethApi": "https://eth-api.lido.fi",
-    "ggvApi": "https://api.sevenseas.capital"
+    "ggvApi": "https://api.sevenseas.capital",
+    "mellowApi": "https://api.mellow.finance"
   }
 }
