@@ -39,8 +39,7 @@ export const useWithdrawStrategy = () => {
         invariant(address, '[useWithdrawal] address is undefined');
         invariant(activeVault, '[useWithdrawal] activeVault is undefined');
 
-        const { lidoEarnStrategy, asyncDepositQueue, strategyProxyAddress } =
-          earnStrategy;
+        const { lidoEarnStrategy, strategyProxyAddress } = earnStrategy;
 
         invariant(
           strategyProxyAddress,

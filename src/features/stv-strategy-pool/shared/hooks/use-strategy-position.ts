@@ -112,22 +112,23 @@ export const getStrategyPosition = async ({
   );
 
   // total stETH shares that can be withdrawn for repayment of delegated liability
+  // we only include actual strategy vault balance because pending deposits/withdrawals cannot be withdrawn(but they count towards user total value)
   const totalStethSharesAvailableForReturn = minBN(
-    totalStrategyBalanceInStethShares,
+    strategyStethSharesBalance,
     totalStethSharesDelegated,
   );
 
   // excess of strategy vault balance after repaying delegated liability (0 -> inf)
   // to be added to total user value
   const strategyStethSharesExcess =
-    totalStrategyBalanceInStethShares - totalStethSharesAvailableForReturn;
+    strategyStethSharesBalance - totalStethSharesAvailableForReturn;
 
   //
   // Pending strategy withdraw
   //
 
   const stethSharesToRepayPendingFromStrategyVault = maxBN(
-    strategyWithdrawalStethSharesOffset - strategyStethSharesExcess,
+    strategyWithdrawalStethSharesOffset + strategyStethSharesExcess,
     0n,
   );
 
@@ -230,6 +231,7 @@ export const getStrategyPosition = async ({
   const [
     totalStrategyBalanceInSteth,
     stethOnBalance,
+    //
     totalMintedSteth,
     strategyVaultStethExcess,
     totalStethDifference,
@@ -241,9 +243,11 @@ export const getStrategyPosition = async ({
   ] = await shares.convertBatchSharesToSteth([
     totalStrategyBalanceInStethShares,
     stethSharesOnBalance,
+    //
     totalMintedStethShares,
     strategyStethSharesExcess,
     totalStethSharesDifference,
+    //
     stethSharesLiabilityToCover,
     stethSharesToRepay,
     stethSharesToRebalance,
@@ -294,6 +298,13 @@ export const getStrategyPosition = async ({
   const totalValuePendingFromStrategyVaultInEth =
     minBN(pendingUnlockFromStrategyVaultInEth, totalLockedEth) +
     strategyVaultStethExcess;
+
+  console.log({
+    totalEthToWithdrawFromStrategyVault,
+    totalStethSharesAvailableForReturnInEth,
+    strategyVaultStethExcess,
+    totalStethSharesAvailableForReturn,
+  });
 
   //
   // Boosting APY via supply(0)
@@ -406,7 +417,14 @@ export const useStrategyPosition = (
     // this is large query so we must be conservative with refetches
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    enabled: !!address && !!wrapper && !!activeVault && !!strategy,
+    enabled:
+      !!address &&
+      !!wrapper &&
+      !!activeVault &&
+      !!strategy &&
+      params.strategyStethSharesBalance !== undefined &&
+      params.strategyDepositStethSharesOffset !== undefined &&
+      params.strategyWithdrawalStethSharesOffset !== undefined,
     queryFn: async () => {
       invariant(activeVault, 'activeVault is required');
       invariant(wrapper, 'wrapper is required');
