@@ -1,29 +1,31 @@
-export const ggvVaultAbi = [
+export const GgvVaultAbi = [
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "target",
-        "type": "address"
-      }
+        internalType: 'address',
+        name: 'target',
+        type: 'address',
+      },
     ],
-    "name": "AddressEmptyCode",
-    "type": "error"
+    name: 'AddressEmptyCode',
+    type: 'error',
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
     ],
-    "name": "AddressInsufficientBalance",
-    "type": "error"
+    name: 'AddressInsufficientBalance',
+    type: 'error',
   },
   {
-    "inputs": [],
-    "name": "FailedInnerCall",
-    "type": "error"
-  }
+    inputs: [],
+    name: 'FailedInnerCall',
+    type: 'error',
+  },
 ] as const;
+
+export type GgvVaultAbiType = typeof GgvVaultAbi;

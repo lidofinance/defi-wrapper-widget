@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { getContract, Address, GetContractReturnType } from 'viem';
+import { getContract, GetContractReturnType } from 'viem';
 import { CHAINS } from '@lidofinance/lido-ethereum-sdk/common';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
@@ -16,16 +16,20 @@ const ETH_DECIMALS = 18n;
 const getAggregatorContract = (
   publicClient: ReturnType<typeof useMainnetOnlyWagmi>['publicClientMainnet'],
 ): GetContractReturnType<AggregatorAbiType, typeof publicClient> => {
+  const priceFeedAddress = getContractAddress(
+    CHAINS.Mainnet,
+    'aggregatorEthUsdPriceFeed',
+  );
+
+  invariant(
+    priceFeedAddress,
+    `Aggregator contract address not found for the current chain ${CHAINS.Mainnet}`,
+  );
   return getContract({
-    address: getContractAddress(
-      CHAINS.Mainnet,
-      'aggregatorEthUsdPriceFeed',
-    ) as Address,
+    address: priceFeedAddress,
     abi: AggregatorAbi,
-    client: {
-      public: publicClient,
-    },
-  }) satisfies GetContractReturnType<AggregatorAbiType, typeof publicClient>;
+    client: publicClient,
+  });
 };
 
 export const useEthUsd = (amount?: bigint | null) => {
