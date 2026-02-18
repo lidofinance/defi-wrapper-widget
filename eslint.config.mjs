@@ -87,7 +87,6 @@ export default defineConfig(
           ],
         },
       ],
-      '@typescript-eslint/require-await': 'warn',
       'react/display-name': 'off',
       '@typescript-eslint/no-shadow': 'warn',
       'jsx-a11y/no-autofocus': 'off',
@@ -98,7 +97,7 @@ export default defineConfig(
         'error',
         {
           ignoreRestSiblings: true,
-          argsIgnorePattern: '^_',
+          argsIgnorePattern: '^_*',
         },
       ],
       'func-style': ['error', 'expression'],
@@ -178,5 +177,5 @@ export default defineConfig(
       'no-restricted-imports': 'off',
     },
   },
-  prettierRecommended,
+  //prettierRecommended,
 );

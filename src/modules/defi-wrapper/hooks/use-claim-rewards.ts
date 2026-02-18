@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import { Address } from 'viem';
+import type { Address, Hex } from 'viem';
 import invariant from 'tiny-invariant';
-import { useInvalidateWrapper, useStvSteth } from '@/modules/defi-wrapper';
+import { useDefiWrapper, useInvalidateWrapper } from '@/modules/defi-wrapper';
 import { useDappStatus, useSendTransaction, withSuccess } from '@/modules/web3';
 import {
   DEFAULT_LOADING_DESCRIPTION,
@@ -10,12 +10,20 @@ import {
 } from '@/shared/components/transaction-modal';
 import { formatBalance } from '@/utils/formatBalance';
 
+type ClaimRewardParams = {
+  amount: bigint;
+  token: Address;
+  symbol: string;
+  rewardTokenDecimals: number;
+  displayClaimAmount: bigint;
+  proofData: readonly Hex[];
+};
+
 export const useClaimReward = () => {
   const invalidateWrapper = useInvalidateWrapper();
   const { address } = useDappStatus();
-  const { wrapper } = useStvSteth();
+  const { wrapper, distributor } = useDefiWrapper();
   const { onTransactionStageChange } = useTransactionModal();
-  const { distributor } = useStvSteth();
   const { sendTX, ...rest } = useSendTransaction({
     callback: onTransactionStageChange,
   });
@@ -28,14 +36,7 @@ export const useClaimReward = () => {
       symbol,
       proofData,
       rewardTokenDecimals,
-    }: {
-      amount: bigint;
-      token: Address;
-      symbol: string;
-      rewardTokenDecimals: number;
-      displayClaimAmount: bigint;
-      proofData: readonly `0x${string}`[];
-    }) => {
+    }: ClaimRewardParams) => {
       invariant(wrapper, '[useClaimRewards] wrapper is undefined');
       invariant(address, '[useClaimRewards] address is undefined');
       invariant(distributor, '[useClaimRewards] distributor is undefined');

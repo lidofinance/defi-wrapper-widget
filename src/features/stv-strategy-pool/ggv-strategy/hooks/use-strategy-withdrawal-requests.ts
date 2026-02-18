@@ -5,10 +5,10 @@ import {
   useWithdrawalQueue,
 } from '@/modules/defi-wrapper';
 
-import { useGGVBoostApy } from './use-ggv-boost-apy';
 import { useGGVCancelRequest } from './use-ggv-cancel-request';
-import { useGGVProcessWithdrawal } from './use-ggv-process-withdrawal';
-import { useGGVRecover } from './use-ggv-recover';
+
+import { useBoostApy, useProcessWithdrawal, useRecover } from '../../shared';
+
 import { useGGVStrategyPosition } from './use-ggv-strategy-position';
 
 export const useStrategyWithdrawalRequestsRead = (includeBoost?: boolean) => {
@@ -74,11 +74,12 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
   // Mutations
   const { cancelRequest, mutation: cancelRequestMutation } =
     useGGVCancelRequest();
+
   const { processWithdrawal, mutation: proccessWithdrawalMutation } =
-    useGGVProcessWithdrawal();
+    useProcessWithdrawal();
   const { claim, mutation: claimMutation } = useClaim();
-  const { recover, mutation: recoverMutation } = useGGVRecover();
-  const { boost, mutation: boostMutation } = useGGVBoostApy();
+  const { recover, mutation: recoverMutation } = useRecover();
+  const { boost, mutation: boostMutation } = useBoostApy();
 
   //
   const { processableRequest, processWithdrawalRequest } = useMemo(() => {

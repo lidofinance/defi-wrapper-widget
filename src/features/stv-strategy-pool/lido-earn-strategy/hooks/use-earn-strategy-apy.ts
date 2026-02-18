@@ -14,7 +14,7 @@ export const useEarnStrategyApy = () => {
   const { data: mellowApy, isPending: isLoadingMellowApy } = useEarnApy();
   const { data: vaultCapacity, isPending: isLoadingVaultCapacity } =
     useVaultCapacity();
-  const { currentUtilizationBP, isPositionLoading } = useEarnPosition();
+  const { positionData, isPositionLoading } = useEarnPosition();
 
   const isLoadingApr =
     isLoadingVaultApr ||
@@ -31,8 +31,8 @@ export const useEarnStrategyApy = () => {
     const defaultUtilizationRate = 1 - vaultCapacity.reserveRationUnit;
 
     const currentUtilizationRate =
-      currentUtilizationBP !== undefined
-        ? Number(currentUtilizationBP) / 10000
+      positionData?.currentUtilizationBP !== undefined
+        ? Number(positionData.currentUtilizationBP) / 10000
         : undefined;
 
     const mellowApr = aprToApy(mellowApy.apy);
@@ -79,7 +79,13 @@ export const useEarnStrategyApy = () => {
       strategyAprSmaCurrent,
       strategyApySmaCurrent,
     };
-  }, [vaultApr, stethApr, mellowApy, vaultCapacity, currentUtilizationBP]);
+  }, [
+    vaultApr,
+    stethApr,
+    mellowApy,
+    vaultCapacity,
+    positionData?.currentUtilizationBP,
+  ]);
 
   return { ...data, updatedAt: vaultApr?.updatedAt, isLoadingApr };
 };

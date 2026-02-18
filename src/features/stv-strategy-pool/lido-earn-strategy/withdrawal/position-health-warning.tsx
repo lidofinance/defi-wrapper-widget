@@ -3,8 +3,12 @@ import { FormatToken } from '@/shared/formatters';
 import { useEarnPosition } from '../hooks';
 
 export const PositionHealthWarning = () => {
-  const { assetShortfallInEth, isUnhealthy } = useEarnPosition();
-  if (!isUnhealthy && assetShortfallInEth && assetShortfallInEth > 1000) {
+  const { positionData } = useEarnPosition();
+  if (
+    !positionData ||
+    !positionData.isUnhealthy ||
+    positionData.assetShortfallInEth <= 1000
+  ) {
     return null;
   }
 
@@ -14,7 +18,7 @@ export const PositionHealthWarning = () => {
         Your stVault position is unhealthy. Your provided assets are shortfall
         of{' '}
         <FormatToken
-          amount={assetShortfallInEth}
+          amount={positionData?.assetShortfallInEth}
           token={'ETH'}
           fallback="N/A"
           trimEllipsis={true}

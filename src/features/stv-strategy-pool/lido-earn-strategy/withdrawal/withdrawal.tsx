@@ -3,7 +3,7 @@ import { WithdrawalPausedAlert } from '@/shared/components/paused-alert';
 import { FormContainer } from '@/shared/hook-form/container';
 import { SubmitButton } from '@/shared/hook-form/controls';
 import { WaitingTime } from '@/shared/wrapper/withdrawal/waiting-time';
-// import { VaultStatus } from '../vault-status';
+import { VaultStatus } from '../vault-status';
 import { PositionHealthWarning } from './position-health-warning';
 import { WithdrawalFormProvider } from './withdrawal-form-context';
 import { WithdrawalInputGroup } from './withdrawal-input-group';
@@ -14,7 +14,7 @@ export const Withdrawal = () => {
       <FormContainer>
         <WithdrawalPausedAlert />
         <VStack align="stretch" gap={6}>
-          {/* <VaultStatus /> */}
+          <VaultStatus />
           <WithdrawalInputGroup />
           <PositionHealthWarning />
           <WaitingTime waitingTime="5 days" />

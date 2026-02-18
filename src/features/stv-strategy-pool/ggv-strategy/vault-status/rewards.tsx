@@ -1,10 +1,9 @@
 import { Button } from '@chakra-ui/react';
+import { useClaimReward, useRewards } from '@/modules/defi-wrapper';
 import {
   VaultInfoEntry,
   VaultInfoSection,
 } from '@/shared/components/vault-info';
-import { useClaimReward } from './use-claim-reward';
-import { useRewards } from './use-rewards';
 
 export const Rewards = () => {
   const { isEmpty, rewardsInfo, isLoading } = useRewards();

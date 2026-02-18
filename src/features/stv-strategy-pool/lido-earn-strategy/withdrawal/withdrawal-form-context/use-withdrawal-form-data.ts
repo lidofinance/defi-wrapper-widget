@@ -10,20 +10,19 @@ import {
 
 export const useWithdrawalFormData = () => {
   const { isWalletConnected } = useDappStatus();
-  const { isPositionLoading, totalEthToWithdrawFromStrategyVault } =
-    useEarnPosition();
+  const { isPositionLoading, positionData } = useEarnPosition();
 
   const contextValue: WithdrawalFormValidationAsyncContextType | undefined =
     useMemo(() => {
-      if (totalEthToWithdrawFromStrategyVault === undefined) {
+      if (!positionData) {
         return undefined;
       }
       return {
-        balanceInEth: totalEthToWithdrawFromStrategyVault,
+        balanceInEth: positionData.totalEthToWithdrawFromStrategyVault,
         minWithdrawalInEth: 100n,
         maxWithdrawalInEth: null,
       };
-    }, [totalEthToWithdrawFromStrategyVault]);
+    }, [positionData]);
 
   const asyncContext = useAwaiter(contextValue).awaiter;
 

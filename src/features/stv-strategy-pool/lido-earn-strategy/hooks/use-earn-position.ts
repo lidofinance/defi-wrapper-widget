@@ -99,8 +99,13 @@ export const useEarnPosition = () => {
 
   return {
     positionQuery,
-    ...(earnPositionData ?? {}),
-    ...(positionQuery.data ?? {}),
+    positionData:
+      positionQuery.data && earnPositionData
+        ? {
+            ...positionQuery.data,
+            ...earnPositionData,
+          }
+        : undefined,
     isPositionLoading: positionQuery.isPending,
     totalUserValueInUsd,
     isUsdAmountLoading,

@@ -2,14 +2,14 @@ import { Address } from 'viem';
 import { usePublicClient } from 'wagmi';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
-import { useStvSteth } from '@/modules/defi-wrapper';
+import { useDefiWrapper } from '@/modules/defi-wrapper';
 import { fetchDistribution } from '@/modules/vaults/api/fetch-report';
 import { generateProofByIndex } from '@/modules/vaults/proof-generator';
 import { useDappStatus } from '@/modules/web3';
 import { getTokenInfo } from '@/modules/web3/utils';
 
 export const useRewards = () => {
-  const { distributor } = useStvSteth();
+  const { distributor } = useDefiWrapper();
   const { address, chainId } = useDappStatus();
   const publicClient = usePublicClient();
   const queryClient = useQueryClient();

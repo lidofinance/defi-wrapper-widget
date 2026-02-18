@@ -1,1 +1,1 @@
-// export * from './vault-status';
+export * from './vault-status';

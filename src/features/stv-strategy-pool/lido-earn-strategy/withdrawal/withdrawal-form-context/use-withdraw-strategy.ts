@@ -39,7 +39,13 @@ export const useWithdrawStrategy = () => {
         invariant(address, '[useWithdrawal] address is undefined');
         invariant(activeVault, '[useWithdrawal] activeVault is undefined');
 
-        const { lidoEarnStrategy } = earnStrategy;
+        const { lidoEarnStrategy, asyncDepositQueue, strategyProxyAddress } =
+          earnStrategy;
+
+        invariant(
+          strategyProxyAddress,
+          '[useWithdrawal] strategyProxyAddress is undefined',
+        );
 
         const requestedETHAmount = formatBalance(amount).actual;
 
@@ -53,6 +59,19 @@ export const useWithdrawStrategy = () => {
             flow: 'withdrawal',
             transactions: async () => {
               const calls: TransactionEntry[] = [];
+
+              const claimable = await lidoEarnStrategy.read.claimableSharesOf([
+                address,
+              ]);
+
+              if (claimable > 0n) {
+                calls.push({
+                  ...lidoEarnStrategy.encode.claimShares(),
+                  loadingText: `Unlocking Lido Earn ETH shares for withdrawal`,
+                  signingDescription: DEFAULT_SIGNING_DESCRIPTION,
+                  loadingDescription: DEFAULT_LOADING_DESCRIPTION,
+                });
+              }
 
               // amount is ETH of total eth value
 

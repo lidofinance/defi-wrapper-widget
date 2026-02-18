@@ -26,10 +26,10 @@ const TABS: TAB[] = [
 ];
 
 export const LidoEarnStrategy = () => {
-  const { totalUserValueInEth } = useEarnPosition();
+  const { positionData } = useEarnPosition();
   const { isEmpty } = useStrategyWithdrawalRequestsRead(true);
 
-  const showDashboard = !isEmpty || !!totalUserValueInEth;
+  const showDashboard = !isEmpty || !!positionData?.totalUserValueInEth;
 
   return <Navigation tabs={TABS} showDashboard={showDashboard} />;
 };

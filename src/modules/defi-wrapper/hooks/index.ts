@@ -9,3 +9,5 @@ export * from './use-requests';
 export * from './use-withdrawal-queue';
 export * from './use-repay-rebalance-ratio';
 export * from './use-estimated-rewards';
+export * from './use-rewards';
+export * from './use-claim-rewards';

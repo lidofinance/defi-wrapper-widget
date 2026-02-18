@@ -5,13 +5,13 @@ import {
 import { ApyTooltipContent } from '../apy-tooltip-content';
 import { useEarnPosition, useEarnStrategyApy } from '../hooks';
 import { VaultDetails } from '../vault-details';
-// import { VaultStatus } from '../vault-status';
+import { VaultStatus } from '../vault-status';
 
 export const Dashboard = () => {
   const { apySmaCurrent, isLoadingApr, updatedAt } = useEarnStrategyApy();
   const {
-    totalUserValueInEth,
     isPositionLoading,
+    positionData,
     totalUserValueInUsd,
     isUsdAmountLoading,
   } = useEarnPosition();
@@ -28,7 +28,7 @@ export const Dashboard = () => {
     <DashboardContainer>
       <DashboardBalanceApy
         token={'ETH'}
-        balance={totalUserValueInEth}
+        balance={positionData?.totalUserValueInEth}
         isBalanceLoading={isPositionLoading}
         isUSDAmountLoading={isUsdAmountLoading}
         usdAmount={totalUserValueInUsd}
@@ -36,7 +36,7 @@ export const Dashboard = () => {
         aprData={aprData}
         customAPYTooltipContent={<ApyTooltipContent />}
       />
-      {/*<VaultStatus showBoost showRewards={true} />*/}
+      <VaultStatus showBoost showRewards={true} />
       <VaultDetails />
     </DashboardContainer>
   );

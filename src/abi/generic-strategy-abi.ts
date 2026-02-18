@@ -14,6 +14,29 @@ export const genericStrategyAbi = [
   },
   {
     type: 'function',
+    name: 'safeTransferERC20',
+    inputs: [
+      {
+        name: '_token',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: '_recipient',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: '_amount',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     name: 'STETH',
     inputs: [],
     outputs: [
