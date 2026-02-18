@@ -1,7 +1,6 @@
 const fs = require('fs');
 const { execSync } = require('child_process');
 const { globSync } = require('glob');
-const path = require('path');
 
 const ARGS = process.argv.slice(2);
 const FILE_GLOB = ARGS[0] || 'src/abis/**/*.ts';

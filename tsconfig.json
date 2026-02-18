@@ -14,7 +14,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "baseUrl": ".",
     "lib": ["dom", "dom.iterable", "esnext"],
     "paths": {
       "@/*": ["./src/*"],
