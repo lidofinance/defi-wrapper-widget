@@ -1,4 +1,4 @@
-export const ETH_COLLECTOR_ABI = [
+export const EthCollectorAbi = [
   {
     inputs: [
       { internalType: 'address', name: 'owner_', type: 'address' },
@@ -509,3 +509,5 @@ export const ETH_COLLECTOR_ABI = [
     type: 'function',
   },
 ] as const;
+
+export type EthCollectorAbiType = typeof EthCollectorAbi;

@@ -1,4 +1,4 @@
-export const ETH_REDEEM_QUEUE_WSTETH_ABI = [
+export const EthRedeemQueueAbi = [
   {
     inputs: [
       { internalType: 'string', name: 'name_', type: 'string' },
@@ -258,3 +258,5 @@ export const ETH_REDEEM_QUEUE_WSTETH_ABI = [
   },
   { stateMutability: 'payable', type: 'receive' },
 ] as const;
+
+export type EthRedeemQueueAbiType = typeof EthRedeemQueueAbi;

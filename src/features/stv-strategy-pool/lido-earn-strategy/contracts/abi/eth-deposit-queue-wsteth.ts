@@ -1,4 +1,4 @@
-export const ETH_DEPOSIT_QUEUE_WSTETH_ABI = [
+export const EthDepositQueueAbi = [
   {
     inputs: [
       { internalType: 'string', name: 'name_', type: 'string' },
@@ -250,3 +250,5 @@ export const ETH_DEPOSIT_QUEUE_WSTETH_ABI = [
     type: 'function',
   },
 ] as const;
+
+export type EthDepositQueueAbiType = typeof EthDepositQueueAbi;

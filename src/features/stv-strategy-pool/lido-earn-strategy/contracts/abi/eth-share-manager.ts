@@ -1,4 +1,4 @@
-export const ETH_SHARE_MANAGER_ABI = [
+export const EthShareManagerAbi = [
   {
     inputs: [
       { internalType: 'string', name: 'name_', type: 'string' },
@@ -630,3 +630,5 @@ export const ETH_SHARE_MANAGER_ABI = [
     type: 'function',
   },
 ] as const;
+
+export type EthShareManagerAbiType = typeof EthShareManagerAbi;

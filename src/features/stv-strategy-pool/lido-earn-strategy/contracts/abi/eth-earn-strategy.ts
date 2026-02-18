@@ -805,3 +805,5 @@ export const EthEarnStrategyAbi = [
     type: 'function',
   },
 ] as const;
+
+export type EthEarnStrategyAbiType = typeof EthEarnStrategyAbi;

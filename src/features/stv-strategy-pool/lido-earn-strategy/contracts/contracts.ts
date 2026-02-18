@@ -1,27 +1,32 @@
-import { type Address, getContract } from 'viem';
+import { type Address, getContract, type GetContractReturnType } from 'viem';
 
 import type { RegisteredPublicClient } from '@/modules/web3';
-import { getEncodable } from '@/utils/encodable';
+import { getEncodable, EncodableContract } from '@/utils/encodable';
 
 import {
   EthEarnStrategyAbi,
-  ETH_VAULT_ABI,
-  ETH_DEPOSIT_QUEUE_WSTETH_ABI,
-  ETH_REDEEM_QUEUE_WSTETH_ABI,
-  ETH_SHARE_MANAGER_ABI,
+  EthVaultAbi,
+  EthDepositQueueAbi,
+  EthRedeemQueueAbi,
+  EthShareManagerAbi,
+  type EthEarnStrategyAbiType,
+  type EthVaultAbiType,
+  type EthDepositQueueAbiType,
+  type EthRedeemQueueAbiType,
+  type EthShareManagerAbiType,
 } from './abi';
 
 export const getLidoEarnStrategyContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-) => {
+): EncodableContract<
+  GetContractReturnType<EthEarnStrategyAbiType, RegisteredPublicClient>
+> => {
   return getEncodable(
     getContract({
       address,
       abi: EthEarnStrategyAbi,
-      client: {
-        public: publicClient,
-      },
+      client: publicClient,
     }),
   );
 };
@@ -29,14 +34,14 @@ export const getLidoEarnStrategyContract = (
 export const getLidoEarnVaultContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-) => {
+): EncodableContract<
+  GetContractReturnType<EthVaultAbiType, RegisteredPublicClient>
+> => {
   return getEncodable(
     getContract({
       address,
-      abi: ETH_VAULT_ABI,
-      client: {
-        public: publicClient,
-      },
+      abi: EthVaultAbi,
+      client: publicClient,
     }),
   );
 };
@@ -59,14 +64,14 @@ export const getLidoEarnVaultContract = (
 export const getLidoEarnAsyncDepositQueueContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-) => {
+): EncodableContract<
+  GetContractReturnType<EthDepositQueueAbiType, RegisteredPublicClient>
+> => {
   return getEncodable(
     getContract({
       address,
-      abi: ETH_DEPOSIT_QUEUE_WSTETH_ABI,
-      client: {
-        public: publicClient,
-      },
+      abi: EthDepositQueueAbi,
+      client: publicClient,
     }),
   );
 };
@@ -74,12 +79,14 @@ export const getLidoEarnAsyncDepositQueueContract = (
 export const getLidoEarnRedeemQueueContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-) => {
+): EncodableContract<
+  GetContractReturnType<EthRedeemQueueAbiType, RegisteredPublicClient>
+> => {
   return getEncodable(
     getContract({
       address,
-      abi: ETH_REDEEM_QUEUE_WSTETH_ABI,
-      client: { public: publicClient },
+      abi: EthRedeemQueueAbi,
+      client: publicClient,
     }),
   );
 };
@@ -87,12 +94,14 @@ export const getLidoEarnRedeemQueueContract = (
 export const getLidoEarnShareManagerContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-) => {
+): EncodableContract<
+  GetContractReturnType<EthShareManagerAbiType, RegisteredPublicClient>
+> => {
   return getEncodable(
     getContract({
       address,
-      abi: ETH_SHARE_MANAGER_ABI,
-      client: { public: publicClient },
+      abi: EthShareManagerAbi,
+      client: publicClient,
     }),
   );
 };

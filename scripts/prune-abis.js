@@ -7,6 +7,12 @@ const ARGS = process.argv.slice(2);
 const FILE_GLOB = ARGS[0] || 'src/abis/**/*.ts';
 const CHECK_COMMAND = 'npx tsc --noEmit';
 
+//
+// This script prunes unused entries from ABIs passed from glob patterns. It works by: deleting one entry at a time, running the type checker, and reverting if it causes errors.
+// It's a bit brute-force and time consuming but effective for cleaning up large ABIs and restoring compile and type check performance.
+// Always make sure to commit your code before running this script as it will modify files in place.
+//
+
 function pruneFiles() {
   const files = globSync(FILE_GLOB);
   if (files.length === 0) {

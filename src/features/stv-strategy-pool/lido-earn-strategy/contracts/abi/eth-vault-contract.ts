@@ -1,4 +1,4 @@
-export const ETH_VAULT_ABI = [
+export const EthVaultAbi = [
   {
     inputs: [
       { internalType: 'string', name: 'name_', type: 'string' },
@@ -1030,3 +1030,5 @@ export const ETH_VAULT_ABI = [
   },
   { stateMutability: 'payable', type: 'receive' },
 ] as const;
+
+export type EthVaultAbiType = typeof EthVaultAbi;
