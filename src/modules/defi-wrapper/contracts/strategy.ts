@@ -5,12 +5,14 @@ import {
   GenericStrategyAbiType,
 } from '@/abi/generic-strategy-abi';
 import type { RegisteredPublicClient } from '@/modules/web3';
-import { getEncodable } from '@/utils/encodable';
+import { EncodableContract, getEncodable } from '@/utils/encodable';
 
 export const getStrategyContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-): GetContractReturnType<GenericStrategyAbiType, RegisteredPublicClient> => {
+): EncodableContract<
+  GetContractReturnType<GenericStrategyAbiType, RegisteredPublicClient>
+> => {
   return getEncodable(
     getContract({
       address,

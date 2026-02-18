@@ -18,12 +18,9 @@ type ContractType = {
   simulate?: {
     [functionName: string]: (...args: any[]) => Promise<any>;
   };
-  write?: {
-    [functionName: string]: (...args: any[]) => Promise<any>;
-  };
 };
 
-type EncodableContract<
+export type EncodableContract<
   TContract extends ContractType,
   TSimulate extends TContract['simulate'] =
     TContract['simulate'] extends undefined ? never : TContract['simulate'],

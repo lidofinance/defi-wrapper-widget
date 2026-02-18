@@ -12,7 +12,7 @@
     "lint:fix": "yarn lint --fix",
     "types": "tsc --noEmit",
     "prepare": "husky",
-    "prune:abi": "node scripts/ prune-abis.js"
+    "prune:abi": "node scripts/prune-abis.js"
   },
   "dependencies": {
     "@chakra-ui/react": "3.33.0",

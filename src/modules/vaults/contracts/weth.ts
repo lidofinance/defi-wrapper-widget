@@ -6,7 +6,7 @@ import invariant from 'tiny-invariant';
 import { WethABI, WethABIType } from '@/abi/weth-abi';
 import { getContractAddress } from '@/config';
 import type { RegisteredPublicClient } from '@/modules/web3';
-import { getEncodable } from '@/utils/encodable';
+import { getEncodable, EncodableContract } from '@/utils/encodable';
 
 export class LidoSDKwETH extends AbstractLidoSDKErc20 {
   public contractAddress() {
@@ -18,7 +18,9 @@ export class LidoSDKwETH extends AbstractLidoSDKErc20 {
 
 export const getWethContract = (
   publicClient: RegisteredPublicClient,
-): GetContractReturnType<WethABIType, RegisteredPublicClient> => {
+): EncodableContract<
+  GetContractReturnType<WethABIType, RegisteredPublicClient>
+> => {
   const address = getContractAddress(publicClient.chain.id, 'weth');
   invariant(
     address,
