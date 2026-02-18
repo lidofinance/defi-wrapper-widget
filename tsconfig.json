@@ -9,6 +9,7 @@
     "esModuleInterop": true,
     "module": "esnext",
     "disableSizeLimit": true,
+    "incremental": true,
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -17,9 +18,9 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "paths": {
       "@/*": ["./src/*"],
-      "assets/*": ["./assets/*"],
-    },
+      "assets/*": ["./assets/*"]
+    }
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "dist", "*.config.[js|mjs]"],
+  "exclude": ["node_modules", "dist", "*.config.[js|mjs]"]
 }

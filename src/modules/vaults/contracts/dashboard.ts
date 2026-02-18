@@ -1,6 +1,6 @@
-import { type Address, getContract } from 'viem';
+import { type Address, getContract, GetContractReturnType } from 'viem';
 
-import { dashboardAbi } from '@/abi/dashboard-abi';
+import { DashboardAbi, DashboardAbiType } from '@/abi/dashboard-abi';
 import type { RegisteredPublicClient } from '@/modules/web3';
 import { getEncodable } from '@/utils/encodable';
 
@@ -8,7 +8,7 @@ import { getEncodable } from '@/utils/encodable';
 export const getDashboardContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-) => {
+): GetContractReturnType<DashboardAbiType, RegisteredPublicClient> => {
   const client: {
     public: RegisteredPublicClient;
   } = {
@@ -18,7 +18,7 @@ export const getDashboardContract = (
   return getEncodable(
     getContract({
       address,
-      abi: dashboardAbi,
+      abi: DashboardAbi,
       client,
     }),
   );

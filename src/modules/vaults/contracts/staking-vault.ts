@@ -1,6 +1,6 @@
-import { type Address, getContract } from 'viem';
+import { type Address, getContract, type GetContractReturnType } from 'viem';
 
-import { StakingVaultAbi } from '@/abi/staking-vault';
+import { StakingVaultAbi, type StakingVaultAbiType } from '@/abi/staking-vault';
 import { RegisteredPublicClient } from '@/modules/web3';
 import { getEncodable } from '@/utils/encodable';
 
@@ -8,7 +8,7 @@ import { getEncodable } from '@/utils/encodable';
 export const getStakingVaultContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-) => {
+): GetContractReturnType<StakingVaultAbiType, RegisteredPublicClient> => {
   return getEncodable(
     getContract({
       address,

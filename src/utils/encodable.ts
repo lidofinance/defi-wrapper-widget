@@ -18,6 +18,9 @@ type ContractType = {
   simulate?: {
     [functionName: string]: (...args: any[]) => Promise<any>;
   };
+  write?: {
+    [functionName: string]: (...args: any[]) => Promise<any>;
+  };
 };
 
 type EncodableContract<

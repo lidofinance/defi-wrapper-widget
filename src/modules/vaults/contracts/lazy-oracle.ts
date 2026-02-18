@@ -1,23 +1,15 @@
-import { getContract } from 'viem';
+import { getContract, GetContractReturnType } from 'viem';
 import invariant from 'tiny-invariant';
 
-import { LazyOracleAbi } from '@/abi/lazy-oracle';
+import { LazyOracleAbi, LazyOracleAbiType } from '@/abi/lazy-oracle';
 import { getContractAddress } from '@/config';
 
-import type {
-  RegisteredPublicClient,
-  RegisteredWalletClient,
-} from '@/modules/web3';
+import type { RegisteredPublicClient } from '@/modules/web3';
 import { getEncodable } from '@/utils/encodable';
 
-export const getLazyOracleContract = <TClient extends RegisteredPublicClient>(
-  publicClient: TClient,
-) => {
-  invariant(
-    publicClient.chain?.id,
-    '[getLazyOracleContract] chainId is not defined',
-  );
-
+export const getLazyOracleContract = (
+  publicClient: RegisteredPublicClient,
+): GetContractReturnType<LazyOracleAbiType, RegisteredPublicClient> => {
   const address = getContractAddress(publicClient.chain.id, 'lazyOracle');
 
   invariant(address, '[getLazyOracleContract] lazyOracle is not defined');
@@ -25,37 +17,7 @@ export const getLazyOracleContract = <TClient extends RegisteredPublicClient>(
     getContract({
       address,
       abi: LazyOracleAbi,
-      client: {
-        public: publicClient,
-      },
+      client: publicClient,
     }),
   );
-};
-
-export const getWritableLazyOracleContract = <
-  TClient extends RegisteredPublicClient,
-  TWallet extends RegisteredWalletClient,
->(
-  publicClient: TClient,
-  walletClient: TWallet,
-) => {
-  invariant(
-    publicClient.chain?.id,
-    '[getWritableLazyOracleContract] chainId is not defined',
-  );
-
-  const address = getContractAddress(publicClient.chain.id, 'lazyOracle');
-
-  invariant(
-    address,
-    '[getWritableLazyOracleContract] lazyOracle is not defined',
-  );
-  return getContract({
-    address,
-    abi: LazyOracleAbi,
-    client: {
-      public: publicClient,
-      wallet: walletClient,
-    },
-  });
 };
