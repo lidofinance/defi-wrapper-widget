@@ -24,7 +24,7 @@ export const WidgetTabNavigation = ({
       fitted
       {...rest}
     >
-      <Tabs.List bg="bg.muted">
+      <Tabs.List bg="bg.subtle">
         {tabs.map((tab) => (
           <Tabs.Trigger value={tab.value} key={tab.value}>
             {tab.label}

@@ -82,7 +82,7 @@ export const cardSlotRecipe = defineSlotRecipe({
         root: {
           bg: 'bg.panel',
           borderWidth: '1px',
-          borderColor: 'border',
+          borderColor: 'border.muted',
         },
       },
       subtle: {

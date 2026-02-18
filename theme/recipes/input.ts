@@ -64,7 +64,7 @@ export const inputRecipe = defineRecipe({
       outline: {
         bg: 'transparent',
         borderWidth: '1px',
-        borderColor: 'border',
+        borderColor: 'border.emphasized',
         focusVisibleRing: 'inside',
         focusRingColor: 'var(--focus-color)',
       },

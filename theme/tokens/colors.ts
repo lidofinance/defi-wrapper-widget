@@ -436,4 +436,17 @@ export const colors = defineTokens.colors({
       value: '#2c0514',
     },
   },
+  obol: {
+    '50':  { value: '#E6FBF5' },
+    '100': { value: '#B3F5E0' },
+    '200': { value: '#80EFC9' },
+    '300': { value: '#4DE9B5' },
+    '400': { value: '#2FE4AB' },
+    '500': { value: '#1BC49B' },
+    '600': { value: '#17A884' },
+    '700': { value: '#33474D' },
+    '800': { value: '#111F22' },
+    '900': { value: '#091011' },
+    '950': { value: '#050A0B' },
+  },
 });
