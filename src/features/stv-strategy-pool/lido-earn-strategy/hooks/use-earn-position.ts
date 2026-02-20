@@ -52,17 +52,32 @@ const useEarnPositionData = () => {
         shareManager.read.balanceOf([strategyProxyAddress]),
       ]);
 
-      const pendingWithdrawalsInWsteth = withdrawalRequests.reduce(
-        (acc, request) => acc + request.assets,
-        0n,
-      );
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [[_, balanceInWsteth], [__, claimableDepositInWsteth]] =
         await Promise.all([
           lidoEarnStrategy.read.previewRedeem([balanceInEarnShares]),
           lidoEarnStrategy.read.previewRedeem([claimableDepositInEarnShares]),
         ]);
+
+      const previewedWithdrawalRequests = await Promise.all(
+        withdrawalRequests.map(async (request) => {
+          if (request.isClaimable) {
+            return request;
+          }
+
+          const [___, previewBalanceInWsteth] =
+            await lidoEarnStrategy.read.previewRedeem([request.shares]);
+
+          return {
+            ...request,
+            assets: previewBalanceInWsteth,
+          };
+        }),
+      );
+
+      const pendingWithdrawalsInWsteth = previewedWithdrawalRequests.reduce(
+        (acc, request) => acc + request.assets,
+        0n,
+      );
 
       return {
         pendingDepositTimestamp,
@@ -70,7 +85,7 @@ const useEarnPositionData = () => {
         claimableDepositInWsteth,
         pendingWithdrawalsInWsteth,
         balanceInWsteth,
-        withdrawalRequests,
+        withdrawalRequests: previewedWithdrawalRequests,
         balanceInEarnShares,
         claimableDepositInEarnShares,
       };

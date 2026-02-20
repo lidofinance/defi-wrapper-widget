@@ -97,7 +97,8 @@ export default defineConfig(
         'error',
         {
           ignoreRestSiblings: true,
-          argsIgnorePattern: '^_*',
+          argsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
         },
       ],
       'func-style': ['error', 'expression'],
