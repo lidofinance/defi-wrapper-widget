@@ -5,9 +5,9 @@ import {
   useWithdrawalQueue,
 } from '@/modules/defi-wrapper';
 
+import { useBoostApy, useProcessWithdrawal, useRecover } from '../../shared';
 import { useGGVCancelRequest } from './use-ggv-cancel-request';
 
-import { useBoostApy, useProcessWithdrawal, useRecover } from '../../shared';
 
 import { useGGVStrategyPosition } from './use-ggv-strategy-position';
 

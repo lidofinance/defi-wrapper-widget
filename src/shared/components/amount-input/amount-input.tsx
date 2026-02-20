@@ -71,9 +71,9 @@ export const AmountInput: React.FC<TokenAmountInputProps> = forwardRef<
       if (currentValue === '') {
         onChange?.(null);
       } else {
-        const value = parseEtherSafe(currentValue);
+        const parsedValue = parseEtherSafe(currentValue);
         // The check !value is not suitable because !value returns true for 0n.
-        if (value == null) {
+        if (parsedValue == null) {
           // invalid value, so we rollback to last valid value
           const rollbackCaretPosition =
             caretPosition -
@@ -90,8 +90,8 @@ export const AmountInput: React.FC<TokenAmountInputProps> = forwardRef<
           return;
         }
 
-        const cappedValue = value > maxUint256 ? maxUint256 : value;
-        if (value > maxUint256) {
+        const cappedValue = parsedValue > maxUint256 ? maxUint256 : parsedValue;
+        if (parsedValue > maxUint256) {
           currentValue = formatEther(maxUint256);
         }
         onChange?.(cappedValue);

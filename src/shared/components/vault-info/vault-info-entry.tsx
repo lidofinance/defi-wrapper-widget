@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import { FiInfo } from 'react-icons/fi';
 import { Box, HStack, Spacer, Text, VStack } from '@chakra-ui/react';
 import { TokenIcon } from '@/shared/components/token-icon/token-icon';
 import { VaultInfoTokenBlock } from '@/shared/components/vault-info/vault-info-token-block';

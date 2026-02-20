@@ -299,13 +299,6 @@ export const getStrategyPosition = async ({
     minBN(pendingUnlockFromStrategyVaultInEth, totalLockedEth) +
     strategyVaultStethExcess;
 
-  console.log({
-    totalEthToWithdrawFromStrategyVault,
-    totalStethSharesAvailableForReturnInEth,
-    strategyVaultStethExcess,
-    totalStethSharesAvailableForReturn,
-  });
-
   //
   // Boosting APY via supply(0)
   //
