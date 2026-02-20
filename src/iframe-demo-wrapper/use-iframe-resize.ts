@@ -1,4 +1,4 @@
-import { MutableRefObject, useEffect, useRef } from 'react';
+import { RefObject, useEffect, useRef } from 'react';
 
 const EVENT = 'iframe-resize';
 
@@ -8,7 +8,7 @@ type ResizeMessage = {
 };
 
 export const useIframeResize = (
-  iframeRef: MutableRefObject<HTMLIFrameElement | null>,
+  iframeRef: RefObject<HTMLIFrameElement | null>,
 ) => {
   const lastHeightRef = useRef(0);
 

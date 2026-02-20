@@ -5573,6 +5573,7 @@ __metadata:
     vite: "npm:^7.3.1"
     vite-plugin-checker: "npm:^0.12.0"
     vite-plugin-svgr: "npm:^4.5.0"
+    vite-plugin-unused-code: "npm:^0.1.6"
     wagmi: "npm:3.4.4"
     zod: "npm:^4.3.6"
   languageName: unknown
@@ -10729,6 +10730,18 @@ __metadata:
   peerDependencies:
     vite: ">=2.6.0"
   checksum: 10c0/3e1959fec626bb4f5a8ec13ff15bc40ffbc1c0ff38149bebe3f37dc2d67ed1f276f129ff7983e06946cf712e19996affd9d6868aa7d20d8921d1fe4449109b55
+  languageName: node
+  linkType: hard
+
+"vite-plugin-unused-code@npm:^0.1.6":
+  version: 0.1.6
+  resolution: "vite-plugin-unused-code@npm:0.1.6"
+  dependencies:
+    fast-glob: "npm:^3.3.2"
+    micromatch: "npm:^4.0.8"
+  peerDependencies:
+    vite: ">=2.0.0"
+  checksum: 10c0/09f8ec56cc3a8f163dea33bf43d4546ddd28cd9d764fd92a8aa893099861f4c834433f38f8d920753c9fc4b5dfd02fc83ed627a2f8f41ada1c0e6ed51f1d845a
   languageName: node
   linkType: hard
 

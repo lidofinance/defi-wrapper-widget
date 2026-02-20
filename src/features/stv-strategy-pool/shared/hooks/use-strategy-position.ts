@@ -415,6 +415,7 @@ export const useStrategyPosition = (
       !!wrapper &&
       !!activeVault &&
       !!strategy &&
+      params.strategyProxyAddress !== undefined &&
       params.strategyStethSharesBalance !== undefined &&
       params.strategyDepositStethSharesOffset !== undefined &&
       params.strategyWithdrawalStethSharesOffset !== undefined,

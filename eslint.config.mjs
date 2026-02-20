@@ -179,5 +179,5 @@ export default defineConfig(
       'no-restricted-imports': 'off',
     },
   },
-  //prettierRecommended,
+  prettierRecommended,
 );
