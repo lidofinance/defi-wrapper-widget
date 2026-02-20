@@ -2,12 +2,7 @@ import { useCallback } from 'react';
 import { Address } from 'viem';
 import invariant from 'tiny-invariant';
 import { useInvalidateWrapper } from '@/modules/defi-wrapper';
-import {
-  TransactionEntry,
-  useDappStatus,
-  useSendTransaction,
-  withSuccess,
-} from '@/modules/web3';
+import { useDappStatus, useSendTransaction, withSuccess } from '@/modules/web3';
 import {
   DEFAULT_LOADING_DESCRIPTION,
   DEFAULT_SIGNING_DESCRIPTION,
@@ -45,20 +40,13 @@ export const useGGVRecover = () => {
             AATitleText: `Claiming rewards`,
             AASigningDescription: DEFAULT_SIGNING_DESCRIPTION,
             AALoadingDescription: DEFAULT_LOADING_DESCRIPTION,
-            transactions: async () => {
-              const calls: TransactionEntry[] = [];
-
-              // recover ERC20
-              calls.push({
-                ...ggvStrategyContract.encode.safeTransferERC20([
-                  assetToRecover,
-                  address,
-                  amountToRecover,
-                ]),
-              });
-
-              return calls;
-            },
+            transactions: [
+              ggvStrategyContract.encode.safeTransferERC20([
+                assetToRecover,
+                address,
+                amountToRecover,
+              ]),
+            ],
           }),
         );
 

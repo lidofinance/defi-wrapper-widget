@@ -1,6 +1,6 @@
 import type { Address } from 'viem';
 
-const API_LIST = ['vaultsApi', 'ethApi', 'ggvApi'] as const;
+const API_LIST = ['vaultsApi', 'ethApi', 'ggvApi', 'mellowApi'] as const;
 
 const CONTRACT_LIST = [
   'lido',

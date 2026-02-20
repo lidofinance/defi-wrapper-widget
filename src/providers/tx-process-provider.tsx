@@ -31,10 +31,10 @@ export const TxProcessProvider: React.FC<TxProcessProviderProps> = ({
   const [txType, setTxType] = useState<TxType>(null);
   const [amount, setAmount] = useState<bigint>(0n);
 
-  const startTx = (type: TxType, amount: bigint) => {
+  const startTx = (type: TxType, amountTx: bigint) => {
     setTxType(type);
     setIsProcessing(true);
-    setAmount(amount);
+    setAmount(amountTx);
     setTimeout(() => {
       setIsProcessing(false);
     }, 1000);

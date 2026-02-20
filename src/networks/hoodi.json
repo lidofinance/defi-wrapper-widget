@@ -16,6 +16,7 @@
   "api": {
     "vaultsApi": "https://stvaults-api-hoodi.testnet.fi",
     "ethApi": "https://eth-api-hoodi.testnet.fi",
-    "ggvApi": "https://api.sevenseas.capital"
+    "ggvApi": "https://api.sevenseas.capital",
+    "mellowApi": "https://api.mellow.finance"
   }
 }

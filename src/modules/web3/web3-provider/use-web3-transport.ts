@@ -35,14 +35,17 @@ const runtimeMutableTransport = (
       const defaultTransport = fallback(mainTransports)(params);
       let externalOnResponse: OnResponseFn | undefined;
 
-      const onResponse: OnResponseFn = (params: unknown) => {
-        if ((params as any).status === 'error' && !(params as any).skipLog) {
+      const onResponse: OnResponseFn = (responseParams: unknown) => {
+        if (
+          (responseParams as any).status === 'error' &&
+          !(responseParams as any).skipLog
+        ) {
           console.warn(
             `[runtimeMutableTransport] error in RuntimeMutableTransport(using injected: ${!!withInjectedTransport})`,
-            params,
+            responseParams,
           );
         }
-        externalOnResponse?.(params);
+        externalOnResponse?.(responseParams);
       };
 
       return createTransport(
@@ -131,7 +134,7 @@ export const useWeb3Transport = (
     };
 
     return supportedChains.reduce(
-      ({ transportMap, setTransportMap }, chain) => {
+      (acc, chain) => {
         const [transport, setTransport] = runtimeMutableTransport([
           // api/rpc
           ...backendRpcMap[chain.id].map((url) =>
@@ -148,11 +151,11 @@ export const useWeb3Transport = (
         ]);
         return {
           transportMap: {
-            ...transportMap,
+            ...acc.transportMap,
             [chain.id]: transport,
           },
           setTransportMap: {
-            ...setTransportMap,
+            ...acc.setTransportMap,
             [chain.id]: setTransport,
           },
         };

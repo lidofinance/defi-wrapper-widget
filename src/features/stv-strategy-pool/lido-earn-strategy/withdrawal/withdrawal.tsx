@@ -1,0 +1,30 @@
+import { VStack } from '@chakra-ui/react';
+import { WithdrawalPausedAlert } from '@/shared/components/paused-alert';
+import { FormContainer } from '@/shared/hook-form/container';
+import { SubmitButton } from '@/shared/hook-form/controls';
+import { WaitingTime } from '@/shared/wrapper/withdrawal/waiting-time';
+
+import { VaultStatus } from '../vault-status';
+
+import { PendingDepositWarning } from './deposit-pending-warning';
+import { PositionHealthWarning } from './position-health-warning';
+import { WithdrawalFormProvider } from './withdrawal-form-context';
+import { WithdrawalInputGroup } from './withdrawal-input-group';
+
+export const Withdrawal = () => {
+  return (
+    <WithdrawalFormProvider>
+      <FormContainer>
+        <WithdrawalPausedAlert />
+        <VStack align="stretch" gap={6}>
+          <VaultStatus />
+          <WithdrawalInputGroup />
+          <PendingDepositWarning />
+          <PositionHealthWarning />
+          <WaitingTime waitingTime="5 days" />
+          <SubmitButton>Withdraw from Strategy</SubmitButton>
+        </VStack>
+      </FormContainer>
+    </WithdrawalFormProvider>
+  );
+};

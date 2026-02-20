@@ -2,13 +2,17 @@ import {
   Address,
   encodeAbiParameters,
   getContract,
+  GetContractReturnType,
   isAddressEqual,
   keccak256,
   maxUint24,
   zeroAddress,
 } from 'viem';
 import { RegisteredPublicClient } from '@/modules/web3';
-import { ggvMockQueueAbi } from './contracts/abi/ggv-mock-queue-abi';
+import {
+  GgvMockQueueAbi,
+  GgvMockQueueAbiType,
+} from './contracts/abi/ggv-mock-queue-abi';
 
 type GGVParams = {
   discount: number; // - only for Withdrawals
@@ -77,9 +81,9 @@ export const fetchPendingWithdrawalRequestsFromMock = async (
 ) => {
   const mockQueue = getContract({
     address: mockBoringQueue,
-    abi: ggvMockQueueAbi,
+    abi: GgvMockQueueAbi,
     client: publicClient,
-  });
+  }) as GetContractReturnType<GgvMockQueueAbiType, RegisteredPublicClient>;
 
   type MockStoredRequestType = Awaited<
     ReturnType<(typeof mockQueue)['read']['mockGetRequestById']>

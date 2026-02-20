@@ -23,3 +23,5 @@ export const LidoV3Abi = [
     type: 'function',
   },
 ] as const;
+
+export type LidoV3AbiType = typeof LidoV3Abi;
