@@ -83,15 +83,16 @@ export const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
 
   const { supportedChains, defaultChain } = useMemo(() => {
     // must preserve order of supportedChainIds
-    const supportedChains = supportedChainIds
+    const supportedChainsList = supportedChainIds
       .map((id) => wagmiChainMap[id])
       .filter((chain) => chain) as unknown as ChainsList;
 
-    const defaultChain = wagmiChainMap[defaultChainId] || supportedChains[0];
+    const defaultChainEntry =
+      wagmiChainMap[defaultChainId] || supportedChainsList[0];
 
     return {
-      supportedChains,
-      defaultChain,
+      supportedChains: supportedChainsList,
+      defaultChain: defaultChainEntry,
     };
   }, [defaultChainId, supportedChainIds]);
 

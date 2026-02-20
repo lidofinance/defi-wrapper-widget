@@ -21,6 +21,7 @@ export default defineConfig(
       'build/**',
       '*.config.js',
       '*.config.mjs',
+      './scripts/**',
     ],
   },
   {
@@ -97,7 +98,8 @@ export default defineConfig(
         'error',
         {
           ignoreRestSiblings: true,
-          argsIgnorePattern: '^_*',
+          argsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
         },
       ],
       'func-style': ['error', 'expression'],
@@ -177,5 +179,5 @@ export default defineConfig(
       'no-restricted-imports': 'off',
     },
   },
-  //prettierRecommended,
+  prettierRecommended,
 );

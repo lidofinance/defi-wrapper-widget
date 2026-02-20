@@ -8,13 +8,17 @@ import { useDappStatus, useLidoSDK } from '@/modules/web3';
 import { absBN, minBN, maxBN } from '@/utils/bn';
 
 type GetStrategyPositionDynamicParams = {
+  // address of the proxy contract, which is used to interact with strategy vault and holds user funds on behalf of strategy
   strategyProxyAddress: Address;
 
   // balance in steth shares that are generating yield in strategy vault
   strategyStethSharesBalance: bigint;
-  // stethShares that are pending deposit to strategy
+
+  // stethShares that are pending deposit to strategy vault
+  // can be const 0n if deposit is instant
   strategyDepositStethSharesOffset: bigint;
-  // stethShares that are pending withdrawal from strategy
+
+  // stethShares that are pending withdrawal from strategy vault
   strategyWithdrawalStethSharesOffset: bigint;
 };
 
@@ -33,6 +37,7 @@ type GetStrategyPositionParams = {
 export const getStrategyPosition = async ({
   publicClient,
   strategy,
+  address,
   activeVault,
   shares,
   wrapper,
@@ -41,14 +46,13 @@ export const getStrategyPosition = async ({
   strategyWithdrawalStethSharesOffset,
   strategyDepositStethSharesOffset,
   strategyStethSharesBalance,
-  address,
 }: GetStrategyPositionParams) => {
   /// GLOSSARY:
   /// strategy - contracts that user interacts with
   /// strategy vault - 3rd party protocol where wstETH is deposited to generate yield
   /// strategy proxy - underlying contract that interacts with Strategy Vault on behalf of user and holds tokens
   /// liability -  stETH shares minted against user provided ETH
-  /// delegated stETH - stETH shares that are on delegated to 3rd party (strategy vault) for rewards accrual
+  /// delegated stETH - stETH shares that are delegated to 3rd party (strategy vault) for rewards accrual
   /// returned stETH - stETH shares that are on strategy proxy balance(returned from strategy vault or somehow else)
   /// available stETH - stETH shares that are available strategy proxy (returned + delegated)
 
@@ -151,6 +155,7 @@ export const getStrategyPosition = async ({
   // out of totalStethSharesLiabilityToCover above:
 
   // stETH shares that can be repaid from returned balance and unlock user ETH
+  // can
   // can eq 0n - no stETH is to be repaid(only rewards to skim) or all stETH is lost and must be rebalanced
   // can eq stethSharesLiabilityToCover - all repayment can be done from returned balance
   const stethSharesToRepay = minBN(
@@ -299,16 +304,13 @@ export const getStrategyPosition = async ({
     minBN(pendingUnlockFromStrategyVaultInEth, totalLockedEth) +
     strategyVaultStethExcess;
 
-  console.log({
-    totalEthToWithdrawFromStrategyVault,
-    totalStethSharesAvailableForReturnInEth,
-    strategyVaultStethExcess,
-    totalStethSharesAvailableForReturn,
-  });
-
   //
-  // Boosting APY via supply(0)
+  // Boosting APY
   //
+  // if stVault accrued rewards OR user has repaid some of his delegated liability
+  // there will be a positive difference between target APY and current APY because of extra minting capacity
+  // executing strategy.supply(extraCapacity) with 0 ETH value will effectively boost user APY
+  // this can be viably performed at certain threshold
 
   const availableMintingCapacityStethShares = minBN(
     currentProxyMintingCapacityShares,
@@ -422,6 +424,7 @@ export const useStrategyPosition = (
       !!wrapper &&
       !!activeVault &&
       !!strategy &&
+      params.strategyProxyAddress !== undefined &&
       params.strategyStethSharesBalance !== undefined &&
       params.strategyDepositStethSharesOffset !== undefined &&
       params.strategyWithdrawalStethSharesOffset !== undefined,

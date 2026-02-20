@@ -60,10 +60,7 @@ export const VaultInfoEntry = ({
             />
           </Text>
         ) : (
-          <VaultInfoTokenBlock
-            token={token}
-            amount={amount}
-          ></VaultInfoTokenBlock>
+          <VaultInfoTokenBlock token={token} amount={amount} />
         )}
       </VStack>
       <Spacer />
