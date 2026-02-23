@@ -41,8 +41,9 @@ export const useStrategyWithdrawalRequestsRead = (includeBoost?: boolean) => {
     (positionData?.withdrawalRequests?.length ?? 0) === 0 &&
     (proxyRequests?.pending.length ?? 0) === 0 &&
     (proxyRequests?.finalized.length ?? 0) === 0 &&
-    (positionData?.totalEthToWithdrawFromProxy ?? 0) <= 0n &&
-    (positionData?.stethSharesToRecover ?? 0) <= 0n;
+    (positionData?.totalEthToWithdrawFromProxy ?? 0n) <= 0n &&
+    (positionData?.stethSharesToRepay ?? 0n) <= 0n &&
+    (positionData?.stethSharesToRecover ?? 0n) <= 0n;
 
   return {
     isEmpty,

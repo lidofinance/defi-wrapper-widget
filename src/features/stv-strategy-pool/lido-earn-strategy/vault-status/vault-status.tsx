@@ -78,7 +78,10 @@ export const VaultStatus = ({
         )}
 
         {pendingEarnRequests && pendingEarnRequests.length > 0 && (
-          <VaultInfoSection label={'Pending withdrawals from Lido Earn ETH'}>
+          <VaultInfoSection
+            label={'Pending withdrawals from Lido Earn ETH'}
+            hint={'The requested assets will be used to unlock ETH based on RR'}
+          >
             {pendingEarnRequests.map((pendingRequest) => (
               <VaultInfoEntry
                 key={pendingRequest.timestamp}
@@ -103,7 +106,10 @@ export const VaultStatus = ({
         )}
 
         {claimableEarnRequests && claimableEarnRequests.length > 0 && (
-          <VaultInfoSection label={'Claimable withdrawals from Lido Earn ETH'}>
+          <VaultInfoSection
+            label={'Claimable withdrawals from Lido Earn ETH'}
+            hint={'The requested assets will be used to unlock ETH based on RR'}
+          >
             {claimableEarnRequests.map((claimableRequest) => (
               <VaultInfoEntry
                 key={claimableRequest.timestamp}

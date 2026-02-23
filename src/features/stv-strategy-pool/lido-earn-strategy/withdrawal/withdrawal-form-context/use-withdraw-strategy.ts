@@ -88,7 +88,7 @@ export const useWithdrawStrategy = () => {
                   stethSharesToWithdraw,
                   '0x',
                 ]),
-                loadingText: `Requesting ${requestedETHAmount} ${tokenLabel('ETH')} from the vault`,
+                loadingText: `Requesting ${requestedETHAmount} ${tokenLabel('ETH')} from the Lido Earn ETH`,
                 signingDescription: DEFAULT_SIGNING_DESCRIPTION,
                 loadingDescription: DEFAULT_LOADING_DESCRIPTION,
               });
