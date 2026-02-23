@@ -1,33 +1,26 @@
-import { type Address, getContract } from 'viem';
+import { type Address, getContract, GetContractReturnType } from 'viem';
 
-import { dashboardAbi } from '@/abi/dashboard-abi';
-import type {
-  RegisteredPublicClient,
-  RegisteredWalletClient,
-} from '@/modules/web3';
-import { getEncodable } from '@/utils/encodable';
+import { DashboardAbi, DashboardAbiType } from '@/abi/dashboard-abi';
+import type { RegisteredPublicClient } from '@/modules/web3';
+import { EncodableContract, getEncodable } from '@/utils/encodable';
 
 // TODO: move to lido-sdk
 export const getDashboardContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-  walletClient?: RegisteredWalletClient,
-) => {
+): EncodableContract<
+  GetContractReturnType<DashboardAbiType, RegisteredPublicClient>
+> => {
   const client: {
     public: RegisteredPublicClient;
-    wallet?: RegisteredWalletClient;
   } = {
     public: publicClient,
   };
 
-  if (walletClient) {
-    client.wallet = walletClient;
-  }
-
   return getEncodable(
     getContract({
       address,
-      abi: dashboardAbi,
+      abi: DashboardAbi,
       client,
     }),
   );

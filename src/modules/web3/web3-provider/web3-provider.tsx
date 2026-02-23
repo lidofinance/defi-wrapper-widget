@@ -108,23 +108,22 @@ export const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
       ? supportedChainIds
       : [CHAINS.Mainnet, ...supportedChainIds];
 
-    const rpcUrlsByChain = supportedChainIdsWithMainnet.reduce(
-      (res, curr) => ({
-        ...res,
-        [curr]: publicElRpcUrls[curr as CHAINS] || [],
-      }),
-      {},
-    );
-
-    const singleRpcUrlByChain = supportedChainIdsWithMainnet.reduce(
-      (res, curr) => ({
-        ...res,
-        [curr]: publicElRpcUrls[curr as CHAINS][0],
-      }),
-      {},
-    );
-
-    return { rpcUrlsByChain, singleRpcUrlByChain };
+    return {
+      rpcUrlsByChain: supportedChainIdsWithMainnet.reduce(
+        (res, curr) => ({
+          ...res,
+          [curr]: publicElRpcUrls[curr as CHAINS] || [],
+        }),
+        {},
+      ),
+      singleRpcUrlByChain: supportedChainIdsWithMainnet.reduce(
+        (res, curr) => ({
+          ...res,
+          [curr]: publicElRpcUrls[curr as CHAINS][0],
+        }),
+        {},
+      ),
+    };
   }, [supportedChainIds, publicElRpcUrls]);
 
   const { transportMap, onActiveConnection } = useWeb3Transport(

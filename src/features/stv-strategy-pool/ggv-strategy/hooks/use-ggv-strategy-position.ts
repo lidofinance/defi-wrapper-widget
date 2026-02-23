@@ -386,6 +386,7 @@ export const getGGVStrategyPosition = async ({
   };
 };
 
+// TODO: use common hook from shared
 export const useGGVStrategyPosition = () => {
   const { publicClient } = useLidoSDK();
   const { activeVault, queryKeys } = useVault();

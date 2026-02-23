@@ -1,22 +1,26 @@
-import { getContract } from 'viem';
+import { getContract, GetContractReturnType } from 'viem';
 import { AbstractLidoSDKErc20 } from '@lidofinance/lido-ethereum-sdk/erc20';
 
 import invariant from 'tiny-invariant';
 
-import { WethABI } from '@/abi/weth-abi';
+import { WethABI, WethABIType } from '@/abi/weth-abi';
 import { getContractAddress } from '@/config';
 import type { RegisteredPublicClient } from '@/modules/web3';
-import { getEncodable } from '@/utils/encodable';
+import { getEncodable, EncodableContract } from '@/utils/encodable';
 
 export class LidoSDKwETH extends AbstractLidoSDKErc20 {
-  public async contractAddress() {
+  public contractAddress() {
     const contractAddress = getContractAddress(this.core.chainId, 'weth');
     invariant(contractAddress, '[LidoSDKwETH] Contract address is not defined');
-    return contractAddress;
+    return Promise.resolve(contractAddress);
   }
 }
 
-export const getWethContract = (publicClient: RegisteredPublicClient) => {
+export const getWethContract = (
+  publicClient: RegisteredPublicClient,
+): EncodableContract<
+  GetContractReturnType<WethABIType, RegisteredPublicClient>
+> => {
   const address = getContractAddress(publicClient.chain.id, 'weth');
   invariant(
     address,
@@ -26,9 +30,7 @@ export const getWethContract = (publicClient: RegisteredPublicClient) => {
     getContract({
       abi: WethABI,
       address,
-      client: {
-        public: publicClient,
-      },
+      client: publicClient,
     }),
   );
 };

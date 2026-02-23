@@ -1,20 +1,23 @@
-import { type Address, getContract } from 'viem';
+import { type Address, getContract, GetContractReturnType } from 'viem';
 
-import { genericStrategyAbi } from '@/abi/generic-strategy-abi';
+import {
+  GenericStrategyAbi,
+  GenericStrategyAbiType,
+} from '@/abi/generic-strategy-abi';
 import type { RegisteredPublicClient } from '@/modules/web3';
-import { getEncodable } from '@/utils/encodable';
+import { EncodableContract, getEncodable } from '@/utils/encodable';
 
 export const getStrategyContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-) => {
+): EncodableContract<
+  GetContractReturnType<GenericStrategyAbiType, RegisteredPublicClient>
+> => {
   return getEncodable(
     getContract({
       address,
-      abi: genericStrategyAbi,
-      client: {
-        public: publicClient,
-      },
+      abi: GenericStrategyAbi,
+      client: publicClient,
     }),
   );
 };

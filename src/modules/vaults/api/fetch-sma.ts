@@ -1,7 +1,7 @@
 import type { Address } from 'viem';
 import { getApiURL } from '@/config';
 import type { RegisteredPublicClient } from '@/modules/web3';
-import { aprToApy } from '@/utils/aprt-to-apy';
+import { aprToApy } from '@/utils/apr-to-apy';
 import { fromBlockChainTime } from '@/utils/blockchain-time';
 import { vaultApiRoutes } from '../consts';
 
