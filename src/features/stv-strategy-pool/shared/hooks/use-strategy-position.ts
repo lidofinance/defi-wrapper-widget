@@ -155,7 +155,6 @@ export const getStrategyPosition = async ({
   // out of totalStethSharesLiabilityToCover above:
 
   // stETH shares that can be repaid from returned balance and unlock user ETH
-  // can
   // can eq 0n - no stETH is to be repaid(only rewards to skim) or all stETH is lost and must be rebalanced
   // can eq stethSharesLiabilityToCover - all repayment can be done from returned balance
   const stethSharesToRepay = minBN(
