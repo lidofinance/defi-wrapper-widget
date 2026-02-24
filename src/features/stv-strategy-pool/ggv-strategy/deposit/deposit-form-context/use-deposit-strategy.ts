@@ -110,7 +110,7 @@ export const useDepositStrategy = () => {
                 maxMintableExternalShares - currentMintedExternalShares,
               );
 
-              const reportCalls = await prepareReportCalls();
+              const reportCalls = prepareReportCalls();
               calls.push(...reportCalls);
 
               const referralAddress = await getReferralAddress(

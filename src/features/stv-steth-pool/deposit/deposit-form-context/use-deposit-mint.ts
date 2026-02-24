@@ -146,7 +146,7 @@ export const useDepositMint = () => {
                 });
               }
 
-              const reportCalls = await prepareReportCalls();
+              const reportCalls = prepareReportCalls();
               calls.push(...reportCalls);
 
               const referralAddress = await getReferralAddress(

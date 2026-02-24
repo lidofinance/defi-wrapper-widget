@@ -1,25 +1,26 @@
 import { createContext, useContext, useEffect, useMemo } from 'react';
 import { isAddressEqual, fromHex, zeroHash } from 'viem';
-import { usePublicClient } from 'wagmi';
 import { LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk/common';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
 import { USER_CONFIG } from '@/config';
 import {
-  getDashboardContract,
-  getStakingVaultContract,
-  getVaultHubContract,
-} from '@/modules/vaults';
+  DashboardContract,
+  StakingVaultContract,
+} from '@/modules/vaults/types';
 import { useLidoSDK } from '@/modules/web3';
 
 import { BYTES_TO_STRATEGY_ID, STRATEGY_IDS } from '../const';
 import {
   getWQContract,
-  getStvPoolContract,
-  getStvStethContract,
   getStrategyContract,
   getDistributorContract,
   stvContractByType,
+  WQContract,
+  DistributorContract,
+  StvPoolContract,
+  StvStethContract,
+  StrategyContract,
 } from '../contracts';
 import type { DefiWrapperTypes } from '../types';
 
@@ -30,13 +31,12 @@ export type WrapperContextValue = {
   error?: Error | null;
   // sync available contracts
   wrapperType: DefiWrapperTypes;
-  vaultHub: ReturnType<typeof getVaultHubContract>;
 
   // async available contracts
-  withdrawalQueue?: ReturnType<typeof getWQContract>;
-  dashboard?: ReturnType<typeof getDashboardContract>;
-  stakingVault?: ReturnType<typeof getStakingVaultContract>;
-  distributor?: ReturnType<typeof getDistributorContract>;
+  withdrawalQueue?: WQContract;
+  dashboard?: DashboardContract;
+  stakingVault?: StakingVaultContract;
+  distributor?: DistributorContract;
 
   // async available configuration
   configuration?: {
@@ -53,20 +53,20 @@ export type WrapperContextValue = {
 } & (
   | {
       wrapperType: Extract<DefiWrapperTypes, 'StvPool'>;
-      wrapper: ReturnType<typeof getStvPoolContract>;
+      wrapper: StvPoolContract;
       strategy: null;
       strategyId: null;
     }
   | {
       wrapperType: Extract<DefiWrapperTypes, 'StvStETHPool'>;
-      wrapper: ReturnType<typeof getStvStethContract>;
+      wrapper: StvStethContract;
       strategy: null;
       strategyId: null;
     }
   | {
       wrapperType: Extract<DefiWrapperTypes, 'StvStrategyPool'>;
-      wrapper: ReturnType<typeof getStvStethContract>;
-      strategy?: ReturnType<typeof getStrategyContract>;
+      wrapper: StvStethContract;
+      strategy?: StrategyContract;
       strategyId?: (typeof STRATEGY_IDS)[number];
     }
 );
@@ -108,8 +108,7 @@ export const useStvStrategy = () => {
 };
 
 export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
-  const { core } = useLidoSDK();
-  const publicClient = usePublicClient();
+  const { core, publicClient, vaults } = useLidoSDK();
 
   const { poolAddress, poolType, strategyAddress } = USER_CONFIG;
 
@@ -231,9 +230,7 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
           wrapper.read.DEPOSITS_FEATURE(),
           withdrawalQueueContract.read.WITHDRAWALS_FEATURE(),
           canMint
-            ? await (
-                wrapper as ReturnType<typeof getStvStethContract>
-              ).read.MINTING_FEATURE()
+            ? await (wrapper as StvStethContract).read.MINTING_FEATURE()
             : zeroHash,
         ]);
 
@@ -255,11 +252,8 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
         isWhitelistEnabled: strategyAddress
           ? isStrategyWhitelistEnabled
           : isContractWhitelistEnabled,
-        dashboard: getDashboardContract(dashboardAddress, publicClient),
-        stakingVault: getStakingVaultContract(
-          stakingVaultAddress,
-          publicClient,
-        ),
+        dashboard: vaults.contracts.getContractVaultDashboard(dashboardAddress),
+        stakingVault: vaults.contracts.getContractVault(stakingVaultAddress),
         distributor: getDistributorContract(distributorAddress, publicClient),
         withdrawalQueue: withdrawalQueueContract,
         strategy: strategyAddress
@@ -286,7 +280,6 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
   const value = useMemo(() => {
     return {
       wrapper: stvContractByType(poolType)(poolAddress, publicClient),
-      vaultHub: getVaultHubContract(publicClient),
       wrapperType: poolType,
       configuration: wrapperStaticConfig.data
         ? {

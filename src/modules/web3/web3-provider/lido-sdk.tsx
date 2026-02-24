@@ -1,41 +1,38 @@
 import { createContext, useContext, useEffect, useMemo } from 'react';
 import {
-  useAccount,
   useConfig,
+  useConnection,
   usePublicClient,
   useSwitchChain,
   useWalletClient,
 } from 'wagmi';
+
 import { CHAINS, LidoSDKCore } from '@lidofinance/lido-ethereum-sdk/core';
 import {
   LidoSDKstETH,
   LidoSDKwstETH,
 } from '@lidofinance/lido-ethereum-sdk/erc20';
 import { LidoSDKShares } from '@lidofinance/lido-ethereum-sdk/shares';
-import { LidoSDKStake } from '@lidofinance/lido-ethereum-sdk/stake';
-import { LidoSDKStatistics } from '@lidofinance/lido-ethereum-sdk/statistics';
-import { LidoSDKWithdraw } from '@lidofinance/lido-ethereum-sdk/withdraw';
-import { LidoSDKWrap } from '@lidofinance/lido-ethereum-sdk/wrap';
+import { LidoSDKVaultModule } from '@lidofinance/lido-ethereum-sdk/stvault';
+
 import invariant from 'tiny-invariant';
 import { USER_CONFIG } from '@/config';
-// EXTRA MODULE
+
 import { getContractAddress } from '@/config';
-import { LidoSDKwETH } from '@/modules/vaults/contracts/weth';
+// EXTRA MODULE
+import { LidoSDKwETH } from '../contracts/weth';
 import { useTokenTransferSubscription } from '../hooks';
-import { useDappChain } from './dapp-chain';
 import type { RegisteredPublicClient, RegisteredWalletClient } from '../types';
+import { useDappChain } from './dapp-chain';
 
 type LidoSDKContextValue = {
   chainId: CHAINS;
   core: LidoSDKCore;
-  stake: LidoSDKStake;
   stETH: LidoSDKstETH;
   shares: LidoSDKShares;
   wstETH: LidoSDKwstETH;
   WETH: LidoSDKwETH;
-  wrap: LidoSDKWrap;
-  withdraw: LidoSDKWithdraw;
-  statistics: LidoSDKStatistics;
+  vaults: LidoSDKVaultModule;
   publicClient: RegisteredPublicClient;
   walletClient?: RegisteredWalletClient;
   subscribeToTokenUpdates: ReturnType<typeof useTokenTransferSubscription>;
@@ -58,7 +55,7 @@ export const LidoSDKProvider = ({ children }: React.PropsWithChildren) => {
   const { data: walletClient } = useWalletClient({ chainId });
   const publicClient = usePublicClient({ chainId });
   // reset internal wagmi state after disconnect
-  const { isConnected } = useAccount();
+  const { isConnected } = useConnection();
 
   const wagmiConfig = useConfig();
   const { switchChain } = useSwitchChain();
@@ -92,28 +89,22 @@ export const LidoSDKProvider = ({ children }: React.PropsWithChildren) => {
       customLidoLocatorAddress,
     });
 
-    const stake = new LidoSDKStake({ core });
     const stETH = new LidoSDKstETH({ core });
     const shares = new LidoSDKShares({ core });
     const wstETH = new LidoSDKwstETH({ core });
     const WETH = new LidoSDKwETH({ core });
-    const wrap = new LidoSDKWrap({ core });
-    const withdraw = new LidoSDKWithdraw({ core });
-    const statistics = new LidoSDKStatistics({ core });
+    const vaults = new LidoSDKVaultModule({ core });
 
     return {
       chainId: core.chainId,
       core,
-      stake,
       stETH,
       shares,
       wstETH,
       WETH,
-      wrap,
-      withdraw,
-      statistics,
       publicClient,
       walletClient,
+      vaults,
       subscribeToTokenUpdates: subscribe,
     };
   }, [chainId, publicClient, subscribe, walletClient]);

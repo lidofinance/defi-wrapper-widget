@@ -1,23 +1,18 @@
 import { useCallback } from 'react';
 
 import invariant from 'tiny-invariant';
-import { useLidoSDK } from '@/modules/web3';
 
 import { ReportMissingError } from '../consts';
-import { getLazyOracleContract } from '../contracts';
 import { useVault } from '../vault-context';
 
 export const useReportCalls = () => {
-  const { publicClient } = useLidoSDK();
   const { activeVault } = useVault();
   return useCallback(() => {
     invariant(activeVault, 'activeVault is required');
 
-    const { report, isReportFresh } = activeVault;
+    const { report, isReportFresh, lazyOracle } = activeVault;
 
-    const lazyOracle = getLazyOracleContract(publicClient);
-
-    lazyOracle.read.latestReportData().then((latestReport) => {
+    void lazyOracle.read.latestReportData().then((latestReport) => {
       console.debug('DEBUGGING INFO, SCREENSHOT ME', {
         latestReport,
         report,
@@ -50,5 +45,5 @@ export const useReportCalls = () => {
         ]),
       },
     ];
-  }, [activeVault, publicClient]);
+  }, [activeVault]);
 };
