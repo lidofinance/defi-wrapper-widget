@@ -1,4 +1,8 @@
+import type { Abi } from 'viem';
+import { AllowListAbi } from './allow-list-abi';
+
 export const GenericStrategyAbi = [
+  ...AllowListAbi,
   {
     type: 'function',
     name: 'safeTransferERC20',
@@ -168,6 +172,6 @@ export const GenericStrategyAbi = [
       },
     ],
   },
-] as const;
+] as const satisfies Abi;
 
 export type GenericStrategyAbiType = typeof GenericStrategyAbi;

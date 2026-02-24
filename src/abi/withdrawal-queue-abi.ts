@@ -1,3 +1,5 @@
+import type { Abi } from 'viem';
+
 export const WithdrawalQueueAbi = [
   {
     type: 'function',
@@ -461,6 +463,6 @@ export const WithdrawalQueueAbi = [
     name: 'ZeroAddress',
     inputs: [],
   },
-] as const;
+] as const satisfies Abi;
 
 export type WithdrawalQueueAbiType = typeof WithdrawalQueueAbi;

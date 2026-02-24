@@ -1,3 +1,5 @@
+import type { Abi } from 'viem';
+
 export const StakingVaultAbi = [
   {
     inputs: [],
@@ -245,6 +247,6 @@ export const StakingVaultAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
 
 export type StakingVaultAbiType = typeof StakingVaultAbi;

@@ -1,3 +1,5 @@
+import type { Abi } from 'viem';
+
 export const DashboardAbi = [
   {
     inputs: [],
@@ -326,6 +328,6 @@ export const DashboardAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
 
 export type DashboardAbiType = typeof DashboardAbi;

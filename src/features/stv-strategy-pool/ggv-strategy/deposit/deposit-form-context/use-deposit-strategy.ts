@@ -2,16 +2,11 @@ import { useCallback } from 'react';
 import { usePublicClient } from 'wagmi';
 import invariant from 'tiny-invariant';
 import { useStvStrategy } from '@/modules/defi-wrapper';
-import {
-  getWethContract,
-  getLidoV3Contract,
-  readWithReport,
-  useReportCalls,
-  useVault,
-} from '@/modules/vaults';
+import { readWithReport, useReportCalls, useVault } from '@/modules/vaults';
 import {
   TransactionEntry,
   useDappStatus,
+  useLidoSDK,
   useSendTransaction,
   withSuccess,
 } from '@/modules/web3';
@@ -36,6 +31,7 @@ const GGV_PARAMS_DEPOSIT = encodeGGVDepositParams({
 export const useDepositStrategy = () => {
   const { address } = useDappStatus();
   const publicClient = usePublicClient();
+  const { core, WETH } = useLidoSDK();
   const { activeVault } = useVault();
   const { wrapper, strategy, dashboard } = useStvStrategy();
   const { data: ggvStrategy } = useGGVStrategy();
@@ -61,8 +57,8 @@ export const useDepositStrategy = () => {
           '[useDeposit] strategyProxyAddress is undefined',
         );
 
-        const wethContract = getWethContract(publicClient);
-        const lidoV3 = getLidoV3Contract(publicClient);
+        const wethContract = await WETH.wethContract();
+        const lidoV3 = await core.getLidoContract();
 
         const depositedETHAmount = formatBalance(amount).actual;
         const TXTitle = `Depositing ${depositedETHAmount} ${tokenLabel('ETH')} to the vault`;
@@ -142,15 +138,17 @@ export const useDepositStrategy = () => {
         return success;
       },
       [
-        activeVault,
-        ggvStrategy,
-        address,
-        prepareReportCalls,
-        publicClient,
-        sendTX,
-        dashboard,
-        strategy,
         wrapper,
+        address,
+        strategy,
+        dashboard,
+        ggvStrategy,
+        WETH,
+        core,
+        sendTX,
+        publicClient,
+        activeVault?.report,
+        prepareReportCalls,
       ],
     ),
     ...rest,

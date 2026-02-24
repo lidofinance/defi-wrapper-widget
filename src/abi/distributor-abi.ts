@@ -1,3 +1,5 @@
+import type { Abi } from 'viem';
+
 export const DistributorAbi = [
   {
     type: 'function',
@@ -159,6 +161,6 @@ export const DistributorAbi = [
     name: 'ZeroAddress',
     inputs: [],
   },
-] as const;
+] as const satisfies Abi;
 
 export type DistributorAbiType = typeof DistributorAbi;

@@ -1,3 +1,5 @@
+import { Abi } from 'viem';
+
 export const VaultFactoryAbi = [
   {
     inputs: [],
@@ -54,6 +56,6 @@ export const VaultFactoryAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
 
 export type VaultFactoryAbiType = typeof VaultFactoryAbi;

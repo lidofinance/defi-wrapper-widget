@@ -5,14 +5,13 @@ import { useStvSteth } from '@/modules/defi-wrapper';
 import {
   useVault,
   readWithReport,
-  getLidoV3Contract,
   VAULT_TOTAL_BASIS_POINTS,
 } from '@/modules/vaults';
 import { useLidoSDK } from '@/modules/web3';
 import { maxBN, minBN } from '@/utils/bn';
 
 export const useVaultCapacity = () => {
-  const { publicClient, shares } = useLidoSDK();
+  const { publicClient, shares, core } = useLidoSDK();
   const { activeVault, queryKeys } = useVault();
   const { wrapper, dashboard } = useStvSteth();
   return useQuery({
@@ -20,7 +19,7 @@ export const useVaultCapacity = () => {
     enabled: !!wrapper && !!dashboard,
     queryFn: async () => {
       invariant(dashboard, '[useVaultCapacity] dashboard is required');
-      const lidoV3 = getLidoV3Contract(publicClient);
+      const lidoV3 = await core.getLidoContract();
 
       // estimate maximum minting capacity in stETH shares for vault if a lot of ether is deposited to it
       // bound by vault tier/limits

@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
-import { usePublicClient } from 'wagmi';
 import invariant from 'tiny-invariant';
 import { useStvPool } from '@/modules/defi-wrapper';
-import { getWethContract, useReportCalls } from '@/modules/vaults';
+import { useReportCalls } from '@/modules/vaults';
 import {
   TransactionEntry,
   useDappStatus,
+  useLidoSDK,
   useSendTransaction,
   withSuccess,
 } from '@/modules/web3';
@@ -22,7 +22,7 @@ import type { DepositFormValidatedValues } from './types';
 
 export const useDeposit = () => {
   const { address } = useDappStatus();
-  const publicClient = usePublicClient();
+  const { WETH, publicClient } = useLidoSDK();
   const { wrapper } = useStvPool();
   const { onTransactionStageChange } = useTransactionModal();
 
@@ -37,8 +37,7 @@ export const useDeposit = () => {
       async ({ amount, token, referral }: DepositFormValidatedValues) => {
         invariant(wrapper, '[useDeposit] wrapper is undefined');
         invariant(address, '[useDeposit] address is undefined');
-        const wethContract = getWethContract(publicClient);
-
+        const wethContract = await WETH.wethContract();
         const depositedETHAmount = formatBalance(amount).actual;
         const TXTitle = `Depositing ${depositedETHAmount} ${tokenLabel('ETH')} to the vault`;
         const { success } = await withSuccess(
@@ -82,7 +81,7 @@ export const useDeposit = () => {
 
         return success;
       },
-      [address, prepareReportCalls, publicClient, sendTX, wrapper],
+      [WETH, address, prepareReportCalls, publicClient, sendTX, wrapper],
     ),
     ...rest,
   };

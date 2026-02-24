@@ -1721,11 +1721,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lidofinance/lido-ethereum-sdk@npm:4.7.0":
-  version: 4.7.0
-  resolution: "@lidofinance/lido-ethereum-sdk@npm:4.7.0"
+"@lidofinance/lido-ethereum-sdk@npm:4.6.0-alpha.7":
+  version: 4.6.0-alpha.7
+  resolution: "@lidofinance/lido-ethereum-sdk@npm:4.6.0-alpha.7"
   dependencies:
-    "@ethersproject/bytes": "npm:^5.7.0"
     "@openzeppelin/merkle-tree": "npm:^1.0.8"
     blockstore-core: "npm:^5.0.4"
     graphql: "npm:^16.8.1"
@@ -1734,7 +1733,7 @@ __metadata:
     multiformats: "npm:^13.4.0"
   peerDependencies:
     viem: ^2.45.0
-  checksum: 10c0/228f2c317ecb37cc2c8febaf32780e6bdd64d3a8f1d1cb221d105ecdfb15b81a9fec6795de40595a0f1f81abf9e9d781e2441420e028b33ebab3d75efbd510f6
+  checksum: 10c0/6fe414896e9b065694d94bbb939dd5878ca0d446e33e9c8491bb13962d9bb0592c95926c2d74933f9bfa801bc138c25a9b9f5def4a6ebb152d739c77f118152b
   languageName: node
   linkType: hard
 
@@ -5533,7 +5532,7 @@ __metadata:
     "@emotion/react": "npm:11.14.0"
     "@emotion/styled": "npm:11.14.0"
     "@hookform/resolvers": "npm:^5.2.2"
-    "@lidofinance/lido-ethereum-sdk": "npm:4.7.0"
+    "@lidofinance/lido-ethereum-sdk": "npm:4.6.0-alpha.7"
     "@lidofinance/lido-ui": "npm:^3.42.0"
     "@metamask/sdk": "npm:^0.34.0"
     "@openzeppelin/merkle-tree": "npm:^1.0.8"

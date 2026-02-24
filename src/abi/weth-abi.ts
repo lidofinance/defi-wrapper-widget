@@ -1,4 +1,8 @@
+import type { Abi } from 'viem';
+import { erc20abi } from '@lidofinance/lido-ethereum-sdk';
+
 export const WethABI = [
+  ...erc20abi,
   {
     constant: false,
     inputs: [
@@ -13,6 +17,6 @@ export const WethABI = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
 
 export type WethABIType = typeof WethABI;
