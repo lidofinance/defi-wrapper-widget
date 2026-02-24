@@ -9,10 +9,12 @@ const App: React.FC = () => {
 
   return (
     <ChakraProvider value={system}>
-      <Theme colorPalette="blue" backgroundColor="transparent">
-        <Center>
-          <WrapperSwitch />
-        </Center>
+      <Theme colorPalette="obol" backgroundColor="transparent">
+        <ModalProvider>
+          <Center>
+            <WrapperSwitch />
+          </Center>
+        </ModalProvider>
       </Theme>
     </ChakraProvider>
   );

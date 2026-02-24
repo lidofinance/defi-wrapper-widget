@@ -117,8 +117,10 @@ export const buttonRecipe = defineRecipe({
         bg: 'colorPalette.solid',
         color: 'colorPalette.contrast',
         borderColor: 'transparent',
+        shadow: '0 2px 12px -2px rgba(47, 228, 171, 0.25)',
         _hover: {
           bg: 'colorPalette.solid/90',
+          shadow: '0 4px 16px -2px rgba(47, 228, 171, 0.40)',
         },
         _expanded: {
           bg: 'colorPalette.solid/90',

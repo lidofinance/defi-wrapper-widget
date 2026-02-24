@@ -25,7 +25,7 @@ export const skeletonRecipe = defineRecipe({
     },
     variant: {
       pulse: {
-        background: 'bg.emphasized',
+        background: 'bg.subtle',
         animation: 'pulse',
         animationDuration: 'var(--duration, 1.2s)',
       },
@@ -33,7 +33,7 @@ export const skeletonRecipe = defineRecipe({
         '--animate-from': '200%',
         '--animate-to': '-200%',
         '--start-color': 'colors.bg.muted',
-        '--end-color': 'colors.bg.emphasized',
+        '--end-color': 'colors.bg.subtle',
         backgroundImage:
           'linear-gradient(270deg,var(--start-color),var(--end-color),var(--end-color),var(--start-color))',
         backgroundSize: '400% 100%',

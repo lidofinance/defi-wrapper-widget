@@ -4,7 +4,7 @@ import { USER_CONFIG, useUserConfig } from '@/config';
 import { useDappStatus } from '@/modules/web3';
 import { Connect } from '@/shared/wallet';
 import { WalletModal } from '@/shared/wallet/wallet-modal';
-import MainLogo from 'assets/icons/header_logo.svg?react';
+import MainLogo from 'assets/icons/Horizontal_white.svg?react';
 
 export const WidgetHeader: React.FC = () => {
   const { defaultChain } = useUserConfig();

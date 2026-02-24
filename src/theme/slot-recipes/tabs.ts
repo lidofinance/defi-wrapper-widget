@@ -178,7 +178,7 @@ export const tabsSlotRecipe = defineSlotRecipe({
       },
       enclosed: {
         list: {
-          bg: 'bg.muted',
+          bg: 'bg.subtle',
           padding: '1',
           borderRadius: '{radii.full}',
           minH: 'calc(var(--tabs-height) - 4px)',
@@ -188,9 +188,9 @@ export const tabsSlotRecipe = defineSlotRecipe({
           color: 'fg.muted',
           borderRadius: 'var(--tabs-trigger-radius)',
           _selected: {
-            bg: 'bg',
+            bg: 'bg.muted',
             color: 'colorPalette.fg',
-            shadow: 'xs',
+            shadow: 'none',
           },
         },
       },
