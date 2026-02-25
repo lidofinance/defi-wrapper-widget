@@ -19,7 +19,7 @@
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.0",
     "@hookform/resolvers": "^5.2.2",
-    "@lidofinance/lido-ethereum-sdk": "4.7.0",
+    "@lidofinance/lido-ethereum-sdk": "4.6.0-alpha.7",
     "@lidofinance/lido-ui": "^3.42.0",
     "@metamask/sdk": "^0.34.0",
     "@openzeppelin/merkle-tree": "^1.0.8",

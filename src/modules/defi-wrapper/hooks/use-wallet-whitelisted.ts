@@ -6,7 +6,7 @@ import { useDefiWrapper } from '../wrapper-provider';
 
 export const useWalletWhitelisted = () => {
   const { address } = useDappStatus();
-  const { wrapper, configuration } = useDefiWrapper();
+  const { wrapper, configuration, strategy } = useDefiWrapper();
   const { queryKeys } = useVault();
 
   const query = useQuery({
@@ -17,6 +17,7 @@ export const useWalletWhitelisted = () => {
       {
         address,
         isWhitelistEnabled: configuration?.isWhitelistEnabled,
+        isStrategy: !!strategy,
       },
     ],
     enabled: !!wrapper && !!address && configuration !== undefined,
@@ -28,7 +29,10 @@ export const useWalletWhitelisted = () => {
       if (!configuration.isWhitelistEnabled) {
         return true;
       }
-      return await wrapper.read.isAllowListed([address]);
+
+      const contract = strategy ? strategy : wrapper;
+
+      return await contract.read.isAllowListed([address]);
     },
   });
 

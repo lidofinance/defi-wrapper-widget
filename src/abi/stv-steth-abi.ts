@@ -1,3 +1,4 @@
+import type { Abi } from 'viem';
 import { StvPoolAbi } from './stv-pool-abi';
 
 export const StvStethAbi = [
@@ -346,6 +347,6 @@ export const StvStethAbi = [
     name: 'ZeroArgument',
     inputs: [],
   },
-] as const;
+] as const satisfies Abi;
 
 export type StvStethAbiType = typeof StvStethAbi;

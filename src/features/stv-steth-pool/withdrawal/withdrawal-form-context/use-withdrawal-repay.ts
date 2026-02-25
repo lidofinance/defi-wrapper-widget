@@ -131,7 +131,7 @@ export const useWithdrawalRepay = () => {
             AALoadingDescription: DEFAULT_LOADING_DESCRIPTION,
             transactions: async () => {
               const calls: TransactionEntry[] = [];
-              const reportCalls = await prepareReportCalls();
+              const reportCalls = prepareReportCalls();
               calls.push(...reportCalls);
 
               const stethSharesToRepay = await calculateStethSharesToRepay({

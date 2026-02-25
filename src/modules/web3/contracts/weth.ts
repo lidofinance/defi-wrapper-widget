@@ -14,23 +14,19 @@ export class LidoSDKwETH extends AbstractLidoSDKErc20 {
     invariant(contractAddress, '[LidoSDKwETH] Contract address is not defined');
     return Promise.resolve(contractAddress);
   }
-}
 
-export const getWethContract = (
-  publicClient: RegisteredPublicClient,
-): EncodableContract<
-  GetContractReturnType<WethABIType, RegisteredPublicClient>
-> => {
-  const address = getContractAddress(publicClient.chain.id, 'weth');
-  invariant(
-    address,
-    `[getWethContract] WETH address is undefined for chain:${publicClient.chain.id}`,
-  );
-  return getEncodable(
-    getContract({
-      abi: WethABI,
-      address,
-      client: publicClient,
-    }),
-  );
-};
+  public async wethContract(): Promise<
+    EncodableContract<
+      GetContractReturnType<WethABIType, RegisteredPublicClient>
+    >
+  > {
+    const address = await this.contractAddress();
+    return getEncodable(
+      getContract({
+        abi: WethABI,
+        address,
+        client: this.core.rpcProvider as RegisteredPublicClient,
+      }),
+    );
+  }
+}

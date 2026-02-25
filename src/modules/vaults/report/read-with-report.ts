@@ -4,9 +4,9 @@ import {
   type MulticallReturnType,
 } from 'viem';
 
+import { LidoSDKVaultModule } from '@lidofinance/lido-ethereum-sdk/stvault';
 import { type RegisteredPublicClient } from '@/modules/web3';
 
-import { getLazyOracleContract } from '../contracts';
 import type { VaultReportType } from '../types';
 
 type ReadWithReportArgs<
@@ -18,21 +18,6 @@ type ReadWithReportArgs<
   publicClient: RegisteredPublicClient;
   contracts: TContracts;
   report?: VaultReportType | null;
-};
-
-export const encodeReportCall = (
-  publicClient: RegisteredPublicClient,
-  report: VaultReportType,
-) => {
-  return getLazyOracleContract(publicClient).encode.updateVaultData([
-    report.vault,
-    report.totalValueWei,
-    report.fee,
-    report.liabilityShares,
-    report.maxLiabilityShares,
-    report.slashingReserve,
-    report.proof,
-  ]);
 };
 
 export const readWithReport = async <
@@ -72,7 +57,13 @@ export const readWithReport = async <
     //   },
     // ],
 
-    const lazyOracle = getLazyOracleContract(publicClient);
+    // @ts-expect-error - to avoid passing lidoSDK to all readWithReport we create it in place
+    const vaultContracts = new LidoSDKVaultModule({
+      logMode: 'none',
+      rpcProvider: publicClient,
+      chainId: publicClient.chain.id as any,
+    }).contracts;
+    const lazyOracle = await vaultContracts.getContractLazyOracle();
 
     const reportCall = lazyOracle.prepare.updateVaultData([
       report.vault,

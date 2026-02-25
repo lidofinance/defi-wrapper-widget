@@ -1,17 +1,8 @@
+import type { Abi } from 'viem';
+import { AllowListAbi } from './allow-list-abi';
+
 export const StvPoolAbi = [
-  {
-    type: 'function',
-    name: 'ALLOW_LIST_ENABLED',
-    inputs: [],
-    outputs: [
-      {
-        name: '',
-        type: 'bool',
-        internalType: 'bool',
-      },
-    ],
-    stateMutability: 'view',
-  },
+  ...AllowListAbi,
   {
     type: 'function',
     name: 'DASHBOARD',
@@ -164,25 +155,6 @@ export const StvPoolAbi = [
       },
     ],
     stateMutability: 'payable',
-  },
-  {
-    type: 'function',
-    name: 'isAllowListed',
-    inputs: [
-      {
-        name: '_user',
-        type: 'address',
-        internalType: 'address',
-      },
-    ],
-    outputs: [
-      {
-        name: '',
-        type: 'bool',
-        internalType: 'bool',
-      },
-    ],
-    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -500,6 +472,6 @@ export const StvPoolAbi = [
     name: 'ZeroDeposit',
     inputs: [],
   },
-] as const;
+] as const satisfies Abi;
 
 export type StvPoolAbiType = typeof StvPoolAbi;

@@ -1,3 +1,5 @@
+import type { Abi } from 'viem';
+
 export const AggregatorAbi = [
   {
     inputs: [],
@@ -25,6 +27,6 @@ export const AggregatorAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
 
 export type AggregatorAbiType = typeof AggregatorAbi;
