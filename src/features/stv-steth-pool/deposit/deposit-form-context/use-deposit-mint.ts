@@ -1,14 +1,7 @@
 import { useCallback } from 'react';
-import { usePublicClient } from 'wagmi';
 import invariant from 'tiny-invariant';
 import { useStvSteth } from '@/modules/defi-wrapper';
-import {
-  getWethContract,
-  readWithReport,
-  useReportCalls,
-  useVault,
-  getLidoV3Contract,
-} from '@/modules/vaults';
+import { readWithReport, useReportCalls, useVault } from '@/modules/vaults';
 import {
   TransactionEntry,
   useDappStatus,
@@ -57,8 +50,7 @@ const combineTxTitles = ({
 
 export const useDepositMint = () => {
   const { address } = useDappStatus();
-  const publicClient = usePublicClient();
-  const { shares } = useLidoSDK();
+  const { shares, core, WETH, publicClient } = useLidoSDK();
   const { activeVault } = useVault();
   const { wrapper, dashboard, mintingPaused } = useStvSteth();
   const { onTransactionStageChange } = useTransactionModal();
@@ -80,8 +72,8 @@ export const useDepositMint = () => {
         invariant(wrapper, '[useDeposit] wrapper is undefined');
         invariant(address, '[useDeposit] address is undefined');
         invariant(dashboard, '[useDeposit] dashboard is undefined');
-        const wethContract = getWethContract(publicClient);
-        const lidoV3 = getLidoV3Contract(publicClient);
+        const wethContract = await WETH.wethContract();
+        const lidoV3 = await core.getLidoContract();
         const depositedAmount = formatBalance(amount).actual;
 
         let maxMintShares: bigint;
@@ -154,7 +146,7 @@ export const useDepositMint = () => {
                 });
               }
 
-              const reportCalls = await prepareReportCalls();
+              const reportCalls = prepareReportCalls();
               calls.push(...reportCalls);
 
               const referralAddress = await getReferralAddress(
@@ -192,15 +184,17 @@ export const useDepositMint = () => {
         return success;
       },
       [
-        activeVault,
-        prepareReportCalls,
-        publicClient,
-        dashboard,
-        shares,
         wrapper,
-        sendTX,
         address,
+        dashboard,
+        WETH,
+        core,
         mintingPaused,
+        sendTX,
+        publicClient,
+        activeVault?.report,
+        shares,
+        prepareReportCalls,
       ],
     ),
     ...rest,

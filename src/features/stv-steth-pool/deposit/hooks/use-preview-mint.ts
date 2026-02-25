@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useWatch } from 'react-hook-form';
 import invariant from 'tiny-invariant';
 import { useStvSteth } from '@/modules/defi-wrapper';
-import { readWithReport, useVault, getLidoV3Contract } from '@/modules/vaults';
+import { readWithReport, useVault } from '@/modules/vaults';
 import { useDappStatus, useLidoSDK } from '@/modules/web3';
 
 import { isEqualEpsilonBN, maxBN, minBN } from '@/utils/bn';
@@ -20,7 +20,7 @@ export const usePreviewMint = () => {
   const { address } = useDappStatus();
   const publicClient = usePublicClient();
   const { wrapper, mintingPaused, dashboard } = useStvSteth();
-  const { shares } = useLidoSDK();
+  const { shares, core } = useLidoSDK();
   const { queryKeys, activeVault } = useVault();
 
   const query = useQuery({
@@ -54,7 +54,7 @@ export const usePreviewMint = () => {
         };
       }
 
-      const lidoV3 = getLidoV3Contract(publicClient);
+      const lidoV3 = await core.getLidoContract();
 
       const [
         remainingUserMintingCapacityShares,

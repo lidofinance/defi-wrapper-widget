@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
-import { getContract, Address } from 'viem';
+import { getContract, GetContractReturnType } from 'viem';
 import { CHAINS } from '@lidofinance/lido-ethereum-sdk/common';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
 
-import { AggregatorAbi } from '@/abi/aggregator-abi';
+import { AggregatorAbi, AggregatorAbiType } from '@/abi/aggregator-abi';
 import { getContractAddress } from '@/config';
 import { STRATEGY_LAZY } from '@/consts/react-query-strategies';
 import { bnAmountToNumber } from '@/utils/bn';
@@ -12,6 +12,25 @@ import { bnAmountToNumber } from '@/utils/bn';
 import { useMainnetOnlyWagmi } from '../web3-provider';
 
 const ETH_DECIMALS = 18n;
+
+const getAggregatorContract = (
+  publicClient: ReturnType<typeof useMainnetOnlyWagmi>['publicClientMainnet'],
+): GetContractReturnType<AggregatorAbiType, typeof publicClient> => {
+  const priceFeedAddress = getContractAddress(
+    CHAINS.Mainnet,
+    'aggregatorEthUsdPriceFeed',
+  );
+
+  invariant(
+    priceFeedAddress,
+    `Aggregator contract address not found for the current chain ${CHAINS.Mainnet}`,
+  );
+  return getContract({
+    address: priceFeedAddress,
+    abi: AggregatorAbi,
+    client: publicClient,
+  });
+};
 
 export const useEthUsd = (amount?: bigint | null) => {
   const { publicClientMainnet } = useMainnetOnlyWagmi();
@@ -34,16 +53,7 @@ export const useEthUsd = (amount?: bigint | null) => {
         '[useEthUsd] The "publicClientMainnet" must be define',
       );
 
-      const contract = getContract({
-        address: getContractAddress(
-          CHAINS.Mainnet,
-          'aggregatorEthUsdPriceFeed',
-        ) as Address,
-        abi: AggregatorAbi,
-        client: {
-          public: publicClientMainnet,
-        },
-      });
+      const contract = getAggregatorContract(publicClientMainnet);
 
       const [latestAnswer, decimals] = await Promise.all([
         contract.read.latestAnswer(),

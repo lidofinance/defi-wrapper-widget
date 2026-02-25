@@ -21,7 +21,7 @@ export const useWithdrawalFormData = () => {
         return undefined;
       }
       return {
-        balanceInEth: ggvPositionData.totalEthToWithdrawFromGGV,
+        balanceInEth: ggvPositionData.totalEthToWithdrawFromStrategyVault,
         minWithdrawalInEth: ggvData.withdrawParams.minimumGGVSharesInSteth,
         maxWithdrawalInEth: null,
       };

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useVaultCapacity } from '@/modules/defi-wrapper';
 import { useStethApr, useVaultApr } from '@/modules/vaults';
-import { aprToApy } from '@/utils/aprt-to-apy';
+import { aprToApy } from '@/utils/apr-to-apy';
 
 import { useGGVApr } from './use-ggv-apr';
 import { useGGVStrategyPosition } from './use-ggv-strategy-position';

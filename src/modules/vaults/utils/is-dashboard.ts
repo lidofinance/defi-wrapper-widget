@@ -1,6 +1,6 @@
 import type { Address } from 'viem';
 import type { RegisteredPublicClient } from '@/modules/web3';
-import { getVaultFactoryContract } from '../contracts';
+import type { LidoSDKVaultModule } from '@lidofinance/lido-ethereum-sdk/stvault';
 
 const PROXY_CODE_PAD_LEFT = '0x363d3d373d3d3d363d73';
 const PROXY_CODE_PAD_RIGHT = '5af43d82803e903d91602b57fd5bf';
@@ -9,8 +9,9 @@ const IMPLEMENTATION_CACHE = new Map<string, string>();
 
 const getProxyCodeWithCache = async (
   publicClient: RegisteredPublicClient,
+  vaultModule: LidoSDKVaultModule,
 ): Promise<string> => {
-  const factory = getVaultFactoryContract(publicClient);
+  const factory = await vaultModule.contracts.getContractVaultFactory();
   const key = factory.address.toLowerCase() + publicClient.chain.id;
   const cachedCode = IMPLEMENTATION_CACHE.get(key);
   if (cachedCode) {
@@ -28,10 +29,11 @@ const getProxyCodeWithCache = async (
 export const isDashboard = async (
   publicClient: RegisteredPublicClient,
   dashboardAddress: Address,
+  vaultModule: LidoSDKVaultModule,
 ): Promise<boolean> => {
   const [contractCode, canonicalCode] = await Promise.all([
     publicClient.getCode({ address: dashboardAddress }),
-    getProxyCodeWithCache(publicClient),
+    getProxyCodeWithCache(publicClient, vaultModule),
   ]);
 
   return contractCode?.startsWith(canonicalCode) || false;

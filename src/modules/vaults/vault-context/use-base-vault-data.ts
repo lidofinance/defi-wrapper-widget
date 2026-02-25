@@ -11,17 +11,17 @@ import {
   vaultQueryKeys,
   VAULT_REPORT_REFETCH_INTERVAL_MS,
 } from '../consts';
-import {
-  getLazyOracleContract,
-  getDashboardContract,
-  getStakingVaultContract,
-  getVaultHubContract,
-} from '../contracts';
-import type { VaultBaseInfo } from '../types';
+import type {
+  DashboardContract,
+  LazyOracleContract,
+  StakingVaultContract,
+  VaultBaseInfo,
+  VaultHubContract,
+} from '../types';
 import { isDashboard } from '../utils/is-dashboard';
 
 export const useBaseVaultData = (vaultAddress: Address | undefined) => {
-  const { publicClient } = useLidoSDK();
+  const { publicClient, vaults } = useLidoSDK();
   const base = vaultQueryKeys(vaultAddress).stateBase;
 
   return useQuery<VaultBaseInfo>({
@@ -35,9 +35,13 @@ export const useBaseVaultData = (vaultAddress: Address | undefined) => {
     queryFn: async () => {
       invariant(vaultAddress, '[useBaseVaultData] vaultAddress is not defined');
 
-      const hub = getVaultHubContract(publicClient);
-      const lazyOracle = getLazyOracleContract(publicClient);
-      const vault = getStakingVaultContract(vaultAddress, publicClient);
+      const [hub, lazyOracle, vault] = await Promise.all([
+        vaults.contracts.getContractVaultHub() as Promise<VaultHubContract>,
+        vaults.contracts.getContractLazyOracle() as Promise<LazyOracleContract>,
+        vaults.contracts.getContractVault(
+          vaultAddress,
+        ) as Promise<StakingVaultContract>,
+      ]);
 
       const [
         nodeOperator,
@@ -75,17 +79,20 @@ export const useBaseVaultData = (vaultAddress: Address | undefined) => {
 
       const isReportMissing = !report && !isReportFresh;
 
-      if (!(await isDashboard(publicClient, connection.owner))) {
+      if (!(await isDashboard(publicClient, connection.owner, vaults))) {
         throw new VaultOwnerNotDashboardError();
       }
 
-      const dashboard = getDashboardContract(connection.owner, publicClient);
+      const dashboard = (await vaults.contracts.getContractVaultDashboard(
+        connection.owner,
+      )) as DashboardContract;
 
       return {
         address: vaultAddress,
         vault,
         dashboard,
         hub,
+        lazyOracle,
         nodeOperator,
         withdrawalCredentials,
         report,

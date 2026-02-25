@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
 import { getApiURL } from '@/config/network';
 import { RegisteredPublicClient, useLidoSDK } from '@/modules/web3';
+import { apyToApr } from '@/utils/apr-to-apy';
 import { useGGVStrategy } from './use-ggv-strategy';
 
 export type SevenSeasAPIDailyResponseItem = {
@@ -21,11 +22,6 @@ type SevenSeasAPIDailyResponse = {
 };
 
 const WEEK_SECONDS = 7 * 24 * 60 * 60;
-
-const apyToApr = (apyPercent: number) => {
-  const apy = apyPercent / 100;
-  return (Math.pow(apy + 1, 1 / 365) - 1) * 365 * 100;
-};
 
 export const fetchGGVApr = async (
   publicClient: RegisteredPublicClient,

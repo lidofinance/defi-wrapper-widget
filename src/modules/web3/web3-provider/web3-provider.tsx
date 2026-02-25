@@ -83,15 +83,16 @@ export const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
 
   const { supportedChains, defaultChain } = useMemo(() => {
     // must preserve order of supportedChainIds
-    const supportedChains = supportedChainIds
+    const supportedChainsList = supportedChainIds
       .map((id) => wagmiChainMap[id])
       .filter((chain) => chain) as unknown as ChainsList;
 
-    const defaultChain = wagmiChainMap[defaultChainId] || supportedChains[0];
+    const defaultChainEntry =
+      wagmiChainMap[defaultChainId] || supportedChainsList[0];
 
     return {
-      supportedChains,
-      defaultChain,
+      supportedChains: supportedChainsList,
+      defaultChain: defaultChainEntry,
     };
   }, [defaultChainId, supportedChainIds]);
 
@@ -108,23 +109,22 @@ export const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
       ? supportedChainIds
       : [CHAINS.Mainnet, ...supportedChainIds];
 
-    const rpcUrlsByChain = supportedChainIdsWithMainnet.reduce(
-      (res, curr) => ({
-        ...res,
-        [curr]: publicElRpcUrls[curr as CHAINS] || [],
-      }),
-      {},
-    );
-
-    const singleRpcUrlByChain = supportedChainIdsWithMainnet.reduce(
-      (res, curr) => ({
-        ...res,
-        [curr]: publicElRpcUrls[curr as CHAINS][0],
-      }),
-      {},
-    );
-
-    return { rpcUrlsByChain, singleRpcUrlByChain };
+    return {
+      rpcUrlsByChain: supportedChainIdsWithMainnet.reduce(
+        (res, curr) => ({
+          ...res,
+          [curr]: publicElRpcUrls[curr as CHAINS] || [],
+        }),
+        {},
+      ),
+      singleRpcUrlByChain: supportedChainIdsWithMainnet.reduce(
+        (res, curr) => ({
+          ...res,
+          [curr]: publicElRpcUrls[curr as CHAINS][0],
+        }),
+        {},
+      ),
+    };
   }, [supportedChainIds, publicElRpcUrls]);
 
   const { transportMap, onActiveConnection } = useWeb3Transport(

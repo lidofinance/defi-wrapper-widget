@@ -1,17 +1,21 @@
+import { useWatch } from 'react-hook-form';
+import { useEstimatedRewards } from '@/modules/defi-wrapper';
 import { RewardEstimation } from '@/shared/wrapper/reward-estimation/reward-estimation';
 import { ApyTooltipContent } from '../apy-tooltip-content';
 import { useGGVStrategyApy } from '../hooks/use-ggv-strategy-apy';
-import { useEstimatedRewards } from './hooks/use-estimated-rewards';
+
+import type { DepositFormValues } from './deposit-form-context/types';
 
 export const DepositApy = () => {
   const { apySma, isLoadingApr, updatedAt } = useGGVStrategyApy();
+  const amountETH = useWatch<DepositFormValues, 'amount'>({ name: 'amount' });
   const {
     estimatedMonthlyRewardsETH,
     estimatedMonthlyRewardsUSD,
     estimatedYearlyRewardsETH,
     estimatedYearlyRewardsUSD,
     isLoadingUSD,
-  } = useEstimatedRewards(apySma);
+  } = useEstimatedRewards(apySma, amountETH);
 
   const aprData =
     apySma && updatedAt

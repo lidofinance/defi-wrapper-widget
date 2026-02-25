@@ -15,9 +15,15 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig(
   {
-    ignores: ['node_modules/**', 'dist/**', 'build/**'],
+    ignores: [
+      'node_modules/**',
+      'dist/**',
+      'build/**',
+      '*.config.js',
+      '*.config.mjs',
+      './scripts/**',
+    ],
   },
-  prettierRecommended,
   {
     files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
     languageOptions: {
@@ -26,9 +32,7 @@ export default defineConfig(
       sourceType: 'module',
       parserOptions: {
         ecmaFeatures: { jsx: true },
-        projectService: {
-          allowDefaultProject: ['*.mjs', '*.cjs'],
-        },
+        projectService: true,
         tsconfigRootDir: __dirname,
       },
       globals: {
@@ -84,7 +88,6 @@ export default defineConfig(
           ],
         },
       ],
-      '@typescript-eslint/require-await': 'warn',
       'react/display-name': 'off',
       '@typescript-eslint/no-shadow': 'warn',
       'jsx-a11y/no-autofocus': 'off',
@@ -96,6 +99,7 @@ export default defineConfig(
         {
           ignoreRestSiblings: true,
           argsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
         },
       ],
       'func-style': ['error', 'expression'],
@@ -175,4 +179,5 @@ export default defineConfig(
       'no-restricted-imports': 'off',
     },
   },
+  prettierRecommended,
 );

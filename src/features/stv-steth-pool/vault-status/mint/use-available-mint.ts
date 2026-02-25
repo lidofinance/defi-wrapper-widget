@@ -2,14 +2,14 @@ import { usePublicClient } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
 import { useStvSteth } from '@/modules/defi-wrapper';
-import { readWithReport, useVault, getLidoV3Contract } from '@/modules/vaults';
+import { readWithReport, useVault } from '@/modules/vaults';
 import { useDappStatus, useLidoSDK } from '@/modules/web3';
 import { minBN } from '@/utils/bn';
 
 export const useAvailableMint = () => {
   const { address, chainId } = useDappStatus();
   const publicClient = usePublicClient();
-  const { shares } = useLidoSDK();
+  const { shares, core } = useLidoSDK();
   const { activeVault } = useVault();
   const { wrapper, dashboard } = useStvSteth();
 
@@ -21,7 +21,7 @@ export const useAvailableMint = () => {
       invariant(wrapper, 'Wrapper is not defined');
       invariant(dashboard, 'Dashboard is not defined');
 
-      const lidoV3 = getLidoV3Contract(publicClient);
+      const lidoV3 = await core.getLidoContract();
 
       const [
         totalMintedStethShares,

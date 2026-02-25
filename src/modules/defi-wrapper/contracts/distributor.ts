@@ -1,20 +1,22 @@
-import { type Address, getContract } from 'viem';
+import { type Address, getContract, GetContractReturnType } from 'viem';
 
-import { distributorAbi } from '@/abi/distributor-abi';
+import { DistributorAbi, DistributorAbiType } from '@/abi/distributor-abi';
 import type { RegisteredPublicClient } from '@/modules/web3';
-import { getEncodable } from '@/utils/encodable';
+import { EncodableContract, getEncodable } from '@/utils/encodable';
+
+export type DistributorContract = EncodableContract<
+  GetContractReturnType<DistributorAbiType, RegisteredPublicClient>
+>;
 
 export const getDistributorContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-) => {
+): DistributorContract => {
   return getEncodable(
     getContract({
       address,
-      abi: distributorAbi,
-      client: {
-        public: publicClient,
-      },
+      abi: DistributorAbi,
+      client: publicClient,
     }),
   );
 };

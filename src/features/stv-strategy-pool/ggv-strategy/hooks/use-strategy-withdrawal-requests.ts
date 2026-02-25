@@ -5,10 +5,9 @@ import {
   useWithdrawalQueue,
 } from '@/modules/defi-wrapper';
 
-import { useGGVBoostApy } from './use-ggv-boost-apy';
+import { useBoostApy, useProcessWithdrawal, useRecover } from '../../shared';
 import { useGGVCancelRequest } from './use-ggv-cancel-request';
-import { useGGVProcessWithdrawal } from './use-ggv-process-withdrawal';
-import { useGGVRecover } from './use-ggv-recover';
+
 import { useGGVStrategyPosition } from './use-ggv-strategy-position';
 
 export const useStrategyWithdrawalRequestsRead = (includeBoost?: boolean) => {
@@ -74,15 +73,16 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
   // Mutations
   const { cancelRequest, mutation: cancelRequestMutation } =
     useGGVCancelRequest();
+
   const { processWithdrawal, mutation: proccessWithdrawalMutation } =
-    useGGVProcessWithdrawal();
+    useProcessWithdrawal();
   const { claim, mutation: claimMutation } = useClaim();
-  const { recover, mutation: recoverMutation } = useGGVRecover();
-  const { boost, mutation: boostMutation } = useGGVBoostApy();
+  const { recover, mutation: recoverMutation } = useRecover();
+  const { boost, mutation: boostMutation } = useBoostApy();
 
   //
   const { processableRequest, processWithdrawalRequest } = useMemo(() => {
-    const processableRequest =
+    const entry =
       ggvPosition &&
       minProccessableValueInEth &&
       (ggvPosition.totalEthToWithdrawFromProxy > 0n ||
@@ -102,22 +102,22 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
           }
         : undefined; // no processable request
 
-    const processWithdrawalRequest = processableRequest
+    const action = entry
       ? () => {
           return processWithdrawal({
-            stvToWithdraw: processableRequest.stvToWithdraw,
-            sharesToRepay: processableRequest.stethSharesToRepay,
-            sharesToRebalance: processableRequest.stethSharesToRebalance,
-            ethToReceive: processableRequest.ethToReceive,
+            stvToWithdraw: entry.stvToWithdraw,
+            sharesToRepay: entry.stethSharesToRepay,
+            sharesToRebalance: entry.stethSharesToRebalance,
+            ethToReceive: entry.ethToReceive,
           });
         }
       : undefined;
 
-    return { processableRequest, processWithdrawalRequest };
+    return { processableRequest: entry, processWithdrawalRequest: action };
   }, [ggvPosition, minProccessableValueInEth, processWithdrawal]);
 
   const { recoverable, recoverRewards } = useMemo(() => {
-    const recoverable =
+    const entry =
       ggvPosition && ggvPosition.stethSharesToRecover > 0n
         ? {
             stethSharesToRecover: ggvPosition.stethSharesToRecover,
@@ -125,27 +125,27 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
           }
         : undefined;
 
-    const recoverRewards = recoverable
+    const action = entry
       ? () => {
           return recover({
-            assetToRecover: recoverable.recoverTokenAddress,
-            amountToRecover: recoverable.stethSharesToRecover,
+            assetToRecover: entry.recoverTokenAddress,
+            amountToRecover: entry.stethSharesToRecover,
           });
         }
       : undefined;
 
-    return { recoverable, recoverRewards };
+    return { recoverable: entry, recoverRewards: action };
   }, [ggvPosition, recover]);
 
   const { boostable, boostAPY } = useMemo(() => {
-    const boostable = !!boostableStethShares && boostableStethShares > 0n;
-    const boostAPY =
-      boostable && boostableStethShares
+    const flag = !!boostableStethShares && boostableStethShares > 0n;
+    const action =
+      flag && boostableStethShares
         ? () => {
             return boost({ boostableStethShares });
           }
         : undefined;
-    return { boostable, boostAPY };
+    return { boostable: flag, boostAPY: action };
   }, [boost, boostableStethShares]);
 
   const isPendingAction =

@@ -1,26 +1,26 @@
 import { createContext, useContext, useEffect, useMemo } from 'react';
-import { isAddressEqual, fromHex, Address } from 'viem';
-import { usePublicClient } from 'wagmi';
-import { AddressZero } from '@ethersproject/constants';
+import { isAddressEqual, fromHex, zeroHash } from 'viem';
 import { LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk/common';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
 import { USER_CONFIG } from '@/config';
 import {
-  getDashboardContract,
-  getStakingVaultContract,
-  getVaultHubContract,
-} from '@/modules/vaults';
+  DashboardContract,
+  StakingVaultContract,
+} from '@/modules/vaults/types';
 import { useLidoSDK } from '@/modules/web3';
 
 import { BYTES_TO_STRATEGY_ID, STRATEGY_IDS } from '../const';
 import {
   getWQContract,
-  getStvPoolContract,
-  getStvStethContract,
   getStrategyContract,
   getDistributorContract,
   stvContractByType,
+  WQContract,
+  DistributorContract,
+  StvPoolContract,
+  StvStethContract,
+  StrategyContract,
 } from '../contracts';
 import type { DefiWrapperTypes } from '../types';
 
@@ -31,13 +31,12 @@ export type WrapperContextValue = {
   error?: Error | null;
   // sync available contracts
   wrapperType: DefiWrapperTypes;
-  vaultHub: ReturnType<typeof getVaultHubContract>;
 
   // async available contracts
-  withdrawalQueue?: ReturnType<typeof getWQContract>;
-  dashboard?: ReturnType<typeof getDashboardContract>;
-  stakingVault?: ReturnType<typeof getStakingVaultContract>;
-  distributor?: ReturnType<typeof getDistributorContract>;
+  withdrawalQueue?: WQContract;
+  dashboard?: DashboardContract;
+  stakingVault?: StakingVaultContract;
+  distributor?: DistributorContract;
 
   // async available configuration
   configuration?: {
@@ -54,20 +53,20 @@ export type WrapperContextValue = {
 } & (
   | {
       wrapperType: Extract<DefiWrapperTypes, 'StvPool'>;
-      wrapper: ReturnType<typeof getStvPoolContract>;
+      wrapper: StvPoolContract;
       strategy: null;
       strategyId: null;
     }
   | {
       wrapperType: Extract<DefiWrapperTypes, 'StvStETHPool'>;
-      wrapper: ReturnType<typeof getStvStethContract>;
+      wrapper: StvStethContract;
       strategy: null;
       strategyId: null;
     }
   | {
       wrapperType: Extract<DefiWrapperTypes, 'StvStrategyPool'>;
-      wrapper: ReturnType<typeof getStvStethContract>;
-      strategy?: ReturnType<typeof getStrategyContract>;
+      wrapper: StvStethContract;
+      strategy?: StrategyContract;
       strategyId?: (typeof STRATEGY_IDS)[number];
     }
 );
@@ -109,8 +108,7 @@ export const useStvStrategy = () => {
 };
 
 export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
-  const { core } = useLidoSDK();
-  const publicClient = usePublicClient();
+  const { core, publicClient, vaults } = useLidoSDK();
 
   const { poolAddress, poolType, strategyAddress } = USER_CONFIG;
 
@@ -143,7 +141,8 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
         contractPoolTypeHex,
         isStrategyAddressAllowListed,
         strategtyIdContract,
-        isWhitelistEnabled,
+        isStrategyWhitelistEnabled,
+        isContractWhitelistEnabled,
         distributorAddress,
         canonicalStethAddress,
       ] = await Promise.all([
@@ -159,6 +158,9 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
           ? wrapper.read.isAllowListed([strategyAddress])
           : Promise.resolve(false),
         strategy ? strategy.read.STRATEGY_ID() : Promise.resolve(null),
+        strategy
+          ? strategy.read.ALLOW_LIST_ENABLED().catch(() => false)
+          : Promise.resolve(false),
         wrapper.read.ALLOW_LIST_ENABLED(),
         wrapper.read.DISTRIBUTOR(),
         core.getContractAddress(LIDO_CONTRACT_NAMES.lido),
@@ -188,7 +190,8 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
           stakingVaultAddress,
           withdrawalQueueAddress,
           distributorAddress,
-          isWhitelistEnabled,
+          isContractWhitelistEnabled,
+          isStrategyWhitelistEnabled,
         };
         console.info(
           '__POOL_STATIC_CONFIG__',
@@ -218,42 +221,39 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
         publicClient,
       );
 
-      // read pause states
-      const [withdrawalsFeatureId, depositsFeatureId] = await Promise.all([
-        wrapper.read.DEPOSITS_FEATURE(),
-        withdrawalQueueContract.read.WITHDRAWALS_FEATURE(),
-      ]);
-
       const canMint: boolean =
         poolType === 'StvStrategyPool' || poolType === 'StvStETHPool';
 
-      const mintingFeatureId: Address = canMint
-        ? await (
-            wrapper as ReturnType<typeof getStvStethContract>
-          ).read.MINTING_FEATURE()
-        : AddressZero;
+      // read features
+      const [withdrawalsFeatureId, depositsFeatureId, mintingFeatureId] =
+        await Promise.all([
+          wrapper.read.DEPOSITS_FEATURE(),
+          withdrawalQueueContract.read.WITHDRAWALS_FEATURE(),
+          canMint
+            ? await (wrapper as StvStethContract).read.MINTING_FEATURE()
+            : zeroHash,
+        ]);
 
-      const mintingPaused: boolean = canMint
-        ? await wrapper.read.isFeaturePaused([mintingFeatureId])
-        : false;
-
-      const [withdrawalsPaused, depositsPaused] = await Promise.all([
-        withdrawalQueueContract.read.isFeaturePaused([withdrawalsFeatureId]),
-        wrapper.read.isFeaturePaused([depositsFeatureId]),
-      ]);
+      // read features pause states
+      const [withdrawalsPaused, depositsPaused, mintingPaused] =
+        await Promise.all([
+          withdrawalQueueContract.read.isFeaturePaused([withdrawalsFeatureId]),
+          wrapper.read.isFeaturePaused([depositsFeatureId]),
+          canMint ? wrapper.read.isFeaturePaused([mintingFeatureId]) : false,
+        ]);
 
       return {
         name,
         symbol,
         decimals,
-        assetDecimals: 18, // ETH decimals
         // for StvStrategyPool whitelist is per strategy
-        isWhitelistEnabled: strategyAddress ? false : isWhitelistEnabled,
-        dashboard: getDashboardContract(dashboardAddress, publicClient),
-        stakingVault: getStakingVaultContract(
-          stakingVaultAddress,
-          publicClient,
-        ),
+        isContractWhitelistEnabled,
+        isStrategyWhitelistEnabled,
+        isWhitelistEnabled: strategyAddress
+          ? isStrategyWhitelistEnabled
+          : isContractWhitelistEnabled,
+        dashboard: vaults.contracts.getContractVaultDashboard(dashboardAddress),
+        stakingVault: vaults.contracts.getContractVault(stakingVaultAddress),
         distributor: getDistributorContract(distributorAddress, publicClient),
         withdrawalQueue: withdrawalQueueContract,
         strategy: strategyAddress
@@ -280,16 +280,13 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
   const value = useMemo(() => {
     return {
       wrapper: stvContractByType(poolType)(poolAddress, publicClient),
-      vaultHub: getVaultHubContract(publicClient),
       wrapperType: poolType,
       configuration: wrapperStaticConfig.data
         ? {
             name: wrapperStaticConfig.data.name,
             symbol: wrapperStaticConfig.data.symbol,
             decimals: wrapperStaticConfig.data.decimals,
-            isWhitelistEnabled: wrapperStaticConfig.data?.isWhitelistEnabled,
-            // safe to cast
-            assetDecimals: Number(wrapperStaticConfig.data.assetDecimals),
+            isWhitelistEnabled: wrapperStaticConfig.data.isWhitelistEnabled,
           }
         : undefined,
       withdrawalQueue: wrapperStaticConfig.data?.withdrawalQueue,

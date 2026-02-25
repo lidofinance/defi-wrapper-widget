@@ -8,7 +8,7 @@ import {
   Tabs,
   Text,
 } from '@chakra-ui/react';
-import { useIframeResize } from '@/utils/use-iframe-resize';
+import { useIframeResize } from './use-iframe-resize';
 
 type MODES = 'StvPool' | 'StvStETHPool' | 'StvStrategyPool';
 
