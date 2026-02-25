@@ -43,7 +43,6 @@ export type WrapperContextValue = {
     name: string;
     symbol: string;
     decimals: number;
-    assetDecimals: number;
     isWhitelistEnabled: boolean;
   };
 
@@ -242,6 +241,11 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
           canMint ? wrapper.read.isFeaturePaused([mintingFeatureId]) : false,
         ]);
 
+      const [stakingVault, dashboard] = await Promise.all([
+        await vaults.contracts.getContractVault(stakingVaultAddress),
+        await vaults.contracts.getContractVaultDashboard(dashboardAddress),
+      ]);
+
       return {
         name,
         symbol,
@@ -252,8 +256,9 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
         isWhitelistEnabled: strategyAddress
           ? isStrategyWhitelistEnabled
           : isContractWhitelistEnabled,
-        dashboard: vaults.contracts.getContractVaultDashboard(dashboardAddress),
-        stakingVault: vaults.contracts.getContractVault(stakingVaultAddress),
+        dashboard,
+        stakingVault,
+
         distributor: getDistributorContract(distributorAddress, publicClient),
         withdrawalQueue: withdrawalQueueContract,
         strategy: strategyAddress

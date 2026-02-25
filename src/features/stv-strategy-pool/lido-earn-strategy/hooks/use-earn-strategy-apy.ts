@@ -14,13 +14,12 @@ export const useEarnStrategyApy = () => {
   const { data: mellowApy, isPending: isLoadingMellowApy } = useEarnApy();
   const { data: vaultCapacity, isPending: isLoadingVaultCapacity } =
     useVaultCapacity();
-  const { positionData, isPositionLoading } = useEarnPosition();
+  const { positionData } = useEarnPosition();
 
   const isLoadingApr =
     isLoadingVaultApr ||
     isLoadingStethApr ||
     isLoadingMellowApy ||
-    isPositionLoading ||
     isLoadingVaultCapacity;
 
   const data = useMemo(() => {
