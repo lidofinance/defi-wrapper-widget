@@ -37,7 +37,7 @@ const useEarnPositionData = () => {
       );
 
       const [
-        [pendingDepositTimestamp, pendingDepositsInWsteth],
+        [depositTimestamp, depositsInWsteth],
         claimableDepositInEarnShares,
         withdrawalRequests,
         balanceInEarnShares,
@@ -52,10 +52,20 @@ const useEarnPositionData = () => {
         shareManager.read.balanceOf([strategyProxyAddress]),
       ]);
 
+      // if claimable > 0, deposit is no longer pending
+      const pendingDepositsInWsteth =
+        claimableDepositInEarnShares > 0n ? 0n : depositsInWsteth;
+
       const [[_, balanceInWsteth], [__, claimableDepositInWsteth]] =
         await Promise.all([
-          lidoEarnStrategy.read.previewRedeem([balanceInEarnShares]),
-          lidoEarnStrategy.read.previewRedeem([claimableDepositInEarnShares]),
+          balanceInEarnShares > 0n
+            ? lidoEarnStrategy.read.previewRedeem([balanceInEarnShares])
+            : [0n, 0n],
+          claimableDepositInEarnShares > 0n
+            ? lidoEarnStrategy.read.previewRedeem([
+                claimableDepositInEarnShares,
+              ])
+            : [0n, 0n],
         ]);
 
       const previewedWithdrawalRequests = await Promise.all(
@@ -80,7 +90,7 @@ const useEarnPositionData = () => {
       );
 
       return {
-        pendingDepositTimestamp,
+        depositTimestamp,
         pendingDepositsInWsteth,
         claimableDepositInWsteth,
         pendingWithdrawalsInWsteth,
@@ -98,16 +108,20 @@ export const useEarnPosition = () => {
 
   const { data: earnPositionData } = useEarnPositionData();
 
-  const positionQuery = useStrategyPosition({
-    strategyProxyAddress: earnStrategy?.strategyProxyAddress,
-    strategyDepositStethSharesOffset: earnPositionData?.pendingDepositsInWsteth,
-    strategyStethSharesBalance: earnPositionData
-      ? earnPositionData?.balanceInWsteth +
-        earnPositionData?.claimableDepositInWsteth
-      : undefined,
-    strategyWithdrawalStethSharesOffset:
-      earnPositionData?.pendingWithdrawalsInWsteth,
-  });
+  const positionQuery = useStrategyPosition(
+    earnPositionData && earnStrategy
+      ? {
+          strategyProxyAddress: earnStrategy.strategyProxyAddress,
+          strategyDepositStethSharesOffset:
+            earnPositionData.pendingDepositsInWsteth,
+          strategyStethSharesBalance:
+            earnPositionData.balanceInWsteth +
+            earnPositionData.claimableDepositInWsteth,
+          strategyWithdrawalStethSharesOffset:
+            earnPositionData.pendingWithdrawalsInWsteth,
+        }
+      : {},
+  );
 
   const { usdAmount: totalUserValueInUsd, isPending: isUsdAmountLoading } =
     useEthUsd(positionQuery.data?.totalUserValueInEth);
