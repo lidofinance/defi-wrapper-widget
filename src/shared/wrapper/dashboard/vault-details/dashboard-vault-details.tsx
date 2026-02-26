@@ -21,6 +21,8 @@ export const DashboardVaultDetails: React.FC<
   vaultDescription,
   additionalContent,
   showMaxTVL,
+  customAPY,
+  customAPYIsLoading,
   ...props
 }) => {
   const [value, setValue] = useState<string[]>([]);
@@ -54,6 +56,8 @@ export const DashboardVaultDetails: React.FC<
             <Accordion.ItemBody>
               {children ?? (
                 <VaultDetailsContent
+                  customAPY={customAPY}
+                  customAPYIsLoading={customAPYIsLoading}
                   showLiquidityFee={showLiquidityFee}
                   vaultDescription={vaultDescription}
                   additionalContent={additionalContent}

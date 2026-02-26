@@ -4,13 +4,15 @@ import { useDefiWrapper } from '@/modules/defi-wrapper';
 
 type PausedAlertProps = {
   title?: string;
+  isPaused?: boolean;
 };
 
 export const DepositPausedAlert = ({
   title = 'Deposit is currently unavailable',
+  isPaused,
 }: PausedAlertProps) => {
   const { depositsPaused } = useDefiWrapper();
-  if (!depositsPaused) {
+  if (!depositsPaused && !isPaused) {
     return null;
   }
   return <PausedAlert title={title} />;
@@ -18,10 +20,11 @@ export const DepositPausedAlert = ({
 
 export const DepositPausedBecauseOfMintingAlert = ({
   title = 'Deposit is currently unavailable',
+  isPaused,
 }: PausedAlertProps) => {
   const { depositsPaused, mintingPaused } = useDefiWrapper();
   // if deposit is paused, we show dedicated deposit alert
-  if (!mintingPaused || depositsPaused) {
+  if ((!mintingPaused || depositsPaused) && !isPaused) {
     return null;
   }
   return <PausedAlert title={title} />;
@@ -29,9 +32,10 @@ export const DepositPausedBecauseOfMintingAlert = ({
 
 export const WithdrawalPausedAlert = ({
   title = 'Withdrawal is currently unavailable',
+  isPaused,
 }: PausedAlertProps) => {
-  const { depositsPaused } = useDefiWrapper();
-  if (!depositsPaused) {
+  const { withdrawalsPaused } = useDefiWrapper();
+  if (!withdrawalsPaused && !isPaused) {
     return null;
   }
   return <PausedAlert title={title} />;

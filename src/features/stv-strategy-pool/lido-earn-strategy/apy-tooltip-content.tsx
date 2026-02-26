@@ -1,12 +1,9 @@
-import React from 'react';
 import { HStack, Skeleton, Text, VStack } from '@chakra-ui/react';
-import { useVaultApr } from '@/modules/vaults';
 import { FormatPercent } from '@/shared/formatters';
 import { useEarnStrategyApy } from './hooks';
 
 export const ApyTooltipContent = () => {
-  const { data: vaultAPRData, isLoading } = useVaultApr();
-  const { strategyApySma } = useEarnStrategyApy();
+  const { strategyApySma, vaultApy, isLoadingApr } = useEarnStrategyApy();
 
   return (
     <VStack gap={2} width={'full'} mb={2}>
@@ -14,9 +11,9 @@ export const ApyTooltipContent = () => {
         <Text fontSize="sm" fontWeight="medium">
           Validation APR
         </Text>
-        <Skeleton as={'span'} loading={isLoading}>
+        <Skeleton as={'span'} loading={isLoadingApr}>
           <Text fontSize="sm" fontWeight="normal">
-            <FormatPercent value={vaultAPRData?.aprSma} decimals="percent" />
+            <FormatPercent value={vaultApy} decimals="percent" />
           </Text>
         </Skeleton>
       </HStack>
@@ -24,7 +21,7 @@ export const ApyTooltipContent = () => {
         <Text fontSize="sm" fontWeight="medium">
           Strategy APY
         </Text>
-        <Skeleton as={'span'} loading={isLoading}>
+        <Skeleton as={'span'} loading={isLoadingApr}>
           <Text fontSize="sm" fontWeight="normal">
             <FormatPercent value={strategyApySma} decimals="percent" />
           </Text>

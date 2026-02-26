@@ -41,6 +41,7 @@ export const useEarnStrategyApy = () => {
       netApy: apySma,
       strategyApr: strategyAprSma,
       strategyApy: strategyApySma,
+      vaultApy,
     } = calculateStrategyApy(
       mellowApr,
       stethApr.smaApr,
@@ -72,7 +73,8 @@ export const useEarnStrategyApy = () => {
       apySma,
       strategyAprSma,
       strategyApySma,
-
+      vaultApr,
+      vaultApy,
       aprSmaCurrent,
       apySmaCurrent,
       strategyAprSmaCurrent,

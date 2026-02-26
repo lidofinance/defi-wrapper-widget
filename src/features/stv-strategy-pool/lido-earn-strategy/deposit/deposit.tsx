@@ -9,13 +9,17 @@ import { VaultDetails } from '../vault-details';
 import { DepositApy } from './deposit-apy';
 import { DepositFormProvider } from './deposit-form-context';
 import { DepositInputGroup } from './deposit-input-group';
+import { DepositPendingWarning } from './deposit-pending-warning';
+import { useEarnStrategy } from '../hooks';
 
 export const Deposit = () => {
+  const { data: earnStrategy } = useEarnStrategy();
   return (
     <DepositFormProvider>
       <FormContainer>
-        <DepositPausedAlert />
+        <DepositPausedAlert isPaused={earnStrategy?.state.isDepositPaused} />
         <DepositPausedBecauseOfMintingAlert />
+        <DepositPendingWarning />
         <DepositInputGroup />
         <DepositApy />
         <VaultDetails />
