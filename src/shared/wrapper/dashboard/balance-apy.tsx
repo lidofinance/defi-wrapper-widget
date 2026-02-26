@@ -41,6 +41,7 @@ export const DashboardBalanceApy = ({
             amount={balance}
             token={token}
             approx={true}
+            maxDecimalDigits={2}
             height={'10'}
             skeletonWidth={'6/12'}
             fallback="-"

@@ -13,7 +13,7 @@ export const formatBalance = (
   balance = 0n,
   {
     tokenDecimals = ETH_DECIMALS,
-    maxDecimalDigits = 4,
+    maxDecimalDigits = 2,
     maxTotalLength,
     adaptiveDecimals,
     trimEllipsis,
@@ -78,7 +78,7 @@ export const formatBalance = (
 export const useFormattedBalance: typeof formatBalance = (
   balance = 0n,
   {
-    maxDecimalDigits = 4,
+    maxDecimalDigits = 2,
     maxTotalLength,
     tokenDecimals = ETH_DECIMALS,
     adaptiveDecimals,

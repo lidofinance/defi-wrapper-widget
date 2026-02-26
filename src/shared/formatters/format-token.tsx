@@ -27,7 +27,7 @@ export const FormatToken: FC<FormatTokenProps> = ({
   amount,
   approx,
   token,
-  maxDecimalDigits = 4,
+  maxDecimalDigits = 2,
   maxTotalLength = 15,
   tokenDecimals = ETH_DECIMALS,
   showAmountTip = true,

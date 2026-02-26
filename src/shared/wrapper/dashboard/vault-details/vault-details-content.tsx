@@ -54,7 +54,7 @@ export const VaultDetailsContent = ({
           isLoading={isTVLLoading}
           info={
             <>
-              <FormatToken amount={tvlETH} token="ETH" />
+              <FormatToken amount={tvlETH} token="ETH" maxDecimalDigits={2} />
               &nbsp;(
               <FormatPrice amount={tvlUSD} currency="USD" />)
             </>
