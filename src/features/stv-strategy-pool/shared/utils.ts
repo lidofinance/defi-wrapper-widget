@@ -1,13 +1,13 @@
 import { aprToApy } from '@/utils/apr-to-apy';
 
 export const calculateStrategyApy = (
-  ggvAprPercent: number, // percent
+  strategyVaultAprPercent: number, // percent
   stethAprPercent: number, // percent
   vaultNetAprPercent: number, // percent
   utilizationRate: number, // 0 - 1, POOL RR for new deposits,  utilizationRate for existing deposits
 ) => {
-  const ggvPureAprPercent = ggvAprPercent - stethAprPercent;
-  const strategyApr = utilizationRate * ggvPureAprPercent;
+  const strategyPureAprPercent = strategyVaultAprPercent - stethAprPercent;
+  const strategyApr = utilizationRate * strategyPureAprPercent;
   const netApr = strategyApr + vaultNetAprPercent;
 
   return {
@@ -15,5 +15,7 @@ export const calculateStrategyApy = (
     netApy: aprToApy(netApr),
     strategyApr,
     strategyApy: aprToApy(strategyApr),
+    vaultApr: vaultNetAprPercent,
+    vaultApy: aprToApy(vaultNetAprPercent),
   };
 };
