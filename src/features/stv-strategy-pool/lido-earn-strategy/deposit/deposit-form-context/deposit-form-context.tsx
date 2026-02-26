@@ -7,6 +7,7 @@ import { useDappStatus } from '@/modules/web3';
 import { FormController } from '@/shared/hook-form/form-controller';
 import { useQueryParamsReferralForm } from '@/shared/hooks/use-query-values-form';
 import { minBN } from '@/utils/bn';
+import { useEarnPosition } from '../../hooks';
 import { useEarnStrategy } from '../../hooks/use-earn-strategy';
 import {
   DepositFormValidatedValues,
@@ -45,6 +46,7 @@ export const DepositFormProvider: React.FC<React.PropsWithChildren> = ({
   const { isWalletWhitelisted } = useWalletWhitelisted();
   const { depositsPaused, mintingPaused } = useStvStrategy();
   const { data: earnStrategy } = useEarnStrategy();
+  const { positionData } = useEarnPosition();
   const formObject = useForm<
     DepositFormValues,
     DepositFormValidationContextType,
@@ -61,6 +63,7 @@ export const DepositFormProvider: React.FC<React.PropsWithChildren> = ({
       !isWalletWhitelisted ||
       depositsPaused ||
       mintingPaused ||
+      (positionData?.pendingDepositsInWsteth ?? 0n) > 0n ||
       earnStrategy?.state.isDepositPaused,
     context,
     resolver: DepositFormResolver,

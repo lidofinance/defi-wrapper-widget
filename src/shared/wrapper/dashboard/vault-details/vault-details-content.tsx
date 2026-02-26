@@ -15,6 +15,8 @@ export type VaultDetailsContentProps = {
   vaultDescription: ReactNode | string;
   showMaxTVL?: boolean;
   additionalContent?: ReactNode;
+  customAPY?: number;
+  customAPYIsLoading?: boolean;
 };
 
 export const VaultDetailsContent = ({
@@ -22,9 +24,15 @@ export const VaultDetailsContent = ({
   vaultDescription,
   showMaxTVL,
   additionalContent,
+  customAPY,
+  customAPYIsLoading,
 }: VaultDetailsContentProps) => {
   const { wrapper } = useDefiWrapper();
-  const { data: aprData, isLoading: isLoadingApr } = useVaultApr();
+  const { data: aprDataVault, isLoading: isLoadingAprVault } = useVaultApr();
+
+  const apr = customAPY ?? aprDataVault?.apySma;
+  const isLoadingApr = customAPYIsLoading ?? isLoadingAprVault;
+
   const { data: feesData, isLoading: isLoadingFees } = useVaultFees();
 
   const { tvlETH, tvlUSD, isLoading: isTVLLoading } = useWrapperTvl();
@@ -39,15 +47,15 @@ export const VaultDetailsContent = ({
             <Flex gap={1} alignItems="center">
               APY{' '}
               <APYTooltip
-                APY={aprData?.apySma}
+                APY={apr}
                 isLoading={isLoadingApr}
-                lastUpdate={aprData?.updatedAt}
+                lastUpdate={aprDataVault?.updatedAt}
                 customContent={additionalContent}
               />
             </Flex>
           }
           isLoading={isLoadingApr}
-          info={<FormatPercent value={aprData?.apySma} decimals="percent" />}
+          info={<FormatPercent value={apr} decimals="percent" />}
         />
         <InfoRow
           description={'TVL'}
