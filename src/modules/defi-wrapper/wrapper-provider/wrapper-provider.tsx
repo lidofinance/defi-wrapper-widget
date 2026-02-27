@@ -191,7 +191,7 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
           poolTypeContract,
           strategyAddress,
           strategyId,
-          strategtyIdContract: strategyIdContract,
+          strategyIdContract,
           dashboardAddress,
           stakingVaultAddress,
           withdrawalQueueAddress,
