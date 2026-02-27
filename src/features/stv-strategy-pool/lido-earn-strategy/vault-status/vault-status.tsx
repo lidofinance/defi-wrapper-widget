@@ -78,15 +78,12 @@ export const VaultStatus = ({
         )}
 
         {pendingEarnRequests && pendingEarnRequests.length > 0 && (
-          <VaultInfoSection
-            label={'Pending withdrawals from Lido Earn ETH'}
-            hint={'The requested assets will be used to unlock ETH based on RR'}
-          >
+          <VaultInfoSection label={'Pending withdrawals from Lido Earn ETH'}>
             {pendingEarnRequests.map((pendingRequest) => (
               <VaultInfoEntry
                 key={pendingRequest.timestamp}
-                token={'WSTETH'}
-                amount={pendingRequest.assets}
+                token={'ETH'}
+                amount={pendingRequest.unlockedETH}
                 suffix={
                   <>
                     {pendingRequest.timestamp && (
@@ -106,15 +103,12 @@ export const VaultStatus = ({
         )}
 
         {claimableEarnRequests && claimableEarnRequests.length > 0 && (
-          <VaultInfoSection
-            label={'Claimable withdrawals from Lido Earn ETH'}
-            hint={'The requested assets will be used to unlock ETH based on RR'}
-          >
+          <VaultInfoSection label={'Claimable withdrawals from Lido Earn ETH'}>
             {claimableEarnRequests.map((claimableRequest) => (
               <VaultInfoEntry
                 key={claimableRequest.timestamp}
-                token={'WSTETH'}
-                amount={claimableRequest.assets}
+                token={'ETH'}
+                amount={claimableRequest.unlockedETH}
                 suffix={
                   claimEarnWithdrawal && (
                     <Button
