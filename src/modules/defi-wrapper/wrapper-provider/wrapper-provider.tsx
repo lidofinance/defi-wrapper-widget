@@ -133,36 +133,43 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
         name,
         symbol,
         decimals,
+        contractPoolTypeHex,
+        isContractWhitelistEnabled,
+        //
         dashboardAddress,
         stakingVaultAddress,
         withdrawalQueueAddress,
         stethAddress,
-        contractPoolTypeHex,
-        isStrategyAddressAllowListed,
-        strategtyIdContract,
-        isStrategyWhitelistEnabled,
-        isContractWhitelistEnabled,
         distributorAddress,
+        //
         canonicalStethAddress,
+        //
+        strategyIdContract,
+        isStrategyAddressAllowListed,
+        isStrategyWhitelistEnabled,
+        ,
       ] = await Promise.all([
         wrapper.read.name(),
         wrapper.read.symbol(),
         wrapper.read.decimals(),
+        wrapper.read.poolType(),
+        wrapper.read.ALLOW_LIST_ENABLED(),
+        //
         wrapper.read.DASHBOARD(),
         wrapper.read.VAULT(),
         wrapper.read.WITHDRAWAL_QUEUE(),
         wrapper.read.STETH(),
-        wrapper.read.poolType(),
+        wrapper.read.DISTRIBUTOR(),
+        //
+        core.getContractAddress(LIDO_CONTRACT_NAMES.lido),
+        //
+        strategy ? strategy.read.STRATEGY_ID() : Promise.resolve(null),
         strategyAddress
           ? wrapper.read.isAllowListed([strategyAddress])
           : Promise.resolve(false),
-        strategy ? strategy.read.STRATEGY_ID() : Promise.resolve(null),
         strategy
           ? strategy.read.ALLOW_LIST_ENABLED().catch(() => false)
           : Promise.resolve(false),
-        wrapper.read.ALLOW_LIST_ENABLED(),
-        wrapper.read.DISTRIBUTOR(),
-        core.getContractAddress(LIDO_CONTRACT_NAMES.lido),
       ]);
 
       const poolTypeContract = fromHex(contractPoolTypeHex, 'string').replace(
@@ -170,8 +177,8 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
         '',
       );
 
-      const strategyId = strategtyIdContract
-        ? BYTES_TO_STRATEGY_ID[strategtyIdContract]
+      const strategyId = strategyIdContract
+        ? BYTES_TO_STRATEGY_ID[strategyIdContract]
         : null;
 
       if (USER_CONFIG.isDev && typeof window !== 'undefined') {
@@ -184,7 +191,7 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
           poolTypeContract,
           strategyAddress,
           strategyId,
-          strategtyIdContract,
+          strategtyIdContract: strategyIdContract,
           dashboardAddress,
           stakingVaultAddress,
           withdrawalQueueAddress,

@@ -82,15 +82,31 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
   // Earn withdrawal claim
   // TODO: merge smartly into processable request
   const { pendingEarnRequests, claimableEarnRequests } = useMemo(() => {
+    const totalSharesPendingDenominator =
+      withdrawalRequests?.reduce((acc, request) => acc + request.shares, 0n) ??
+      1n;
+    const totalValuePendingInEth =
+      positionData?.totalValuePendingFromStrategyVaultInEth ?? 0n;
+
+    const adjustedRequests = withdrawalRequests?.map((request) => {
+      const unlockedETH =
+        (request.shares * totalValuePendingInEth) /
+        totalSharesPendingDenominator;
+      return {
+        ...request,
+        unlockedETH,
+      };
+    });
+
     return {
-      pendingEarnRequests: withdrawalRequests?.filter(
+      pendingEarnRequests: adjustedRequests?.filter(
         (request) => !request.isClaimable,
       ),
-      claimableEarnRequests: withdrawalRequests?.filter(
+      claimableEarnRequests: adjustedRequests?.filter(
         (request) => request.isClaimable,
       ),
     };
-  }, [withdrawalRequests]);
+  }, [withdrawalRequests, positionData]);
 
   //
   const { processableRequest, processWithdrawalRequest } = useMemo(() => {
