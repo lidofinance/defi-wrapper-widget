@@ -48,7 +48,7 @@ export const useProcessWithdrawal = () => {
         const isHealingOnly = stvToWithdraw <= 0n && sharesToRepay > 0n;
 
         const successText = isHealingOnly
-          ? `Posisition healed by repaying shares`
+          ? `Position healed by repaying shares`
           : `Withdrawal of ${formatted} ETH processed`;
 
         const successDescription = isHealingOnly
@@ -69,9 +69,14 @@ export const useProcessWithdrawal = () => {
               // report
               calls.push(...prepareReportCalls());
 
+              const reportCallsCount = calls.length;
+
               // repay
               if (sharesToRepay > 0n) {
                 calls.push({
+                  signingDescription: DEFAULT_SIGNING_DESCRIPTION,
+                  loadingDescription: DEFAULT_LOADING_DESCRIPTION,
+                  loadingText: `Repaying stVault liabilities`,
                   ...strategy.encode.burnWsteth([sharesToRepay]),
                 });
               }
@@ -79,6 +84,9 @@ export const useProcessWithdrawal = () => {
               if (stvToWithdraw > 0n) {
                 // request withdrawal
                 calls.push({
+                  signingDescription: DEFAULT_SIGNING_DESCRIPTION,
+                  loadingDescription: DEFAULT_LOADING_DESCRIPTION,
+                  loadingText: `Requesting withdrawal from stVault`,
                   ...strategy.encode.requestWithdrawalFromPool([
                     address,
                     stvToWithdraw,
@@ -87,7 +95,10 @@ export const useProcessWithdrawal = () => {
                 });
               }
 
-              invariant(calls.length !== 0, 'Nothing to process');
+              invariant(
+                calls.length !== reportCallsCount,
+                'Nothing to process',
+              );
 
               return calls;
             },
