@@ -85,6 +85,7 @@ export const useDepositStrategy = () => {
                   publicClient,
                   report: activeVault?.report,
                   contracts: [
+                    // This can round down the shares, leaving 1n steth shares unminted
                     wrapper.prepare.remainingMintingCapacitySharesOf([
                       strategyProxyAddress,
                       amount,
@@ -99,7 +100,6 @@ export const useDepositStrategy = () => {
                   lidoV3.read.getExternalShares(),
                 ]);
 
-              // TODO: check for roudning issues overstepping max minting capacity by 1 wei
               let maxMintShares = minBN(
                 proxyCapacityShares,
                 vaultCapacityShares,

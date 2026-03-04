@@ -44,7 +44,6 @@ export const VaultStatus = ({
   const { apySma, apySmaCurrent } = useEarnStrategyApy();
 
   const apyDifference = apySma && apySmaCurrent ? apySma - apySmaCurrent : null;
-  const isDifferenceSustainable = apyDifference !== null && apyDifference > 0.1;
 
   if (isLoading || isEmpty) {
     return null;
@@ -58,11 +57,16 @@ export const VaultStatus = ({
     >
       {showRewards && <Rewards />}
       <VaultInfo>
-        {boostable && isDifferenceSustainable && (
+        {boostable && (
           <VaultInfoSection label={'Boost strategy APY'}>
             <HStack gap={2} alignItems="center" width="100%">
               <Text fontSize="sm" fontWeight="semibold" color="green">
-                +<FormatPercent value={apyDifference} decimals="percent" />
+                +
+                <FormatPercent
+                  value={apyDifference ?? undefined}
+                  fallback={''}
+                  decimals="percent"
+                />
               </Text>
               <Spacer />
               <Button

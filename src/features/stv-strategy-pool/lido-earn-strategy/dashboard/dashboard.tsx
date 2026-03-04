@@ -36,7 +36,7 @@ export const Dashboard = () => {
         aprData={aprData}
         customAPYTooltipContent={<ApyTooltipContent />}
       />
-      <VaultStatus showBoost showRewards={true} />
+      <VaultStatus showBoost showRewards />
       <VaultDetails />
     </DashboardContainer>
   );
