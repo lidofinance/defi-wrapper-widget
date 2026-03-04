@@ -13,6 +13,37 @@ import {
 import { useFinalizeEarnWithdrawal } from './use-earn-finalize-request';
 import { useEarnPosition } from './use-earn-position';
 
+const canProcessRequest = (
+  positionData: ReturnType<typeof useEarnPosition>['positionData'],
+  minProccessableValueInEth: bigint | undefined,
+) => {
+  if (!positionData) return false;
+
+  if (typeof minProccessableValueInEth === 'undefined') return false;
+
+  if (positionData.totalEthToWithdrawFromProxy > 0n) {
+    return (
+      positionData.totalEthToWithdrawFromProxy -
+        positionData.stethToRebalance >=
+      minProccessableValueInEth
+    );
+  } else {
+    return positionData.stethSharesToRepay > 0n;
+  }
+};
+
+const canBoost = (boostableStethShares: bigint | undefined) => {
+  return !!boostableStethShares && boostableStethShares > 100n;
+};
+
+const canRecover = (
+  positionData: ReturnType<typeof useEarnPosition>['positionData'],
+) => {
+  if (!positionData) return false;
+
+  return positionData.stethSharesToRecover > 0n;
+};
+
 export const useStrategyWithdrawalRequestsRead = (includeBoost?: boolean) => {
   // Data fetching
   // requests to withdraw from GGV - STEP 1
@@ -24,7 +55,7 @@ export const useStrategyWithdrawalRequestsRead = (includeBoost?: boolean) => {
     useRequests();
 
   const {
-    minWithdrawalAmountInEth: minProccessableValueInEth,
+    minWithdrawalAmountInEth: minProcessableValueInEth,
     isPending: isLoadingWithdrawalQueue,
   } = useWithdrawalQueue();
 
@@ -37,13 +68,12 @@ export const useStrategyWithdrawalRequestsRead = (includeBoost?: boolean) => {
       : undefined;
 
   const isEmpty =
-    (boostableStethShares ?? 0n) === 0n &&
     (positionData?.withdrawalRequests?.length ?? 0) === 0 &&
     (proxyRequests?.pending.length ?? 0) === 0 &&
     (proxyRequests?.finalized.length ?? 0) === 0 &&
-    (positionData?.totalEthToWithdrawFromProxy ?? 0n) <= 0n &&
-    (positionData?.stethSharesToRepay ?? 0n) <= 0n &&
-    (positionData?.stethSharesToRecover ?? 0n) <= 0n;
+    !canBoost(boostableStethShares) &&
+    !canProcessRequest(positionData, minProcessableValueInEth) &&
+    !canRecover(positionData);
 
   return {
     isEmpty,
@@ -52,7 +82,7 @@ export const useStrategyWithdrawalRequestsRead = (includeBoost?: boolean) => {
     positionData,
     withdrawalRequests: positionData?.withdrawalRequests,
     boostableStethShares,
-    minProccessableValueInEth,
+    minProcessableValueInEth,
   };
 };
 
@@ -64,7 +94,7 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
     positionData,
     withdrawalRequests,
     boostableStethShares,
-    minProccessableValueInEth,
+    minProcessableValueInEth,
   } = useStrategyWithdrawalRequestsRead(includeBoost);
 
   // Mutations
@@ -110,13 +140,11 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
     };
   }, [withdrawalRequests, positionData]);
 
-  //
   const { processableRequest, processWithdrawalRequest } = useMemo(() => {
     const request =
       positionData &&
-      minProccessableValueInEth &&
-      (positionData.totalEthToWithdrawFromProxy > 0n ||
-        positionData.stethSharesToRepay > 0n)
+      typeof minProcessableValueInEth === 'bigint' &&
+      canProcessRequest(positionData, minProcessableValueInEth)
         ? {
             stvToWithdraw: positionData.totalStvToWithdrawFromProxy,
             ethToReceive: positionData.totalEthToWithdrawFromProxy,
@@ -127,7 +155,7 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
             isBelowMinimumThreshold:
               positionData.totalStvToWithdrawFromProxy > 0n &&
               positionData.totalEthToWithdrawFromProxy <=
-                minProccessableValueInEth,
+                minProcessableValueInEth,
             isHealing: positionData.totalStvToWithdrawFromProxy <= 0n,
           }
         : undefined; // no processable request
@@ -145,11 +173,11 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
           }
         : undefined,
     };
-  }, [positionData, minProccessableValueInEth, processWithdrawal]);
+  }, [positionData, minProcessableValueInEth, processWithdrawal]);
 
   const { recoverable, recoverRewards } = useMemo(() => {
     const recoverablePosition =
-      positionData && positionData.stethSharesToRecover > 0n
+      positionData && canRecover(positionData)
         ? {
             stethSharesToRecover: positionData.stethSharesToRecover,
             recoverTokenAddress: positionData.recoverTokenAddress,
@@ -158,20 +186,19 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
     return {
       recoverable: recoverablePosition,
 
-      recoverRewards:
-        recoverablePosition && positionData
-          ? () => {
-              return recover({
-                assetToRecover: recoverablePosition.recoverTokenAddress,
-                amountToRecover: recoverablePosition.stethSharesToRecover,
-              });
-            }
-          : undefined,
+      recoverRewards: recoverablePosition
+        ? () => {
+            return recover({
+              assetToRecover: recoverablePosition.recoverTokenAddress,
+              amountToRecover: recoverablePosition.stethSharesToRecover,
+            });
+          }
+        : undefined,
     };
   }, [positionData, recover]);
 
   const { boostable, boostAPY } = useMemo(() => {
-    const isBoostable = !!boostableStethShares && boostableStethShares > 0n;
+    const isBoostable = canBoost(boostableStethShares);
     return {
       boostable: isBoostable,
       boostAPY:

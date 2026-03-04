@@ -51,7 +51,7 @@ export const useWithdrawStrategy = () => {
         const { success } = await withSuccess(
           sendTX({
             successText: `${requestedETHAmount} ${tokenLabel('ETH')} has been requested`,
-            successDescription: `Lido Earn ETH will be withdrawing the requested amount for up 5 days. After that you will be able to process your withdrawal further.`,
+            successDescription: `Lido Earn ETH will be withdrawing the requested amount for up 5 to days. After that you will be able to process your withdrawal further.`,
             AATitleText: `${requestedETHAmount} ${tokenLabel('ETH')} has been requested`,
             AASigningDescription: DEFAULT_SIGNING_DESCRIPTION,
             AALoadingDescription: DEFAULT_LOADING_DESCRIPTION,
