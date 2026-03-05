@@ -6,6 +6,7 @@ import { useWalletWhitelisted } from '@/modules/defi-wrapper/hooks/use-wallet-wh
 import { useDappStatus } from '@/modules/web3';
 import { FormController } from '@/shared/hook-form/form-controller';
 
+import { useEarnStrategy } from '../../hooks';
 import {
   WithdrawalFormValidatedValues,
   WithdrawalFormValidationContextType,
@@ -37,6 +38,7 @@ export const useWithdrawalFormContext = () => {
 export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
+  const { data: earnStrategy } = useEarnStrategy();
   const invalidateWrapper = useInvalidateWrapper();
   const { isDappActive } = useDappStatus();
   const { withdrawStrategy } = useWithdrawStrategy();
@@ -53,7 +55,11 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
       amount: null,
     },
     mode: 'onChange',
-    disabled: !isDappActive || !isWalletWhitelisted || withdrawalsPaused,
+    disabled:
+      !isDappActive ||
+      !isWalletWhitelisted ||
+      withdrawalsPaused ||
+      earnStrategy?.state.isWithdrawalPaused,
     context,
     resolver: WithdrawalFormResolver,
   });
