@@ -63,8 +63,8 @@ export const DepositFormProvider: React.FC<React.PropsWithChildren> = ({
       !isWalletWhitelisted ||
       depositsPaused ||
       mintingPaused ||
-      (positionData?.pendingDepositsInWsteth ?? 0n) > 0n ||
-      earnStrategy?.state.isDepositPaused,
+      earnStrategy?.state.isDepositPaused ||
+      (positionData?.pendingDepositsInWsteth ?? 0n) > 0n,
     context,
     resolver: DepositFormResolver,
   });
