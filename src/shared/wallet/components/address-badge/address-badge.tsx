@@ -113,7 +113,7 @@ export const AddressBadge = forwardRef<HTMLDivElement, AddressBadgeProps>(
           style={
             {
               fontWeight: 'var(--chakra-font-weights-semibold)',
-              color: `var(--chakra-colors-gray-800)`,
+              color: `var(--chakra-colors-fg)`,
             } as CSSProperties
           }
           address={mainText ?? ''}
