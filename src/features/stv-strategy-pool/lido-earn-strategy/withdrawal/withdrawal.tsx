@@ -4,6 +4,7 @@ import { FormContainer } from '@/shared/hook-form/container';
 import { SubmitButton } from '@/shared/hook-form/controls';
 import { WaitingTime } from '@/shared/wrapper/withdrawal/waiting-time';
 
+import { useEarnStrategy } from '../hooks';
 import { VaultStatus } from '../vault-status';
 
 import { PendingDepositWarning } from './deposit-pending-warning';
@@ -12,10 +13,13 @@ import { WithdrawalFormProvider } from './withdrawal-form-context';
 import { WithdrawalInputGroup } from './withdrawal-input-group';
 
 export const Withdrawal = () => {
+  const { data: earnStrategy } = useEarnStrategy();
   return (
     <WithdrawalFormProvider>
       <FormContainer>
-        <WithdrawalPausedAlert />
+        <WithdrawalPausedAlert
+          isPaused={earnStrategy?.state.isWithdrawalPaused}
+        />
         <VStack align="stretch" gap={6}>
           <VaultStatus />
           <WithdrawalInputGroup />

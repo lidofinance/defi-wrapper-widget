@@ -15,7 +15,6 @@ export const Deposit = () => {
   return (
     <DepositFormProvider>
       <FormContainer>
-        <DepositPausedAlert />
         <DepositPausedBecauseOfMintingAlert />
         <DepositInputGroup />
         <DepositApy />

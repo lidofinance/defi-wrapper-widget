@@ -134,7 +134,9 @@ export const VaultStatus = ({
           </VaultInfoSection>
         )}
         {processableRequest && (
-          <VaultInfoSection label={'Processable withdrawal requests'}>
+          <VaultInfoSection
+            label={'Processable withdrawal requests to stVault'}
+          >
             <VaultInfoEntry
               token={'ETH'}
               amount={processableRequest.ethToReceive}
@@ -165,7 +167,10 @@ export const VaultStatus = ({
           </VaultInfoSection>
         )}
 
-        <PendingRequests requests={proxyPendingRequests} />
+        <PendingRequests
+          label={'Pending withdrawal requests from stVault'}
+          requests={proxyPendingRequests}
+        />
         <FinalizedRequests
           isClaimLoading={isPendingAction}
           onClaim={({ id, amountOfAssets, checkpointHint }) =>

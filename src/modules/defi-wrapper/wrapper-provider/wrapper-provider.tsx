@@ -181,30 +181,6 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
         ? BYTES_TO_STRATEGY_ID[strategyIdContract]
         : null;
 
-      if (USER_CONFIG.isDev && typeof window !== 'undefined') {
-        (window as any).__POOL_STATIC_CONFIG__ = {
-          name,
-          symbol,
-          decimals,
-          poolAddress,
-          poolType,
-          poolTypeContract,
-          strategyAddress,
-          strategyId,
-          strategyIdContract,
-          dashboardAddress,
-          stakingVaultAddress,
-          withdrawalQueueAddress,
-          distributorAddress,
-          isContractWhitelistEnabled,
-          isStrategyWhitelistEnabled,
-        };
-        console.info(
-          '__POOL_STATIC_CONFIG__',
-          (window as any).__POOL_STATIC_CONFIG__,
-        );
-      }
-
       if (poolType === 'StvStrategyPool') {
         invariant(
           isStrategyAddressAllowListed,
@@ -252,6 +228,33 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
         await vaults.contracts.getContractVault(stakingVaultAddress),
         await vaults.contracts.getContractVaultDashboard(dashboardAddress),
       ]);
+
+      if (USER_CONFIG.isDev && typeof window !== 'undefined') {
+        (window as any).__POOL_STATIC_CONFIG__ = {
+          name,
+          symbol,
+          decimals,
+          poolAddress,
+          poolType,
+          poolTypeContract,
+          strategyAddress,
+          strategyId,
+          strategyIdContract,
+          dashboardAddress,
+          stakingVaultAddress,
+          withdrawalQueueAddress,
+          distributorAddress,
+          isContractWhitelistEnabled,
+          isStrategyWhitelistEnabled,
+          mintingPaused,
+          withdrawalsPaused,
+          depositsPaused,
+        };
+        console.info(
+          '__POOL_STATIC_CONFIG__',
+          (window as any).__POOL_STATIC_CONFIG__,
+        );
+      }
 
       return {
         name,
