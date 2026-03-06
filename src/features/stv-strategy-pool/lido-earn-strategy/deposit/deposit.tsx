@@ -1,7 +1,4 @@
-import {
-  DepositPausedAlert,
-  DepositPausedBecauseOfMintingAlert,
-} from '@/shared/components/paused-alert';
+import { DepositPausedBecauseOfMintingAlert } from '@/shared/components/paused-alert';
 import { FormContainer } from '@/shared/hook-form/container';
 import { SubmitButton } from '@/shared/hook-form/controls';
 import { VaultDetails } from '../vault-details';
@@ -17,8 +14,9 @@ export const Deposit = () => {
   return (
     <DepositFormProvider>
       <FormContainer>
-        <DepositPausedAlert isPaused={earnStrategy?.state.isDepositPaused} />
-        <DepositPausedBecauseOfMintingAlert />
+        <DepositPausedBecauseOfMintingAlert
+          isPaused={earnStrategy?.state.isDepositPaused}
+        />
         <DepositPendingWarning />
         <DepositInputGroup />
         <DepositApy />

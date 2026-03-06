@@ -12,7 +12,7 @@ export const DepositPausedAlert = ({
   isPaused,
 }: PausedAlertProps) => {
   const { depositsPaused } = useDefiWrapper();
-  if (!depositsPaused && !isPaused) {
+  if (!(depositsPaused || isPaused)) {
     return null;
   }
   return <PausedAlert title={title} />;
@@ -23,8 +23,7 @@ export const DepositPausedBecauseOfMintingAlert = ({
   isPaused,
 }: PausedAlertProps) => {
   const { depositsPaused, mintingPaused } = useDefiWrapper();
-  // if deposit is paused, we show dedicated deposit alert
-  if ((!mintingPaused || depositsPaused) && !isPaused) {
+  if (!(mintingPaused || depositsPaused || isPaused)) {
     return null;
   }
   return <PausedAlert title={title} />;
@@ -35,7 +34,7 @@ export const WithdrawalPausedAlert = ({
   isPaused,
 }: PausedAlertProps) => {
   const { withdrawalsPaused } = useDefiWrapper();
-  if (!withdrawalsPaused && !isPaused) {
+  if (!(withdrawalsPaused || isPaused)) {
     return null;
   }
   return <PausedAlert title={title} />;

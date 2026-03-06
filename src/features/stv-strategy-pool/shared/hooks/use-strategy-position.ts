@@ -190,6 +190,7 @@ export const getStrategyPosition = async ({
     proxyUnlockedBalanceStvInEth,
     unlockedStv,
     //
+    strategyDepositOffsetInLockedEth,
     totalStethLiabilityInEth,
     totalStethSharesAvailableForReturnInEth,
     withdrawableStvAfterRepay,
@@ -206,6 +207,9 @@ export const getStrategyPosition = async ({
       wrapper.prepare.unlockedAssetsOf([strategyProxyAddress, 0n]),
       wrapper.prepare.unlockedStvOf([strategyProxyAddress, 0n]),
       //
+      wrapper.prepare.calcAssetsToLockForStethShares([
+        strategyDepositStethSharesOffset,
+      ]),
       wrapper.prepare.calcAssetsToLockForStethShares([totalMintedStethShares]),
       wrapper.prepare.calcAssetsToLockForStethShares([
         totalStethSharesAvailableForReturn,
@@ -346,6 +350,8 @@ export const getStrategyPosition = async ({
     //
     // total user ETH value in strategy (proxyBalanceStvInEth + profit/loss from stETH delegation)
     totalUserValueInEth,
+    // how much of user ETH value is currently pending deposit to strategy vault(cannot be withdrawn but counts towards total value)
+    strategyDepositOffsetInLockedEth,
     //profit/loss from stETH delegation
     totalStethDifference,
     // normalized profit/loss values
