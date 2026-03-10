@@ -93,8 +93,8 @@ export const useEarnStrategy = () => {
       );
 
       const [SUPPLY_FEATURE, REDEEM_FEATURE] = await Promise.all([
-        lidoEarnStrategy.read.REDEEM_FEATURE(),
         lidoEarnStrategy.read.SUPPLY_FEATURE(),
+        lidoEarnStrategy.read.REDEEM_FEATURE(),
       ]);
 
       const [

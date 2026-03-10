@@ -5,5 +5,5 @@ export const aprToApy = (aprPercent: number) => {
 
 export const apyToApr = (apyPercent: number) => {
   const apy = apyPercent / 100;
-  return (Math.pow(1 + apy, 1 / 365) - 1) * 100;
+  return (Math.pow(1 + apy, 1 / 365) - 1) * 365 * 100;
 };
