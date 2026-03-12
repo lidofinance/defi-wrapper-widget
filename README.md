@@ -36,7 +36,7 @@ For dev server and install dependencies and fill envs and run `yarn dev`
 The dapp widget is a Single Page React App build with Chakra UI and Wagmi/Viem/React-query.
 You can adjust any part of the UI as you see fit.
 
-- For adjust visual styling and colors see `/theme` and [Chakra UI docs](https://chakra-ui.com/docs/theming/overview).
+- For adjust visual styling and colors see `src/theme` and [Chakra UI docs](https://chakra-ui.com/docs/theming/overview).
 - Each pool type code is separate feature, see `/src/features`
 - Each strategy for `StvStrategyPool` is a separate feature, for adding new supported strategies follow example of `/src/features/stv-strategy-pool/ggv-strategy`
 - Shared logic code is stored in `/src/modules` in a relevant module folder

@@ -209,8 +209,8 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
       // read features
       const [withdrawalsFeatureId, depositsFeatureId, mintingFeatureId] =
         await Promise.all([
-          wrapper.read.DEPOSITS_FEATURE(),
           withdrawalQueueContract.read.WITHDRAWALS_FEATURE(),
+          wrapper.read.DEPOSITS_FEATURE(),
           canMint
             ? await (wrapper as StvStethContract).read.MINTING_FEATURE()
             : zeroHash,
