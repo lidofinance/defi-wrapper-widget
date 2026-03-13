@@ -12,6 +12,7 @@ import {
 } from '../../shared/hooks';
 import { useFinalizeEarnWithdrawal } from './use-earn-finalize-request';
 import { useEarnPosition } from './use-earn-position';
+import { encodeEarnSupplyParams } from '../utils';
 
 const canProcessRequest = (
   positionData: ReturnType<typeof useEarnPosition>['positionData'],
@@ -204,7 +205,13 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
       boostAPY:
         isBoostable && boostableStethShares
           ? () => {
-              return boost({ boostableStethShares });
+              return boost({
+                boostableStethShares,
+                supplyParams: encodeEarnSupplyParams({
+                  isSync: false,
+                  merkleProof: [],
+                }),
+              });
             }
           : undefined,
     };
