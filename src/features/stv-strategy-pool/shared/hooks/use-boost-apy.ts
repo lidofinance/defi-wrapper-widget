@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { Hex } from 'viem';
 import { usePublicClient } from 'wagmi';
 import invariant from 'tiny-invariant';
 import { useInvalidateWrapper, useStvStrategy } from '@/modules/defi-wrapper';
@@ -19,6 +20,7 @@ import { getReferralAddress } from '@/shared/wrapper/refferals/get-refferal-addr
 
 type BoostAprParams = {
   boostableStethShares: bigint;
+  supplyParams?: Hex;
 };
 
 export const useBoostApy = () => {
@@ -34,7 +36,7 @@ export const useBoostApy = () => {
 
   return {
     boost: useCallback(
-      async ({ boostableStethShares }: BoostAprParams) => {
+      async ({ boostableStethShares, supplyParams }: BoostAprParams) => {
         invariant(strategy, '[useBoostApy] strategy is undefined');
         invariant(address, '[useBoostApy] address is undefined');
 
@@ -61,7 +63,7 @@ export const useBoostApy = () => {
                 ...strategy.encode.supply([
                   referralAddress,
                   boostableStethShares,
-                  '0x',
+                  supplyParams ?? '0x',
                 ]),
                 loadingText: 'Boosting Strategy Vault APY.',
                 signingDescription: DEFAULT_SIGNING_DESCRIPTION,
