@@ -1,3 +1,7 @@
+# 0.3.1
+
+- Add functionality to claim distribution rewards for StvStrategyPool
+
 # 0.3.0
 - support new strategy type
 
