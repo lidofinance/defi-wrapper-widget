@@ -146,7 +146,13 @@ export const getStrategyPosition = async ({
   //
 
   const stethSharesToRepayPendingFromStrategyVault = maxBN(
-    strategyWithdrawalStethSharesOffset + strategyStethSharesExcess,
+    strategyWithdrawalStethSharesOffset - totalStethSharesExcess,
+    0n,
+  );
+
+  const stethSharesToRecoverPendingFromStrategyVault = maxBN(
+    strategyWithdrawalStethSharesOffset -
+      stethSharesToRepayPendingFromStrategyVault,
     0n,
   );
 
@@ -262,6 +268,7 @@ export const getStrategyPosition = async ({
     stethToRepay,
     stethToRebalance,
     stethToRecover,
+    stethToRecoverPendingFromStrategyVault,
   ] = await shares.convertBatchSharesToSteth([
     totalStrategyBalanceInStethShares,
     stethSharesOnBalance,
@@ -274,6 +281,7 @@ export const getStrategyPosition = async ({
     stethSharesToRepay,
     stethSharesToRebalance,
     stethSharesToRecover,
+    stethSharesToRecoverPendingFromStrategyVault,
   ]);
 
   // represents how much eth is actually locked to cover total liability
@@ -319,8 +327,14 @@ export const getStrategyPosition = async ({
   // - excess wsteth(in eth) that can be recovered calculated 1:1
   const totalValuePendingFromStrategyVaultInEth =
     minBN(pendingUnlockFromStrategyVaultInEth, totalLockedEth) +
-    strategyVaultStethExcess;
+    stethToRecoverPendingFromStrategyVault;
 
+  console.log({
+    totalValuePendingFromStrategyVaultInEth,
+    pendingUnlockFromStrategyVaultInEth,
+    totalLockedEth,
+    stethToRecoverPendingFromStrategyVault,
+  });
   //
   // Boosting APY
   //
