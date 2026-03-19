@@ -18,6 +18,19 @@ export const StvStethAbi = [
   },
   {
     type: 'function',
+    name: 'totalLiabilityShares',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     name: 'burnStethShares',
     inputs: [
       {

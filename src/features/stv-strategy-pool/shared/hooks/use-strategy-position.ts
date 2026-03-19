@@ -62,17 +62,31 @@ export const getStrategyPosition = async ({
 
   const [
     stethSharesOnBalance,
-    totalMintedStethShares,
+    totalMintedStethSharesPerUserAccounting,
     wstethAddress,
     proxyBalanceStv,
     reserveRatioBP,
+    totalPoolLiabilitySharesPerPoolAccounting,
   ] = await Promise.all([
     strategy.read.wstethOf([address]),
     strategy.read.mintedStethSharesOf([address]),
     strategy.read.WSTETH(),
     wrapper.read.balanceOf([strategyProxyAddress]),
     wrapper.read.poolReserveRatioBP(),
+    wrapper.read.totalLiabilityShares(),
   ]);
+
+  // because vault accounting and user accounting are not directly in sync (esp in case of disconnected vault)
+  // we cap user minted stETH shares by total pool liability shares to prevent overestimation of user position
+  // for disconnected vault total liability is 0 so users cannot individually owe more than that
+  const totalPoolLiabilityShares = activeVault.isConnected
+    ? totalPoolLiabilitySharesPerPoolAccounting
+    : 0n;
+
+  const totalMintedStethShares = minBN(
+    totalMintedStethSharesPerUserAccounting,
+    totalPoolLiabilityShares,
+  );
 
   // adjust strategy balance by actual + pending deposits/withdrawals in stETH shares
   // this ensures we account correctly for delegated stETH and will not rebalance what is not lost yet
@@ -338,6 +352,8 @@ export const getStrategyPosition = async ({
     // available in strategy vault
     totalStrategyBalanceInStethShares,
     totalStrategyBalanceInSteth,
+    strategyStethSharesBalance,
+
     // returned to proxy
     stethOnBalance,
     stethSharesOnBalance,

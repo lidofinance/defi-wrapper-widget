@@ -102,7 +102,7 @@ export const useBaseVaultData = (vaultAddress: Address | undefined) => {
         nodeOperator,
         withdrawalCredentials,
         report,
-        isVaultConnected,
+        isConnected: isVaultConnected,
         hubReport: {
           root: latestHubReportRoot,
           refSlot: latestDataRefSlot,
