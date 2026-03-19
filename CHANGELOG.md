@@ -1,6 +1,7 @@
-# 0.3.1
+# 0.4.0
 
 - Add functionality to claim distribution rewards for StvStrategyPool
+- Fix withdrawal amount calculation for StvStrategyPool to account for disconnected vault state
 
 # 0.3.0
 - support new strategy type
