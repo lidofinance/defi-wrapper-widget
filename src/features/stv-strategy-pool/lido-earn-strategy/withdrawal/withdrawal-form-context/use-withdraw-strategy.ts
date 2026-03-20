@@ -6,6 +6,7 @@ import { useVault, readWithReport } from '@/modules/vaults';
 import {
   TransactionEntry,
   useDappStatus,
+  useLidoSDK,
   useSendTransaction,
   withSuccess,
 } from '@/modules/web3';
@@ -14,16 +15,19 @@ import {
   DEFAULT_SIGNING_DESCRIPTION,
   useTransactionModal,
 } from '@/shared/components/transaction-modal';
+import { maxBN, minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
-import { useEarnStrategy } from '../../hooks';
+import { useEarnPosition, useEarnStrategy } from '../../hooks';
 
 import type { WithdrawalFormValidatedValues } from './types';
 
 export const useWithdrawStrategy = () => {
+  const { positionData } = useEarnPosition();
   const { address } = useDappStatus();
   const publicClient = usePublicClient();
   const { activeVault } = useVault();
+  const { shares } = useLidoSDK();
   const { wrapper } = useStvStrategy();
   const { data: earnStrategy } = useEarnStrategy();
   const { onTransactionStageChange } = useTransactionModal();
@@ -35,15 +39,25 @@ export const useWithdrawStrategy = () => {
   return {
     withdrawStrategy: useCallback(
       async ({ amount }: WithdrawalFormValidatedValues) => {
-        invariant(earnStrategy, '[useWithdrawal] earnStrategy is undefined');
-        invariant(address, '[useWithdrawal] address is undefined');
-        invariant(activeVault, '[useWithdrawal] activeVault is undefined');
+        invariant(
+          earnStrategy,
+          '[useWithdrawStrategy] earnStrategy is undefined',
+        );
+        invariant(address, '[useWithdrawStrategy] address is undefined');
+        invariant(
+          activeVault,
+          '[useWithdrawStrategy] activeVault is undefined',
+        );
+        invariant(
+          positionData,
+          '[useWithdrawStrategy] positionData is undefined',
+        );
 
         const { lidoEarnStrategy, strategyProxyAddress } = earnStrategy;
 
         invariant(
           strategyProxyAddress,
-          '[useWithdrawal] strategyProxyAddress is undefined',
+          '[useWithdrawStrategy] strategyProxyAddress is undefined',
         );
 
         const requestedETHAmount = formatBalance(amount).actual;
@@ -72,16 +86,55 @@ export const useWithdrawStrategy = () => {
                 });
               }
 
-              // amount is ETH of total eth value
+              // We need to convert ETH withdrawal value -> liability wstETH
+              // But ETH strategy withdrawable amount consists of two parts:
+              //  - unlocked eth (by repaying liability and calculated by RR and calcAssetsToLockForMintStethShares )
+              //  - excess steth (calculated from strategy balance above liabilities and calculated to eth as stETH<>Wsteth lido rate)
+              // this is not linear conversion and we need to first try to withdraw excess and then only liability part
+              //
+              // Example:
+              //
+              // [min:0------[USER INPUT]----------------------------------------------------------------------------------------max]
+              //                 |
+              //                \_/
+              //
+              // [ --- EXCESS ETH ---- ] | [ ---------------------------------- ETH TO PAY FOR LIABILITY -------------------------- ]
+              //          |                                        |
+              //    <1:1 lido ratio>                    <calculated by RR and calcAssetsToLockForMintStethShares>
+              //          |                                        |
+              // [ --- EXCESS STETH ---] | [ ------------- LIABILITY (WSTETH) ---------- ]
+              //
+
+              const ethToPayForLiability = maxBN(
+                amount - positionData.strategyVaultStethExcess,
+                0n,
+              );
+
+              const stethToWithdrawForExcess = maxBN(
+                amount - ethToPayForLiability,
+                0n,
+              );
+
+              const stethSharesToWithdrawForExcess =
+                await shares.convertToShares(stethToWithdrawForExcess);
 
               // calculate how much stETH should be returned from strategy to proxy
-              const [stethSharesToWithdraw] = await readWithReport({
-                contracts: [
-                  wrapper.prepare.calcStethSharesToMintForAssets([amount]),
-                ],
-                report: activeVault.report,
-                publicClient,
-              });
+              const [stethSharesToWithdrawToPayForLiability] =
+                await readWithReport({
+                  contracts: [
+                    wrapper.prepare.calcStethSharesToMintForAssets([
+                      ethToPayForLiability,
+                    ]),
+                  ],
+                  report: activeVault.report,
+                  publicClient,
+                });
+
+              const stethSharesToWithdraw = minBN(
+                stethSharesToWithdrawToPayForLiability +
+                  stethSharesToWithdrawForExcess,
+                positionData.strategyStethSharesBalance,
+              );
 
               calls.push({
                 ...lidoEarnStrategy.encode.requestExitByWsteth([
@@ -100,7 +153,16 @@ export const useWithdrawStrategy = () => {
 
         return success;
       },
-      [activeVault, earnStrategy, address, wrapper, publicClient, sendTX],
+      [
+        earnStrategy,
+        address,
+        activeVault,
+        positionData,
+        sendTX,
+        shares,
+        wrapper.prepare,
+        publicClient,
+      ],
     ),
     ...rest,
   };

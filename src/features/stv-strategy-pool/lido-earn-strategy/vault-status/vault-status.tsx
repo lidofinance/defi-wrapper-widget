@@ -39,6 +39,7 @@ export const VaultStatus = ({
     claim,
     boostable,
     boostAPY,
+    proxyClaimableRewards,
   } = useStrategyWithdrawalRequests(showBoost);
 
   const { apySma, apySmaCurrent } = useEarnStrategyApy();
@@ -178,6 +179,30 @@ export const VaultStatus = ({
           }
           requests={proxyFinalizedRequests}
         />
+        {proxyClaimableRewards && proxyClaimableRewards.length > 0 && (
+          <VaultInfoSection label={'Distributed rewards'}>
+            {proxyClaimableRewards.map((claimableDistribution) => (
+              <VaultInfoEntry
+                key={
+                  claimableDistribution.recipientUserAddress +
+                  claimableDistribution.rewardToken
+                }
+                customSymbol={claimableDistribution.rewardTokenSymbol}
+                customDecimals={claimableDistribution.rewardTokenDecimals}
+                amount={claimableDistribution.previewClaim}
+                suffix={
+                  <Button
+                    loading={isPendingAction}
+                    onClick={() => claimableDistribution.claim()}
+                    size={'xs'}
+                  >
+                    Claim
+                  </Button>
+                }
+              />
+            ))}
+          </VaultInfoSection>
+        )}
         {recoverable && (
           <VaultInfoSection label={'Rewards'}>
             <VaultInfoEntry

@@ -1,4 +1,4 @@
-import { Address } from 'viem';
+import { Address, isAddressEqual } from 'viem';
 import { usePublicClient } from 'wagmi';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
@@ -8,11 +8,23 @@ import { generateProofByIndex } from '@/modules/vaults/proof-generator';
 import { useDappStatus } from '@/modules/web3';
 import { getTokenInfo } from '@/modules/web3/utils';
 
-export const useRewards = () => {
+export type RewardsInfoEntry = {
+  previewClaim: bigint;
+  rewardToken: `0x${string}`;
+  rewardTokenSymbol: string;
+  rewardTokenDecimals: number;
+  claimableAmount: bigint;
+  recipientUserAddress: `0x${string}`;
+  proofData: readonly `0x${string}`[];
+};
+
+export const useRewards = (addressOverride?: Address) => {
   const { distributor } = useDefiWrapper();
-  const { address, chainId } = useDappStatus();
+  const { address: userAddress, chainId } = useDappStatus();
   const publicClient = usePublicClient();
   const queryClient = useQueryClient();
+
+  const address = addressOverride ?? userAddress;
 
   const query = useQuery({
     queryKey: ['wrapper', 'rewards', { address, chainId }],
@@ -21,20 +33,25 @@ export const useRewards = () => {
       invariant(address, 'Wallet not connected');
       invariant(distributor, 'Distributor is not defined');
 
+      const userAddresses = [address];
       const cid = await distributor.read.cid();
 
       if (!cid) return { rewardsInfo: [], isEmpty: true };
 
       const merkleTree = await fetchDistribution(cid);
 
-      const rewardsInfo = [];
+      const rewardsInfo: RewardsInfoEntry[] = [];
 
       for (const [index, record] of merkleTree.values.entries()) {
         const recipientAddress = record.value[0] as Address;
         const rewardToken = record.value[1] as Address;
         const claimableAmount = BigInt(record.value[2]);
 
-        if (recipientAddress !== address) {
+        const recipientUserAddress = userAddresses.find((addr) =>
+          isAddressEqual(addr, recipientAddress),
+        );
+
+        if (!recipientUserAddress) {
           continue;
         }
 
@@ -49,7 +66,7 @@ export const useRewards = () => {
         invariant(proofData, 'Proof is not defined');
 
         const previewClaim: bigint = await distributor.read.previewClaim([
-          address,
+          recipientUserAddress,
           rewardToken,
           claimableAmount,
           proofData,
@@ -65,6 +82,7 @@ export const useRewards = () => {
           rewardTokenSymbol: symbol,
           rewardTokenDecimals: decimals,
           claimableAmount,
+          recipientUserAddress,
           proofData,
         });
       }

@@ -23,6 +23,7 @@ export const Rewards = () => {
           proofData,
           rewardTokenSymbol,
           rewardTokenDecimals,
+          recipientUserAddress,
         }) => (
           <VaultInfoEntry
             key={rewardToken}
@@ -36,6 +37,7 @@ export const Rewards = () => {
                   claimReward({
                     displayClaimAmount: previewClaim,
                     rewardTokenDecimals: rewardTokenDecimals,
+                    recipientUserAddress,
                     amount: claimableAmount,
                     token: rewardToken,
                     symbol: rewardTokenSymbol,

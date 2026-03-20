@@ -49,6 +49,7 @@ export const useBaseVaultData = (vaultAddress: Address | undefined) => {
         connection,
         isReportFresh,
         latestVaultReport,
+        isVaultConnected,
         latestHubReport,
       ] = await Promise.all([
         vault.read.nodeOperator(),
@@ -56,6 +57,7 @@ export const useBaseVaultData = (vaultAddress: Address | undefined) => {
         hub.read.vaultConnection([vaultAddress]),
         hub.read.isReportFresh([vaultAddress]),
         hub.read.latestReport([vaultAddress]),
+        hub.read.isVaultConnected([vaultAddress]),
         lazyOracle.read.latestReportData(),
       ]);
 
@@ -67,6 +69,7 @@ export const useBaseVaultData = (vaultAddress: Address | undefined) => {
       ] = latestHubReport;
 
       const isReportAvailable =
+        isVaultConnected &&
         latestHubReportTimestamp > latestVaultReport.timestamp;
 
       // we might not have a report even when fresh is not true
@@ -77,9 +80,12 @@ export const useBaseVaultData = (vaultAddress: Address | undefined) => {
           )
         : null;
 
-      const isReportMissing = !report && !isReportFresh;
+      const isReportMissing = isVaultConnected && !report && !isReportFresh;
 
-      if (!(await isDashboard(publicClient, connection.owner, vaults))) {
+      if (
+        isVaultConnected &&
+        !(await isDashboard(publicClient, connection.owner, vaults))
+      ) {
         throw new VaultOwnerNotDashboardError();
       }
 
@@ -96,6 +102,7 @@ export const useBaseVaultData = (vaultAddress: Address | undefined) => {
         nodeOperator,
         withdrawalCredentials,
         report,
+        isConnected: isVaultConnected,
         hubReport: {
           root: latestHubReportRoot,
           refSlot: latestDataRefSlot,
