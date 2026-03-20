@@ -31,9 +31,9 @@ export const MintEstimationWarning = ({
       <FormatToken
         amount={expectedMintedAmount}
         token={tokenToMint}
-        showSymbolOnFallback={true}
+        showSymbolOnFallback
         fallback="N/A"
-        trimEllipsis={true}
+        trimEllipsis
       />{' '}
       should be minted, but due to {reason},
       {maxMintableAmount > 0n ? (
@@ -43,9 +43,9 @@ export const MintEstimationWarning = ({
           <FormatToken
             amount={maxMintableAmount}
             token={tokenToMint}
-            showSymbolOnFallback={true}
+            showSymbolOnFallback
             fallback="N/A"
-            trimEllipsis={true}
+            trimEllipsis
           />{' '}
           will be minted.
         </>

@@ -14,9 +14,9 @@ export const MintPausedWarning = ({
         <FormatToken
           amount={0n}
           token={tokenToMint}
-          showSymbolOnFallback={true}
+          showSymbolOnFallback
           fallback="N/A"
-          trimEllipsis={true}
+          trimEllipsis
         />{' '}
         will be minted{' '}
       </Alert.Title>

@@ -21,7 +21,7 @@ export const PositionHealthWarning = () => {
           amount={positionData?.assetShortfallInEth}
           token={'ETH'}
           fallback="N/A"
-          trimEllipsis={true}
+          trimEllipsis
         />{' '}
         to cover for strategy liabilities and your position will be rebalanced
         during stage 2 of withdrawal. Strategy withdrawal amounts are

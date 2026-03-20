@@ -83,7 +83,7 @@ export const useStrategyWithdrawalRequestsRead = (includeBoost?: boolean) => {
     (positionData?.withdrawalRequests?.length ?? 0) === 0 &&
     (proxyRequests?.pending.length ?? 0) === 0 &&
     (proxyRequests?.finalized.length ?? 0) === 0 &&
-    proxyRewards?.isEmpty &&
+    (proxyRewards?.rewardsInfo.length ?? 0) == 0 &&
     !canBoost(boostableStethShares) &&
     !canProcessRequest(positionData, minProcessableValueInEth) &&
     !canRecover(positionData);

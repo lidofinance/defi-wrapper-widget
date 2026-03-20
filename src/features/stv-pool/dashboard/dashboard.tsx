@@ -24,7 +24,7 @@ export const Dashboard = () => {
         isAPYLoading={isAPRLoading}
         aprData={vaultAprData}
       />
-      <VaultStatus />
+      <VaultStatus showRewards />
       <VaultDetails />
     </DashboardContainer>
   );

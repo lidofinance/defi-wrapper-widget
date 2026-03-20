@@ -1,4 +1,5 @@
 import { Button, HStack, Presence, Spacer, Text } from '@chakra-ui/react';
+import { Rewards } from '@/shared/components/rewards';
 import { Tooltip } from '@/shared/components/tooltip';
 import {
   VaultInfo,
@@ -12,7 +13,6 @@ import {
 import { FormatPercent, FormatDate } from '@/shared/formatters';
 import { fromBlockChainTime } from '@/utils/blockchain-time';
 import { useEarnStrategyApy, useStrategyWithdrawalRequests } from '../hooks';
-import { Rewards } from '../vault-status/rewards';
 
 type VaultStatusProps = {
   showBoost?: boolean;
@@ -52,7 +52,7 @@ export const VaultStatus = ({
 
   return (
     <Presence
-      present={true}
+      present
       animationName={{ _open: 'fade-in', _closed: 'fade-out' }}
       animationDuration="moderate"
     >

@@ -35,7 +35,7 @@ export const RepaymentAlert = ({
         <FormatToken
           amount={amount}
           fontWeight={700}
-          trimEllipsis={true}
+          trimEllipsis
           token={token}
         />{' '}
         you need to repay all minted {tokenLabel(repaymentToken)} but your
@@ -44,7 +44,7 @@ export const RepaymentAlert = ({
           <List.Item>
             <FormatToken
               amount={repayable}
-              trimEllipsis={true}
+              trimEllipsis
               token={repaymentToken}
               fontWeight={700}
             />{' '}
@@ -53,7 +53,7 @@ export const RepaymentAlert = ({
           <List.Item>
             <FormatToken
               amount={rebalanceable}
-              trimEllipsis={true}
+              trimEllipsis
               token={repaymentToken}
               fontWeight={700}
             />{' '}

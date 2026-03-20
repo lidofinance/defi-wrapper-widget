@@ -26,7 +26,7 @@ export const WhitelistedModal = () => {
         open={showPopup}
         placement={'center'}
         size="sm"
-        skipAnimationOnMount={true}
+        skipAnimationOnMount
         closeOnEscape={false}
         closeOnInteractOutside={false}
         motionPreset={'none'}

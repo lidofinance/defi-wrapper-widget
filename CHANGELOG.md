@@ -2,6 +2,8 @@
 
 - Add functionality to claim distribution rewards for StvStrategyPool
 - Fix withdrawal amount calculation for StvStrategyPool to account for disconnected vault state
+- Show distribution rewards in vault status all pools
+- Show icons for known tokens in vault details
 
 # 0.3.0
 - support new strategy type
