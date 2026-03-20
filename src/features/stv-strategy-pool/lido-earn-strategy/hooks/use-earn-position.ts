@@ -112,11 +112,14 @@ export const useEarnPosition = () => {
     earnPositionData && earnStrategy
       ? {
           strategyProxyAddress: earnStrategy.strategyProxyAddress,
+          // pending deposits, they are not yet claimable(and not withdrawable) but count towards total values
           strategyDepositStethSharesOffset:
             earnPositionData.pendingDepositsInWsteth,
+          // actual balance, includes claimable deposits and existing balance, counts towards total values and is fully withdrawable
           strategyStethSharesBalance:
             earnPositionData.balanceInWsteth +
             earnPositionData.claimableDepositInWsteth,
+          // pending&claimable withdrawals, they count towards total value but are already withdrawn from strategy
           strategyWithdrawalStethSharesOffset:
             earnPositionData.pendingWithdrawalsInWsteth,
         }

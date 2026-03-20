@@ -3,16 +3,19 @@ import {
   useRequests,
   useClaim,
   useWithdrawalQueue,
+  useRewards,
 } from '@/modules/defi-wrapper';
 
 import {
   useBoostApy,
+  useClaimProxyDistribution,
   useProcessWithdrawal,
   useRecover,
 } from '../../shared/hooks';
 import { useFinalizeEarnWithdrawal } from './use-earn-finalize-request';
 import { useEarnPosition } from './use-earn-position';
 import { encodeEarnSupplyParams } from '../utils';
+import { useEarnStrategy } from './use-earn-strategy';
 
 const canProcessRequest = (
   positionData: ReturnType<typeof useEarnPosition>['positionData'],
@@ -46,6 +49,7 @@ const canRecover = (
 };
 
 export const useStrategyWithdrawalRequestsRead = (includeBoost?: boolean) => {
+  const { data: earnStrategyData } = useEarnStrategy();
   // Data fetching
   // requests to withdraw from GGV - STEP 1
   // position data - used to calcualted processable request - STEP 2
@@ -55,13 +59,20 @@ export const useStrategyWithdrawalRequestsRead = (includeBoost?: boolean) => {
   const { data: proxyRequests, isPending: isLoadingProxyRequests } =
     useRequests();
 
+  const { data: proxyRewards, isPending: isLoadingProxyRewards } = useRewards(
+    earnStrategyData?.strategyProxyAddress,
+  );
+
   const {
     minWithdrawalAmountInEth: minProcessableValueInEth,
     isPending: isLoadingWithdrawalQueue,
   } = useWithdrawalQueue();
 
   const isLoading =
-    isPositionLoading || isLoadingProxyRequests || isLoadingWithdrawalQueue;
+    isPositionLoading ||
+    isLoadingProxyRequests ||
+    isLoadingProxyRewards ||
+    isLoadingWithdrawalQueue;
 
   const boostableStethShares =
     includeBoost && positionData?.availableMintingCapacityStethShares
@@ -72,6 +83,7 @@ export const useStrategyWithdrawalRequestsRead = (includeBoost?: boolean) => {
     (positionData?.withdrawalRequests?.length ?? 0) === 0 &&
     (proxyRequests?.pending.length ?? 0) === 0 &&
     (proxyRequests?.finalized.length ?? 0) === 0 &&
+    (proxyRewards?.rewardsInfo.length ?? 0) == 0 &&
     !canBoost(boostableStethShares) &&
     !canProcessRequest(positionData, minProcessableValueInEth) &&
     !canRecover(positionData);
@@ -79,6 +91,7 @@ export const useStrategyWithdrawalRequestsRead = (includeBoost?: boolean) => {
   return {
     isEmpty,
     isLoading,
+    proxyRewards,
     proxyRequests,
     positionData,
     withdrawalRequests: positionData?.withdrawalRequests,
@@ -94,6 +107,7 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
     proxyRequests,
     positionData,
     withdrawalRequests,
+    proxyRewards,
     boostableStethShares,
     minProcessableValueInEth,
   } = useStrategyWithdrawalRequestsRead(includeBoost);
@@ -104,6 +118,8 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
   const { processWithdrawal, mutation: proccessWithdrawalMutation } =
     useProcessWithdrawal();
   const { recover, mutation: recoverMutation } = useRecover();
+  const { claimProxyDistribution, mutation: claimProxyDistributionMutation } =
+    useClaimProxyDistribution();
   const { boost, mutation: boostMutation } = useBoostApy();
   const {
     finalizeEarnWithdrawal: claimEarnWithdrawal,
@@ -198,6 +214,19 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
     };
   }, [positionData, recover]);
 
+  const proxyClaimableRewards = useMemo(() => {
+    return proxyRewards?.rewardsInfo.map((claimableDistribution) => {
+      return {
+        ...claimableDistribution,
+        claim: () => {
+          return claimProxyDistribution({
+            claimableDistribution,
+          });
+        },
+      };
+    });
+  }, [proxyRewards, claimProxyDistribution]);
+
   const { boostable, boostAPY } = useMemo(() => {
     const isBoostable = canBoost(boostableStethShares);
     return {
@@ -222,7 +251,8 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
     claimMutation.isPending ||
     recoverMutation.isPending ||
     boostMutation.isPending ||
-    finalizeEarnWithdrawalMutation.isPending;
+    finalizeEarnWithdrawalMutation.isPending ||
+    claimProxyDistributionMutation.isPending;
 
   return {
     // Earn vault withdrawal
@@ -242,6 +272,8 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
     // recoverable rewards
     recoverable,
     recoverRewards,
+    // rewards claimable via distributor
+    proxyClaimableRewards,
 
     // apy boost
     boostable,

@@ -44,7 +44,7 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
   const { withdrawStrategy } = useWithdrawStrategy();
   const { context, contextValue, isLoading } = useWithdrawalFormData();
   const { isWalletWhitelisted } = useWalletWhitelisted();
-  const { withdrawalsPaused } = useStvStrategy();
+
   const formObject = useForm<
     WithdrawalFormValues,
     WithdrawalFormValidationContextType,
@@ -58,8 +58,7 @@ export const WithdrawalFormProvider: React.FC<React.PropsWithChildren> = ({
     disabled:
       !isDappActive ||
       !isWalletWhitelisted ||
-      withdrawalsPaused ||
-      earnStrategy?.state.isWithdrawalPaused,
+      earnStrategy?.state.isAsyncRedeemQueuePaused,
     context,
     resolver: WithdrawalFormResolver,
   });

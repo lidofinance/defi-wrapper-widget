@@ -12,7 +12,7 @@ export const Withdrawal = () => {
       <FormContainer>
         <WithdrawalPausedAlert />
         <VStack align="stretch" gap={6}>
-          <VaultStatus showWithdrawalRequests={true} />
+          <VaultStatus showWithdrawalRequests />
           <WithdrawalInputGroup />
         </VStack>
       </FormContainer>

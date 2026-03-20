@@ -11,7 +11,13 @@ export const getTokenInfo = async (
   queryClient: QueryClient,
 ): Promise<TokenInfo> => {
   // Define the query key for caching
-  const queryKey = ['token-symbol', tokenAddress, publicClient];
+  const queryKey = [
+    'token-symbol',
+    tokenAddress,
+    {
+      chainId: publicClient.chain?.id,
+    },
+  ];
 
   // Check if we have cached data
   const cachedData = queryClient.getQueryData<TokenInfo>(queryKey);

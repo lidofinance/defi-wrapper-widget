@@ -5,9 +5,9 @@ import { ApyTooltipContent } from './apy-tooltip-content';
 export const VaultDetails = () => {
   return (
     <DashboardVaultDetails
-      showMaxTVL={true}
+      showMaxTVL
       additionalContent={<ApyTooltipContent />}
-      showLiquidityFee={true}
+      showLiquidityFee
       vaultDescription={
         <>
           The vault strategy: ETH is deposited to validators and generate

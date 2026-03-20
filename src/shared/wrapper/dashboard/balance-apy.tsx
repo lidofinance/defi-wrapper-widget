@@ -40,7 +40,7 @@ export const DashboardBalanceApy = ({
             isLoading={isBalanceLoading}
             amount={balance}
             token={token}
-            approx={true}
+            approx
             height={'10'}
             skeletonWidth={'6/12'}
             fallback="-"

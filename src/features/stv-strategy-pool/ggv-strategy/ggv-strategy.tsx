@@ -24,6 +24,9 @@ const TABS: TAB[] = [
   },
 ];
 
+/**
+ * @deprecated use LidoEarnStrategy instead. GGV strategy is deprecated and only used as an reference
+ */
 export const GGVStrategyPool = () => {
   const { totalValueInEth } = useGGVStrategyPosition();
   const { isEmpty } = useStrategyWithdrawalRequestsRead(true);

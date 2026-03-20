@@ -6,8 +6,8 @@ export const VaultDetails = () => {
   const { data: vaultCapacity } = useVaultCapacity();
   return (
     <DashboardVaultDetails
-      showMaxTVL={true}
-      showLiquidityFee={true}
+      showMaxTVL
+      showLiquidityFee
       vaultDescription={
         <>
           The vault strategy: ETH is deposited on validators and generate

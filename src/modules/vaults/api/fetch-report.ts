@@ -87,7 +87,14 @@ export const fetchIPFS = async <TResult>(cid: string): Promise<TResult> => {
   for (const gateway of CID_TO_GATEWAY) {
     const url = gateway(cid);
     try {
-      return await fetch(url).then((res) => res.json());
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch from IPFS gateway: ${response.statusText}`,
+        );
+      }
+      return await response.json();
     } catch (error) {
       console.warn(
         `Error fetching from IPFS gateway(${url}). Trying next...`,

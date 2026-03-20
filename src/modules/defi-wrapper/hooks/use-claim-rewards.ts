@@ -14,6 +14,7 @@ type ClaimRewardParams = {
   amount: bigint;
   token: Address;
   symbol: string;
+  recipientUserAddress: Address;
   rewardTokenDecimals: number;
   displayClaimAmount: bigint;
   proofData: readonly Hex[];
@@ -34,6 +35,7 @@ export const useClaimReward = () => {
       token,
       displayClaimAmount,
       symbol,
+      recipientUserAddress,
       proofData,
       rewardTokenDecimals,
     }: ClaimRewardParams) => {
@@ -55,7 +57,12 @@ export const useClaimReward = () => {
           AALoadingDescription: DEFAULT_LOADING_DESCRIPTION,
           transactions: [
             {
-              ...distributor.encode.claim([address, token, amount, proofData]),
+              ...distributor.encode.claim([
+                recipientUserAddress,
+                token,
+                amount,
+                proofData,
+              ]),
               loadingText: `Claiming ${formattedAmount} ${symbol}`,
               signingDescription: DEFAULT_SIGNING_DESCRIPTION,
               loadingDescription: DEFAULT_LOADING_DESCRIPTION,

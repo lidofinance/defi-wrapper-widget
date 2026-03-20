@@ -38,7 +38,7 @@ export const FormatTokenWithIcon: FC<
         trimEllipsis={trimEllipsis}
         isLoading={isLoading}
         skeletonWidth={skeletonWidth}
-        showSymbolOnFallback={true}
+        showSymbolOnFallback
         fallback={fallback}
       />
       <TokenIcon token={token} size={'20px'} />

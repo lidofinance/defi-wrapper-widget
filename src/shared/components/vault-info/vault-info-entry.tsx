@@ -1,9 +1,12 @@
 import { ReactNode } from 'react';
+import { Address } from 'viem';
 import { Box, HStack, Spacer, Text, VStack } from '@chakra-ui/react';
+import { useDappStatus } from '@/modules/web3';
 import { TokenIcon } from '@/shared/components/token-icon/token-icon';
 import { VaultInfoTokenBlock } from '@/shared/components/vault-info/vault-info-token-block';
 import { FormatToken } from '@/shared/formatters';
 import type { Token } from '@/types/token';
+import { getTokenByAddress } from '@/utils/token-by-address';
 
 type VaultInfoEntryProps = {
   token?: Token;
@@ -12,6 +15,7 @@ type VaultInfoEntryProps = {
   customSymbol?: string;
   isLoading?: boolean;
   customDecimals?: number;
+  customAddress?: Address;
 };
 
 export const VaultInfoEntry = ({
@@ -20,7 +24,12 @@ export const VaultInfoEntry = ({
   suffix,
   customSymbol,
   customDecimals,
+  customAddress,
 }: VaultInfoEntryProps) => {
+  const { chainId } = useDappStatus();
+  const customToken =
+    customAddress && getTokenByAddress(customAddress, chainId);
+  token = token || customToken || undefined;
   const useCustomSymbol = !token || customSymbol;
 
   const tokenIcon = useCustomSymbol ? (
@@ -33,7 +42,7 @@ export const VaultInfoEntry = ({
       {(customSymbol || '').substring(0, 2)}
     </Text>
   ) : (
-    <TokenIcon token={token} size={'24px'} />
+    <TokenIcon token={token as Token} size={'24px'} />
   );
   return (
     <HStack gap={2} alignItems="center" width="100%">
@@ -60,7 +69,7 @@ export const VaultInfoEntry = ({
             />
           </Text>
         ) : (
-          <VaultInfoTokenBlock token={token} amount={amount} />
+          <VaultInfoTokenBlock token={token as Token} amount={amount} />
         )}
       </VStack>
       <Spacer />

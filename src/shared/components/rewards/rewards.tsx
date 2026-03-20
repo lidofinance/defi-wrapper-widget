@@ -23,12 +23,14 @@ export const Rewards = () => {
           proofData,
           rewardTokenSymbol,
           rewardTokenDecimals,
+          recipientUserAddress,
         }) => (
           <VaultInfoEntry
             key={rewardToken}
             amount={previewClaim}
             customSymbol={rewardTokenSymbol}
             customDecimals={rewardTokenDecimals}
+            customAddress={rewardToken}
             suffix={
               <Button
                 loading={mutation.isPending}
@@ -36,6 +38,7 @@ export const Rewards = () => {
                   claimReward({
                     displayClaimAmount: previewClaim,
                     rewardTokenDecimals: rewardTokenDecimals,
+                    recipientUserAddress: recipientUserAddress,
                     amount: claimableAmount,
                     token: rewardToken,
                     symbol: rewardTokenSymbol,

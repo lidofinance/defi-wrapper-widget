@@ -43,9 +43,9 @@ const MintEstimationAlert = ({
             <FormatToken
               amount={mintingSpread}
               token={tokenToMint}
-              showSymbolOnFallback={true}
+              showSymbolOnFallback
               fallback="N/A"
-              trimEllipsis={true}
+              trimEllipsis
             />{' '}
             will be minted due to existing minting capacity.
           </>
