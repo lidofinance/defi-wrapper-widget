@@ -1,4 +1,4 @@
-import React, { SVGProps } from 'react';
+import { SVGProps } from 'react';
 import { Token } from '@/types/token';
 import ETH from 'assets/icons/ETH.svg?react';
 import STETH from 'assets/icons/STETH.svg?react';

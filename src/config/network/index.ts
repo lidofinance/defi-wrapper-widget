@@ -1,4 +1,4 @@
-import type { Address } from 'viem';
+import { isAddressEqual, type Address } from 'viem';
 import { CHAINS } from '@lidofinance/lido-ethereum-sdk/common';
 import invariant from 'tiny-invariant';
 
@@ -56,6 +56,19 @@ export const getContractAddress = (
   const networkConfig = getNetworkConfig(chain);
 
   return networkConfig?.contracts?.[contractName];
+};
+
+export const getContractByAddress = (
+  chain: CHAINS,
+  address: Address,
+): CONTRACT_NAMES | null => {
+  const networkConfig = getNetworkConfig(chain);
+  if (!networkConfig?.contracts) return null;
+
+  const entry = Object.entries(networkConfig.contracts).find(
+    ([, contractAddress]) => isAddressEqual(contractAddress, address),
+  );
+  return entry ? (entry[0] as CONTRACT_NAMES) : null;
 };
 
 export const getApiURL = (

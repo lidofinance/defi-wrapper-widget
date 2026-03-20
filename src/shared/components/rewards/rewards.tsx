@@ -30,6 +30,7 @@ export const Rewards = () => {
             amount={previewClaim}
             customSymbol={rewardTokenSymbol}
             customDecimals={rewardTokenDecimals}
+            customAddress={rewardToken}
             suffix={
               <Button
                 loading={mutation.isPending}

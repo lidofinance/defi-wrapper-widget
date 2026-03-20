@@ -1,4 +1,5 @@
 import { Button, HStack, Presence, Spacer, Text } from '@chakra-ui/react';
+import { Rewards } from '@/shared/components/rewards';
 import { Tooltip } from '@/shared/components/tooltip';
 import {
   VaultInfo,
@@ -13,7 +14,6 @@ import { FormatDate, FormatPercent } from '@/shared/formatters';
 import { fromBlockChainTime } from '@/utils/blockchain-time';
 import { useGGVStrategyApy } from '../hooks/use-ggv-strategy-apy';
 import { useStrategyWithdrawalRequests } from '../hooks/use-strategy-withdrawal-requests';
-import { Rewards } from '../vault-status/rewards';
 
 type VaultStatusProps = {
   showBoost?: boolean;
