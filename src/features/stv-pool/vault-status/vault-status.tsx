@@ -26,7 +26,7 @@ export const VaultStatus = ({ showRewards = false }: VaultStatusProps) => {
 
   return (
     <Presence
-      present={true}
+      present
       animationName={{ _open: 'fade-in', _closed: 'fade-out' }}
       animationDuration="moderate"
     >

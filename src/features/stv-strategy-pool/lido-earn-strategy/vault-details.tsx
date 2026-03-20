@@ -6,9 +6,9 @@ export const VaultDetails = () => {
   const { apySma, isLoadingApr } = useEarnStrategyApy();
   return (
     <DashboardVaultDetails
-      showMaxTVL={true}
+      showMaxTVL
       additionalContent={<ApyTooltipContent />}
-      showLiquidityFee={true}
+      showLiquidityFee
       vaultDescription={
         <>
           The vault strategy: ETH is deposited to validators and generates

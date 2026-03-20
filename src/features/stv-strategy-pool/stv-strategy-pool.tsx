@@ -15,7 +15,7 @@ export const StvStrategyPool = () => {
     case undefined:
       return (
         <WrapperLayout>
-          <SplashScreen isLoading={true} />
+          <SplashScreen isLoading />
         </WrapperLayout>
       );
     case 'strategy.mellow.v1':
