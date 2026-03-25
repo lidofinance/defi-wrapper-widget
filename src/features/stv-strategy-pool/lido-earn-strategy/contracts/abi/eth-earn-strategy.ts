@@ -12,6 +12,7 @@ export const EthEarnStrategyAbi = [
       { internalType: 'address', name: 'syncDepositQueue_', type: 'address' },
       { internalType: 'address', name: 'asyncDepositQueue_', type: 'address' },
       { internalType: 'address', name: 'asyncRedeemQueue_', type: 'address' },
+      { internalType: 'bool', name: 'allowListEnabled_', type: 'bool' },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
@@ -23,6 +24,11 @@ export const EthEarnStrategyAbi = [
       { internalType: 'bytes32', name: 'neededRole', type: 'bytes32' },
     ],
     name: 'AccessControlUnauthorizedAccount',
+    type: 'error',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
+    name: 'AlreadyAllowListed',
     type: 'error',
   },
   {
@@ -57,9 +63,18 @@ export const EthEarnStrategyAbi = [
     type: 'error',
   },
   { inputs: [], name: 'NoAsyncDepositQueue', type: 'error' },
+  {
+    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
+    name: 'NotAllowListed',
+    type: 'error',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
+    name: 'NotInAllowList',
+    type: 'error',
+  },
   { inputs: [], name: 'NotInitializing', type: 'error' },
   { inputs: [], name: 'RedeemFailed', type: 'error' },
-  { inputs: [], name: 'RequestIdNotFound', type: 'error' },
   {
     inputs: [
       { internalType: 'uint8', name: 'bits', type: 'uint8' },
@@ -69,14 +84,28 @@ export const EthEarnStrategyAbi = [
     type: 'error',
   },
   { inputs: [], name: 'SupplyFailed', type: 'error' },
-  { inputs: [], name: 'SuspiciousReport', type: 'error' },
   { inputs: [], name: 'WithdrawalFailed', type: 'error' },
   {
     inputs: [{ internalType: 'string', name: 'name', type: 'string' }],
     name: 'ZeroArgument',
     type: 'error',
   },
-  { inputs: [], name: 'ZeroShares', type: 'error' },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+    ],
+    name: 'AllowListAdded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+    ],
+    name: 'AllowListRemoved',
+    type: 'event',
+  },
   {
     anonymous: false,
     inputs: [
@@ -159,6 +188,19 @@ export const EthEarnStrategyAbi = [
       { indexed: false, internalType: 'bytes', name: 'params', type: 'bytes' },
     ],
     name: 'MellowDeposited',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'msgSender',
+        type: 'address',
+      },
+    ],
+    name: 'MellowSharesClaimed',
     type: 'event',
   },
   {
@@ -317,7 +359,28 @@ export const EthEarnStrategyAbi = [
   },
   {
     inputs: [],
+    name: 'ALLOW_LIST_ENABLED',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'ALLOW_LIST_MANAGER_ROLE',
+    outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'DEFAULT_ADMIN_ROLE',
+    outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'DEPOSIT_ROLE',
     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
     stateMutability: 'view',
     type: 'function',
@@ -333,31 +396,6 @@ export const EthEarnStrategyAbi = [
     inputs: [],
     name: 'MELLOW_ASYNC_REDEEM_QUEUE',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'MELLOW_FEE_MANAGER',
-    outputs: [
-      { internalType: 'contract IFeeManager', name: '', type: 'address' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'MELLOW_ORACLE',
-    outputs: [{ internalType: 'contract IOracle', name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'MELLOW_SHARE_MANAGER',
-    outputs: [
-      { internalType: 'contract IShareManager', name: '', type: 'address' },
-    ],
     stateMutability: 'view',
     type: 'function',
   },
@@ -453,6 +491,13 @@ export const EthEarnStrategyAbi = [
     type: 'function',
   },
   {
+    inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
+    name: 'addToAllowList',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [
       { internalType: 'uint256', name: '_wstethToBurn', type: 'uint256' },
     ],
@@ -480,6 +525,31 @@ export const EthEarnStrategyAbi = [
     name: 'finalizeRequestExit',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getAllowListAddresses',
+    outputs: [{ internalType: 'address[]', name: '', type: 'address[]' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getAllowListSize',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
+    name: 'getDepositRequestOf',
+    outputs: [
+      { internalType: 'uint256', name: 'assets', type: 'uint256' },
+      { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
+      { internalType: 'bool', name: 'isClaimable', type: 'bool' },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -591,6 +661,13 @@ export const EthEarnStrategyAbi = [
     type: 'function',
   },
   {
+    inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
+    name: 'isAllowListed',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [{ internalType: 'bytes32', name: '_featureId', type: 'bytes32' }],
     name: 'isFeaturePaused',
     outputs: [{ internalType: 'bool', name: 'isPaused', type: 'bool' }],
@@ -621,17 +698,6 @@ export const EthEarnStrategyAbi = [
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
-    name: 'pendingDepositRequests',
-    outputs: [
-      { internalType: 'uint256', name: 'assets', type: 'uint256' },
-      { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
-      { internalType: 'bool', name: 'isClaimable', type: 'bool' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [{ internalType: 'uint256', name: 'shares', type: 'uint256' }],
     name: 'previewRedeem',
     outputs: [
@@ -644,6 +710,7 @@ export const EthEarnStrategyAbi = [
   {
     inputs: [
       { internalType: 'uint256', name: 'assets', type: 'uint256' },
+      { internalType: 'address', name: 'msgSender', type: 'address' },
       { internalType: 'address', name: 'callForwarder', type: 'address' },
       {
         components: [
@@ -683,6 +750,13 @@ export const EthEarnStrategyAbi = [
       { internalType: 'uint256', name: 'stethShares', type: 'uint256' },
     ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
+    name: 'removeFromAllowList',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -761,6 +835,16 @@ export const EthEarnStrategyAbi = [
       { internalType: 'uint256', name: '_amount', type: 'uint256' },
     ],
     name: 'safeTransferERC20',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '_recipient', type: 'address' },
+      { internalType: 'uint256', name: '_amount', type: 'uint256' },
+    ],
+    name: 'safeTransferETH',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',

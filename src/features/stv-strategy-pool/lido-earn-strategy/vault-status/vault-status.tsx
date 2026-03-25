@@ -44,7 +44,10 @@ export const VaultStatus = ({
 
   const { apySma, apySmaCurrent } = useEarnStrategyApy();
 
-  const apyDifference = apySma && apySmaCurrent ? apySma - apySmaCurrent : null;
+  const apyDifference =
+    apySma !== undefined && apySmaCurrent !== undefined
+      ? apySma - apySmaCurrent
+      : null;
 
   if (isLoading || isEmpty) {
     return null;

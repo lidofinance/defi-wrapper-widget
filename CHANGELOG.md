@@ -1,3 +1,8 @@
+# 0.4.1
+
+- update abi to fit mainnet deploy of lido earn strategy adapter
+- fix APY fetching and display 
+
 # 0.4.0
 
 - Add functionality to claim distribution rewards for StvStrategyPool

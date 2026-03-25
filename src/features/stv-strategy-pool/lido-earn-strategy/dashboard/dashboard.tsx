@@ -17,7 +17,7 @@ export const Dashboard = () => {
   } = useEarnPosition();
 
   const aprData =
-    updatedAt && apySmaCurrent
+    updatedAt !== undefined && apySmaCurrent !== undefined
       ? {
           updatedAt,
           apySma: apySmaCurrent,
