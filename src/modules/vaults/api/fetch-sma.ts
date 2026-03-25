@@ -65,9 +65,14 @@ export const fetchVaultSMA = async (
       ? data.netStakingApr.aprs[data.netStakingApr.aprs.length - 1]
       : 0;
 
+  const updatedAt =
+    data.range.toTimestamp === 0
+      ? new Date()
+      : fromBlockChainTime(data.range.toTimestamp);
+
   return {
     ...data,
-    updatedAt: fromBlockChainTime(data.range.toTimestamp),
+    updatedAt,
     aprSma: data.netStakingApr.sma,
     apySma: aprToApy(data.netStakingApr.sma),
     aprDaily: aprDaily,

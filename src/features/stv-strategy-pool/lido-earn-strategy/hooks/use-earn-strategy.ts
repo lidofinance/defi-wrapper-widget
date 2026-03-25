@@ -49,9 +49,6 @@ export const useEarnStrategy = () => {
         syncDepositQueueAddress,
         asyncRedeemQueueAddress,
         lidoEthEarnVaultAddress,
-        oracleAddress,
-        feeManagerAddress,
-        shareManagerAddress,
         wstethAddress,
       ] = await Promise.all([
         address
@@ -62,9 +59,6 @@ export const useEarnStrategy = () => {
         lidoEarnStrategy.read.MELLOW_SYNC_DEPOSIT_QUEUE(),
         lidoEarnStrategy.read.MELLOW_ASYNC_REDEEM_QUEUE(),
         lidoEarnStrategy.read.MELLOW_VAULT(),
-        lidoEarnStrategy.read.MELLOW_ORACLE(),
-        lidoEarnStrategy.read.MELLOW_FEE_MANAGER(),
-        lidoEarnStrategy.read.MELLOW_SHARE_MANAGER(),
         lidoEarnStrategy.read.WSTETH(),
       ]);
 
@@ -87,15 +81,17 @@ export const useEarnStrategy = () => {
         publicClient,
       );
 
+      const [SUPPLY_FEATURE, REDEEM_FEATURE, shareManagerAddress] =
+        await Promise.all([
+          lidoEarnStrategy.read.SUPPLY_FEATURE(),
+          lidoEarnStrategy.read.REDEEM_FEATURE(),
+          earnVault.read.shareManager(),
+        ]);
+
       const shareManager = getLidoEarnShareManagerContract(
         shareManagerAddress,
         publicClient,
       );
-
-      const [SUPPLY_FEATURE, REDEEM_FEATURE] = await Promise.all([
-        lidoEarnStrategy.read.SUPPLY_FEATURE(),
-        lidoEarnStrategy.read.REDEEM_FEATURE(),
-      ]);
 
       const [
         isSupplyPaused,
@@ -120,9 +116,6 @@ export const useEarnStrategy = () => {
           syncDepositQueueAddress,
           asyncRedeemQueueAddress,
           lidoEthEarnVaultAddress,
-          oracleAddress,
-          feeManagerAddress,
-          shareManagerAddress,
           wstethAddress,
           state: {
             isDepositPaused,
