@@ -329,12 +329,6 @@ export const getStrategyPosition = async ({
     minBN(pendingUnlockFromStrategyVaultInEth, totalLockedEth) +
     stethToRecoverPendingFromStrategyVault;
 
-  console.log({
-    totalValuePendingFromStrategyVaultInEth,
-    pendingUnlockFromStrategyVaultInEth,
-    totalLockedEth,
-    stethToRecoverPendingFromStrategyVault,
-  });
   //
   // Boosting APY
   //

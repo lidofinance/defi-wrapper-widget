@@ -1,7 +1,7 @@
 # 0.4.1
 
 - update abi to fit mainnet deploy of lido earn strategy adapter
-- fix APY fetching 
+- fix APY fetching and display 
 
 # 0.4.0
 
