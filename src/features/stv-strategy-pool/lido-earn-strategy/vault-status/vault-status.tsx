@@ -53,11 +53,6 @@ export const VaultStatus = ({
     return null;
   }
 
-  console.log({
-    boostable,
-    apyDifference,
-  });
-
   return (
     <Presence
       present
