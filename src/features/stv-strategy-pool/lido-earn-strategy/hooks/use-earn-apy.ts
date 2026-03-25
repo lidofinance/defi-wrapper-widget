@@ -2,6 +2,7 @@ import { usePublicClient } from 'wagmi';
 import { invariant } from '@lidofinance/lido-ethereum-sdk';
 import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
+import { th } from 'zod/v4/locales/index.js';
 import { getApiURL } from '@/config';
 import { useEarnStrategy } from './use-earn-strategy';
 
@@ -25,10 +26,15 @@ export const useEarnApy = () => {
       const vaultAddress =
         publicClient.chain.id !== 1
           ? '0x277C6A642564A91ff78b008022D65683cEE5CCC5'
-          : strategyData.earnVault;
+          : strategyData.earnVault.address;
 
       const path = `${apiUrl}/v1/chain/1/core-vaults/${vaultAddress}/apy`;
       const response = await fetch(path);
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch Mellow APY: ${response.status} ${response.statusText}`,
+        );
+      }
       const data = await response.json();
 
       return MELLOW_APY_SCHEMA.parse(data);
