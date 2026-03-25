@@ -24,7 +24,7 @@ export const useEarnApy = () => {
       // sub for testnets
       const vaultAddress =
         publicClient.chain.id !== 1
-          ? '0x277C6A642564A91ff78b008022D65683cEE5CCC5'
+          ? '0x6a37725ca7f4CE81c004c955f7280d5C704a249e'
           : strategyData.earnVault.address;
 
       const path = `${apiUrl}/v1/chain/1/core-vaults/${vaultAddress}/apy`;
