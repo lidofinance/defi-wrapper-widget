@@ -1,3 +1,6 @@
+# 0.4.2
+- correct user value calc for disconnected vault state
+
 # 0.4.1
 
 - update abi to fit mainnet deploy of lido earn strategy adapter
