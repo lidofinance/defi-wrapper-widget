@@ -17,7 +17,7 @@ import { useEarnPosition } from './use-earn-position';
 import { encodeEarnSupplyParams } from '../utils';
 import { useEarnStrategy } from './use-earn-strategy';
 
-const canProcessRequest = (
+const hasProcessRequest = (
   positionData: ReturnType<typeof useEarnPosition>['positionData'],
   minProccessableValueInEth: bigint | undefined,
 ) => {
@@ -26,14 +26,10 @@ const canProcessRequest = (
   if (typeof minProccessableValueInEth === 'undefined') return false;
 
   if (positionData.totalEthToWithdrawFromProxy > 0n) {
-    return (
-      positionData.totalEthToWithdrawFromProxy -
-        positionData.stethToRebalance >=
-      minProccessableValueInEth
-    );
-  } else {
-    return positionData.stethSharesToRepay > 0n;
+    return true;
   }
+
+  return positionData.stethSharesToRepay > 0n;
 };
 
 const canBoost = (boostableStethShares: bigint | undefined) => {
@@ -85,7 +81,7 @@ export const useStrategyWithdrawalRequestsRead = (includeBoost?: boolean) => {
     (proxyRequests?.finalized.length ?? 0) === 0 &&
     (proxyRewards?.rewardsInfo.length ?? 0) == 0 &&
     !canBoost(boostableStethShares) &&
-    !canProcessRequest(positionData, minProcessableValueInEth) &&
+    !hasProcessRequest(positionData, minProcessableValueInEth) &&
     !canRecover(positionData);
 
   return {
@@ -161,7 +157,7 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
     const request =
       positionData &&
       typeof minProcessableValueInEth === 'bigint' &&
-      canProcessRequest(positionData, minProcessableValueInEth)
+      hasProcessRequest(positionData, minProcessableValueInEth)
         ? {
             stvToWithdraw: positionData.totalStvToWithdrawFromProxy,
             ethToReceive: positionData.totalEthToWithdrawFromProxy,
@@ -171,7 +167,8 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
             // but if value is zero and it's just repay it's healing
             isBelowMinimumThreshold:
               positionData.totalStvToWithdrawFromProxy > 0n &&
-              positionData.totalEthToWithdrawFromProxy <=
+              positionData.totalEthToWithdrawFromProxy -
+                positionData.stethToRebalance <=
                 minProcessableValueInEth,
             isHealing: positionData.totalStvToWithdrawFromProxy <= 0n,
           }
