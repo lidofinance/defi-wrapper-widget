@@ -38,11 +38,16 @@ export const useRecover = () => {
             AASigningDescription: DEFAULT_SIGNING_DESCRIPTION,
             AALoadingDescription: DEFAULT_LOADING_DESCRIPTION,
             transactions: [
-              strategy.encode.safeTransferERC20([
-                assetToRecover,
-                address,
-                amountToRecover,
-              ]),
+              {
+                loadingText: `Claiming rewards`,
+                signingDescription: DEFAULT_SIGNING_DESCRIPTION,
+                loadingDescription: DEFAULT_LOADING_DESCRIPTION,
+                ...strategy.encode.safeTransferERC20([
+                  assetToRecover,
+                  address,
+                  amountToRecover,
+                ]),
+              },
             ],
           }),
         );
