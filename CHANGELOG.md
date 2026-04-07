@@ -1,5 +1,6 @@
 # 0.4.2
 - correct user value calc for disconnected vault state
+- display withdrawal requests for stvStrategyPool when below min withdrawal value
 
 # 0.4.1
 
