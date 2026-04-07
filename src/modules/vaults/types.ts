@@ -1,38 +1,12 @@
-import type {
-  Address,
-  Hex,
-  ReadContractReturnType,
-  GetContractReturnType,
-} from 'viem';
-import { RegisteredPublicClient } from '../web3';
-import type { EncodableContract } from '@lidofinance/lido-ethereum-sdk';
+import type { Address, Hex, ReadContractReturnType } from 'viem';
+
 import type {
   VaultHubAbiType,
-  StakingVaultAbiType,
-  DashboardAbiType,
-  LazyOracleAbiType,
-  VaultFactoryAbiType,
+  DashboardContractType,
+  LazyOracleContractType,
+  StakingVaultContractType,
+  VaultHubContractType,
 } from '@lidofinance/lido-ethereum-sdk/stvault';
-
-export type VaultFactoryContract = EncodableContract<
-  GetContractReturnType<VaultFactoryAbiType, RegisteredPublicClient>
->;
-
-export type VaultHubContract = EncodableContract<
-  GetContractReturnType<VaultHubAbiType, RegisteredPublicClient>
->;
-
-export type StakingVaultContract = EncodableContract<
-  GetContractReturnType<StakingVaultAbiType, RegisteredPublicClient>
->;
-
-export type DashboardContract = EncodableContract<
-  GetContractReturnType<DashboardAbiType, RegisteredPublicClient>
->;
-
-export type LazyOracleContract = EncodableContract<
-  GetContractReturnType<LazyOracleAbiType, RegisteredPublicClient>
->;
 
 export type VaultConnection = ReadContractReturnType<
   VaultHubAbiType,
@@ -66,10 +40,10 @@ export type HubReportData = {
 
 export type VaultBaseInfo = {
   address: Address;
-  vault: StakingVaultContract;
-  hub: VaultHubContract;
-  lazyOracle: LazyOracleContract;
-  dashboard: DashboardContract;
+  vault: StakingVaultContractType;
+  hub: VaultHubContractType;
+  lazyOracle: LazyOracleContractType;
+  dashboard: DashboardContractType;
   nodeOperator: Address;
   withdrawalCredentials: Hex;
   isReportFresh: boolean;

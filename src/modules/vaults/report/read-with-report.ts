@@ -57,11 +57,9 @@ export const readWithReport = async <
     //   },
     // ],
 
-    // @ts-expect-error - to avoid passing lidoSDK to all readWithReport we create it in place
     const vaultContracts = new LidoSDKVaultModule({
       logMode: 'none',
-      rpcProvider: publicClient,
-      chainId: publicClient.chain.id as any,
+      publicClient,
     }).contracts;
     const lazyOracle = await vaultContracts.getContractLazyOracle();
 

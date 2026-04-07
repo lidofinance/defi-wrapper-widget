@@ -4,10 +4,7 @@ import { LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk/common';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
 import { USER_CONFIG } from '@/config';
-import {
-  DashboardContract,
-  StakingVaultContract,
-} from '@/modules/vaults/types';
+
 import { useLidoSDK } from '@/modules/web3';
 
 import { BYTES_TO_STRATEGY_ID, STRATEGY_IDS } from '../const';
@@ -23,6 +20,10 @@ import {
   StrategyContract,
 } from '../contracts';
 import type { DefiWrapperTypes } from '../types';
+import type {
+  DashboardContractType,
+  StakingVaultContractType,
+} from '@lidofinance/lido-ethereum-sdk';
 
 export type WidgetFlow = 'strategy' | 'mint' | 'stake';
 
@@ -34,8 +35,8 @@ export type WrapperContextValue = {
 
   // async available contracts
   withdrawalQueue?: WQContract;
-  dashboard?: DashboardContract;
-  stakingVault?: StakingVaultContract;
+  dashboard?: DashboardContractType;
+  stakingVault?: StakingVaultContractType;
   distributor?: DistributorContract;
 
   // async available configuration
