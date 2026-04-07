@@ -38,13 +38,6 @@ type LidoSDKContextValue = {
   subscribeToTokenUpdates: ReturnType<typeof useTokenTransferSubscription>;
 };
 
-declare module '@lidofinance/lido-ethereum-sdk' {
-  interface ClientRegister {
-    publicClient: RegisteredPublicClient;
-    walletClient: NonNullable<RegisteredWalletClient>;
-  }
-}
-
 const LidoSDKContext = createContext<LidoSDKContextValue | null>(null);
 LidoSDKContext.displayName = 'LidoSDKContext';
 

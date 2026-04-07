@@ -1,6 +1,6 @@
 import { usePublicClient } from 'wagmi';
-import { invariant } from '@lidofinance/lido-ethereum-sdk';
 import { useQuery } from '@tanstack/react-query';
+import invariant from 'tiny-invariant';
 import { z } from 'zod';
 import { getApiURL } from '@/config';
 import { useEarnStrategy } from './use-earn-strategy';

@@ -23,7 +23,7 @@ import type { DefiWrapperTypes } from '../types';
 import type {
   DashboardContractType,
   StakingVaultContractType,
-} from '@lidofinance/lido-ethereum-sdk';
+} from '@lidofinance/lido-ethereum-sdk/stvault';
 
 export type WidgetFlow = 'strategy' | 'mint' | 'stake';
 
