@@ -1,7 +1,7 @@
 import { Address, ethAddress, isAddressEqual } from 'viem';
-import { CHAINS } from '@lidofinance/lido-ethereum-sdk';
 import { getContractByAddress } from '@/config';
 import { Token } from '@/types/token';
+import type { CHAINS } from '@lidofinance/lido-ethereum-sdk/common';
 
 export const getTokenByAddress = (
   address: Address,

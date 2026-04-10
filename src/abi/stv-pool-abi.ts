@@ -18,6 +18,25 @@ export const StvPoolAbi = [
   },
   {
     type: 'function',
+    name: 'nominalAssetsOf',
+    inputs: [
+      {
+        name: '_account',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: 'assets',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     name: 'DEPOSITS_FEATURE',
     inputs: [],
     outputs: [

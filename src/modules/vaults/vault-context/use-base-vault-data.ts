@@ -11,13 +11,7 @@ import {
   vaultQueryKeys,
   VAULT_REPORT_REFETCH_INTERVAL_MS,
 } from '../consts';
-import type {
-  DashboardContract,
-  LazyOracleContract,
-  StakingVaultContract,
-  VaultBaseInfo,
-  VaultHubContract,
-} from '../types';
+import type { VaultBaseInfo } from '../types';
 import { isDashboard } from '../utils/is-dashboard';
 
 export const useBaseVaultData = (vaultAddress: Address | undefined) => {
@@ -36,11 +30,9 @@ export const useBaseVaultData = (vaultAddress: Address | undefined) => {
       invariant(vaultAddress, '[useBaseVaultData] vaultAddress is not defined');
 
       const [hub, lazyOracle, vault] = await Promise.all([
-        vaults.contracts.getContractVaultHub() as Promise<VaultHubContract>,
-        vaults.contracts.getContractLazyOracle() as Promise<LazyOracleContract>,
-        vaults.contracts.getContractVault(
-          vaultAddress,
-        ) as Promise<StakingVaultContract>,
+        vaults.contracts.getContractVaultHub(),
+        vaults.contracts.getContractLazyOracle(),
+        vaults.contracts.getContractVault(vaultAddress),
       ]);
 
       const [
@@ -89,9 +81,9 @@ export const useBaseVaultData = (vaultAddress: Address | undefined) => {
         throw new VaultOwnerNotDashboardError();
       }
 
-      const dashboard = (await vaults.contracts.getContractVaultDashboard(
+      const dashboard = await vaults.contracts.getContractVaultDashboard(
         connection.owner,
-      )) as DashboardContract;
+      );
 
       return {
         address: vaultAddress,

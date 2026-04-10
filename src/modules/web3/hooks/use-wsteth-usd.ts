@@ -1,4 +1,3 @@
-import type { PublicClient } from 'viem';
 import { usePublicClient } from 'wagmi';
 import { LidoSDKWrap } from '@lidofinance/lido-ethereum-sdk/wrap';
 import { useQuery } from '@tanstack/react-query';
@@ -18,7 +17,7 @@ export const useWstethUsd = (amountWsteth?: bigint) => {
       const wrap = new LidoSDKWrap({
         chainId,
         logMode: 'none',
-        rpcProvider: publicClient as PublicClient,
+        publicClient,
       });
 
       const wstethToStethRate = await wrap.convertWstethToSteth(ONE_wstETH);
