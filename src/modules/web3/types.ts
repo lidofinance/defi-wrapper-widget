@@ -21,6 +21,13 @@ declare module 'wagmi' {
   }
 }
 
+declare module '@lidofinance/lido-ethereum-sdk/core' {
+  interface ClientRegister {
+    publicClient: RegisteredPublicClient;
+    walletClient: NonNullable<RegisteredWalletClient>;
+  }
+}
+
 /** EXPORT TYPES  */
 
 // numeric literal union of all supported chain ids

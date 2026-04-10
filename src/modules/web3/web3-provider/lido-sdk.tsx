@@ -58,12 +58,12 @@ export const LidoSDKProvider = ({ children }: React.PropsWithChildren) => {
   const { isConnected } = useConnection();
 
   const wagmiConfig = useConfig();
-  const { switchChain } = useSwitchChain();
+  const { mutate: switchChain } = useSwitchChain();
 
   useEffect(() => {
     if (isConnected) {
       return () => {
-        // protecs from side effect double run
+        // protects from side effect double run
         if (!wagmiConfig.state.current) {
           switchChain({
             chainId: USER_CONFIG.defaultChain as CHAINS,
@@ -83,9 +83,8 @@ export const LidoSDKProvider = ({ children }: React.PropsWithChildren) => {
     const core = new LidoSDKCore({
       chainId,
       logMode: 'none',
-      // @ts-ignore
-      rpcProvider: publicClient,
-      web3Provider: walletClient,
+      publicClient,
+      walletClient,
       customLidoLocatorAddress,
     });
 

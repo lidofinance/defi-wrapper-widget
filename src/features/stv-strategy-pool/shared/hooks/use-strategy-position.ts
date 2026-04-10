@@ -207,6 +207,7 @@ export const getStrategyPosition = async ({
 
   const [
     proxyBalanceStvInEth,
+    proxyNominalBalanceStvInEth,
     proxyUnlockedBalanceStvInEth,
     unlockedStv,
     //
@@ -224,6 +225,7 @@ export const getStrategyPosition = async ({
     report: activeVault.report,
     contracts: [
       wrapper.prepare.assetsOf([strategyProxyAddress]),
+      wrapper.prepare.nominalAssetsOf([strategyProxyAddress]),
       wrapper.prepare.unlockedAssetsOf([strategyProxyAddress, 0n]),
       wrapper.prepare.unlockedStvOf([strategyProxyAddress, 0n]),
       //
@@ -299,7 +301,10 @@ export const getStrategyPosition = async ({
 
   const isBadDebt = proxyBalanceStvInEth < totalStethLiabilityInEth;
 
-  const totalUserValueInEth = proxyBalanceStvInEth + totalStethDifference;
+  const proxyBalanceInEth = activeVault.isConnected
+    ? proxyBalanceStvInEth
+    : proxyNominalBalanceStvInEth;
+  const totalUserValueInEth = proxyBalanceInEth + totalStethDifference;
 
   // maximum ETH that can be withdrawn from strategy vault (for delegated stETH repayment + excess) assuming healthy position
   // if stv position is unhealthy this number can be higher than user balance in eth
