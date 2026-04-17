@@ -13,7 +13,7 @@ import {
   type RegisteredPublicClient,
 } from '@/modules/web3';
 import { Token } from '@/types/token';
-import { bnCeilDiv, maxBN, minBN } from '@/utils/bn';
+import { bnCeilDiv, clampZeroBN, minBN } from '@/utils/bn';
 
 import type { LidoSDKwstETH } from '@lidofinance/lido-ethereum-sdk/erc20';
 import type { LidoSDKShares } from '@lidofinance/lido-ethereum-sdk/shares';
@@ -85,9 +85,8 @@ export const calculateStethSharesToRepay = async ({
     stethSharesLockedForRemainingEth = calcedStethShares;
   }
 
-  const stethSharesToRepay = maxBN(
+  const stethSharesToRepay = clampZeroBN(
     mintedStethShares - stethSharesLockedForRemainingEth,
-    0n,
   );
 
   return stethSharesToRepay;
@@ -130,9 +129,8 @@ const prepareLocalWithdrawalCalc = async ({
   });
 
   // if user actual liability exceeds calculated liability then they have to repay the difference before unlocking any assets
-  const exceedingLiability = maxBN(
+  const exceedingLiability = clampZeroBN(
     mintedStethShares - totalLiabilityStethShares,
-    0n,
   );
 
   const localStethToShares = (stethAmount: bigint) =>
@@ -158,7 +156,7 @@ const prepareLocalWithdrawalCalc = async ({
     amount: bigint,
     repayableToken: RepayTokens,
   ): CalcWithdrawalRepayRebalanceRatioResult => {
-    const amountToUnlock = maxBN(amount - unlockedAssets, 0n);
+    const amountToUnlock = clampZeroBN(amount - unlockedAssets);
 
     if (amountToUnlock === 0n)
       return {
@@ -182,9 +180,8 @@ const prepareLocalWithdrawalCalc = async ({
       localSharesToSteth(wstETHBalance),
     );
 
-    const wstethLossInShares = maxBN(
+    const wstethLossInShares = clampZeroBN(
       wstETHBalance - wstethBalanceConvertedToShares,
-      0n,
     );
 
     const balanceInSharesOfRepayableToken =
@@ -201,9 +198,8 @@ const prepareLocalWithdrawalCalc = async ({
 
     const repayableSteth = localSharesToSteth(repayableStethShares);
 
-    const rebalancableStethShares = maxBN(
+    const rebalancableStethShares = clampZeroBN(
       sharesToRepay - repayableStethShares,
-      0n,
     );
 
     const rebalancableSteth = localSharesToSteth(rebalancableStethShares);
@@ -212,7 +208,7 @@ const prepareLocalWithdrawalCalc = async ({
       rebalancableStethShares,
     );
 
-    const withdrawalValue = maxBN(amount - rebalancableValue, 0n);
+    const withdrawalValue = clampZeroBN(amount - rebalancableValue);
     return {
       repayableSteth,
       repayableWsteth,

@@ -1,32 +1,25 @@
 export const PRECISION_DECIMALS = 18;
 
-export const minBN = (
-  a: bigint | undefined | null,
-  b: bigint | undefined | null,
-): bigint => {
-  if (a == null && b == null) {
-    throw new Error('Both values are null or undefined');
-  } else if (b == null) {
-    return a as bigint;
-  } else if (a == null) {
-    return b;
+export const minBN = (...values: (bigint | undefined | null)[]): bigint => {
+  const validValues = values.filter((v) => v != null) as bigint[];
+  if (validValues.length === 0) {
+    throw new Error('All values are null or undefined');
   }
-  return a < b ? a : b;
+  return validValues.reduce((min, current) => (current < min ? current : min));
 };
 
-export const maxBN = (
-  a: bigint | undefined | null,
-  b: bigint | undefined | null,
-): bigint => {
-  if (a == null && b == null) {
-    throw new Error('Both values are null or undefined');
-  } else if (b == null) {
-    return a as bigint;
-  } else if (a == null) {
-    return b;
+export const maxBN = (...values: (bigint | undefined | null)[]): bigint => {
+  const validValues = values.filter((v) => v != null) as bigint[];
+  if (validValues.length === 0) {
+    throw new Error('All values are null or undefined');
   }
-  return a > b ? a : b;
+  return validValues.reduce((max, current) => (current > max ? current : max));
 };
+
+export const clampZeroBN = (value: bigint): bigint => {
+  return value < 0n ? 0n : value;
+};
+
 export const bnAmountToNumber = (
   amount?: bigint | null,
   precision = PRECISION_DECIMALS,

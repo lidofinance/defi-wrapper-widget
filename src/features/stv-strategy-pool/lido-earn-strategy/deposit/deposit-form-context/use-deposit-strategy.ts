@@ -16,7 +16,7 @@ import {
   useTransactionModal,
 } from '@/shared/components/transaction-modal';
 import { getReferralAddress } from '@/shared/wrapper/refferals/get-refferal-address';
-import { minBN } from '@/utils/bn';
+import { clampZeroBN, minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
 import { useEarnStrategy } from '../../hooks/use-earn-strategy';
@@ -74,34 +74,35 @@ export const useDepositStrategy = () => {
                 });
               }
 
-              const [proxyCapacityShares, vaultCapacityShares] =
-                await readWithReport({
-                  publicClient,
-                  report: activeVault?.report,
-                  contracts: [
-                    // This can round down the shares, leaving 1n steth shares unminted
-                    wrapper.prepare.remainingMintingCapacitySharesOf([
-                      strategyProxyAddress,
-                      amount,
-                    ]),
-                    dashboard.prepare.remainingMintingCapacityShares([amount]),
-                  ],
-                });
-
-              const [maxMintableExternalShares, currentMintedExternalShares] =
-                await Promise.all([
-                  lidoV3.read.getMaxMintableExternalShares(),
-                  lidoV3.read.getExternalShares(),
-                ]);
-
-              let maxMintShares = minBN(
+              const [
                 proxyCapacityShares,
                 vaultCapacityShares,
-              );
+                maxMintableExternalShares,
+                currentMintedExternalShares,
+              ] = await readWithReport({
+                publicClient,
+                report: activeVault?.report,
+                contracts: [
+                  // This can round down the shares, leaving 1n steth shares unminted
+                  wrapper.prepare.remainingMintingCapacitySharesOf([
+                    strategyProxyAddress,
+                    amount,
+                  ]),
+                  dashboard.prepare.remainingMintingCapacityShares([amount]),
+                  // not dependant on report but benefit from batch
+                  lidoV3.prepare.getMaxMintableExternalShares(),
+                  lidoV3.prepare.getExternalShares(),
+                ],
+              });
 
-              maxMintShares = minBN(
-                maxMintShares,
-                maxMintableExternalShares - currentMintedExternalShares,
+              // Subtract 1n to absorb the known 1-wei floor rounding in remainingMintingCapacitySharesOf;
+              // clamp to 0n so capacity=0 doesn't produce a negative mint amount
+              const maxMintShares = clampZeroBN(
+                minBN(
+                  proxyCapacityShares,
+                  vaultCapacityShares,
+                  maxMintableExternalShares - currentMintedExternalShares,
+                ) - 1n,
               );
 
               const reportCalls = prepareReportCalls();

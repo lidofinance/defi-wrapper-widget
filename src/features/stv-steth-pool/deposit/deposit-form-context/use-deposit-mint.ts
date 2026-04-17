@@ -17,7 +17,7 @@ import {
 } from '@/shared/components/transaction-modal';
 import { getReferralAddress } from '@/shared/wrapper/refferals/get-refferal-address';
 import { Token } from '@/types/token';
-import { minBN } from '@/utils/bn';
+import { clampZeroBN, minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
 import type { DepositFormValidatedValues } from './types';
@@ -76,54 +76,9 @@ export const useDepositMint = () => {
         const lidoV3 = await core.getLidoContract();
         const depositedAmount = formatBalance(amount).actual;
 
-        let maxMintShares: bigint;
-        let mintedAmountBalance: string | undefined = undefined;
-
-        if (mintingPaused) {
-          maxMintShares = 0n;
-        } else {
-          const [
-            remainingUserMintingCapacityShares,
-            remainingVaultMintingCapacityShares,
-          ] = await readWithReport({
-            publicClient,
-            report: activeVault?.report,
-            contracts: [
-              wrapper.prepare.remainingMintingCapacitySharesOf([
-                address,
-                amount,
-              ]),
-              dashboard.prepare.remainingMintingCapacityShares([amount]),
-            ],
-          });
-
-          const [maxMintableExternalShares, currentMintedExternalShares] =
-            await Promise.all([
-              lidoV3.read.getMaxMintableExternalShares(),
-              lidoV3.read.getExternalShares(),
-            ]);
-
-          // TODO: check for rounding issues overstepping max minting capacity by 1 wei
-          maxMintShares = minBN(
-            minBN(
-              remainingUserMintingCapacityShares,
-              remainingVaultMintingCapacityShares,
-            ),
-            maxMintableExternalShares - currentMintedExternalShares,
-          );
-
-          const maxMintSteth = await shares.convertToSteth(maxMintShares);
-
-          mintedAmountBalance =
-            tokenToMint === 'STETH'
-              ? formatBalance(maxMintSteth).actual
-              : formatBalance(maxMintShares).actual;
-        }
-
         const TXTitle = combineTxTitles({
           depositedAmount,
           token,
-          mintedAmountBalance,
           tokenToMint,
         });
 
@@ -134,6 +89,8 @@ export const useDepositMint = () => {
             flow: 'deposit',
             AASigningDescription: DEFAULT_SIGNING_DESCRIPTION,
             AALoadingDescription: DEFAULT_LOADING_DESCRIPTION,
+            // Capacity reads are inside transactions so values are fresh at signing time,
+            // not stale from button-click under AA wallet delays or network congestion.
             transactions: async () => {
               const calls: TransactionEntry[] = [];
 
@@ -149,6 +106,50 @@ export const useDepositMint = () => {
               const reportCalls = prepareReportCalls();
               calls.push(...reportCalls);
 
+              let maxMintShares: bigint;
+              let mintedAmountBalance: string | undefined = undefined;
+
+              if (mintingPaused) {
+                maxMintShares = 0n;
+              } else {
+                const [
+                  remainingUserMintingCapacityShares,
+                  remainingVaultMintingCapacityShares,
+                  maxMintableExternalShares,
+                  currentMintedExternalShares,
+                ] = await readWithReport({
+                  publicClient,
+                  report: activeVault?.report,
+                  contracts: [
+                    wrapper.prepare.remainingMintingCapacitySharesOf([
+                      address,
+                      amount,
+                    ]),
+                    dashboard.prepare.remainingMintingCapacityShares([amount]),
+                    // not dependant on report but benefit from batch
+                    lidoV3.prepare.getMaxMintableExternalShares(),
+                    lidoV3.prepare.getExternalShares(),
+                  ],
+                });
+
+                // Subtract 1n to absorb the known 1-wei floor rounding in remainingMintingCapacitySharesOf;
+                // clamp to 0n so capacity=0 doesn't produce a negative mint amount
+                maxMintShares = clampZeroBN(
+                  minBN(
+                    remainingUserMintingCapacityShares,
+                    remainingVaultMintingCapacityShares,
+                    maxMintableExternalShares - currentMintedExternalShares,
+                  ) - 1n,
+                );
+
+                const maxMintSteth = await shares.convertToSteth(maxMintShares);
+
+                mintedAmountBalance =
+                  tokenToMint === 'STETH'
+                    ? formatBalance(maxMintSteth).actual
+                    : formatBalance(maxMintShares).actual;
+              }
+
               const referralAddress = await getReferralAddress(
                 referral,
                 publicClient,
@@ -161,10 +162,7 @@ export const useDepositMint = () => {
                   : wrapper.encode.depositETHAndMintWsteth;
 
               calls.push({
-                ...depositMethod([
-                  referralAddress, // referral
-                  maxMintShares, // max mint shares
-                ]),
+                ...depositMethod([referralAddress, maxMintShares]),
                 value: amount,
                 ...createTxMetadata(
                   combineTxTitles({

@@ -19,7 +19,7 @@ import {
   DEFAULT_SIGNING_DESCRIPTION,
   useTransactionModal,
 } from '@/shared/components/transaction-modal';
-import { maxBN, minBN } from '@/utils/bn';
+import { minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
 import type { RepayTokens, WithdrawalFormValidatedValues } from './types';
@@ -105,7 +105,7 @@ export const useWithdrawalRepay = () => {
           : repayableStethShares;
 
       // steth shares that will be forgiven when rebalancing
-      return maxBN(stethSharesToRepay - repaidShares, 0n);
+      return clampZeroBN(stethSharesToRepay - repaidShares);
     },
     [shares],
   );

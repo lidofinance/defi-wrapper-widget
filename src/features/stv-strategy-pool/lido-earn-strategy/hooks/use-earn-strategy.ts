@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
 import { USER_CONFIG } from '@/config';
 import { useStvStrategy } from '@/modules/defi-wrapper';
+import { VAULT_REPORT_REFETCH_INTERVAL_MS } from '@/modules/vaults';
 import { useDappStatus, useLidoSDK } from '@/modules/web3';
 import {
   getLidoEarnAsyncDepositQueueContract,
@@ -33,6 +34,8 @@ export const useEarnStrategy = () => {
       { address, chainId: publicClient.chain?.id },
     ],
     enabled: !!wrapper && !!strategy,
+    // Poll every 60s so deposit/withdrawal pause-state changes are reflected promptly
+    refetchInterval: VAULT_REPORT_REFETCH_INTERVAL_MS,
     queryFn: async () => {
       invariant(wrapper, 'wrapper is required');
       invariant(strategy, 'strategy is required');

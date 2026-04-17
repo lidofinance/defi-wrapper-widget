@@ -80,33 +80,30 @@ export const useDepositStrategy = () => {
                 });
               }
 
-              const [proxyCapacityShares, vaultCapacityShares] =
-                await readWithReport({
-                  publicClient,
-                  report: activeVault?.report,
-                  contracts: [
-                    // This can round down the shares, leaving 1n steth shares unminted
-                    wrapper.prepare.remainingMintingCapacitySharesOf([
-                      strategyProxyAddress,
-                      amount,
-                    ]),
-                    dashboard.prepare.remainingMintingCapacityShares([amount]),
-                  ],
-                });
-
-              const [maxMintableExternalShares, currentMintedExternalShares] =
-                await Promise.all([
-                  lidoV3.read.getMaxMintableExternalShares(),
-                  lidoV3.read.getExternalShares(),
-                ]);
-
-              let maxMintShares = minBN(
+              const [
                 proxyCapacityShares,
                 vaultCapacityShares,
-              );
+                maxMintableExternalShares,
+                currentMintedExternalShares,
+              ] = await readWithReport({
+                publicClient,
+                report: activeVault?.report,
+                contracts: [
+                  // This can round down the shares, leaving 1n steth shares unminted
+                  wrapper.prepare.remainingMintingCapacitySharesOf([
+                    strategyProxyAddress,
+                    amount,
+                  ]),
+                  dashboard.prepare.remainingMintingCapacityShares([amount]),
+                  // not dependant on the report but benefit from batch
+                  lidoV3.prepare.getMaxMintableExternalShares(),
+                  lidoV3.prepare.getExternalShares(),
+                ],
+              });
 
-              maxMintShares = minBN(
-                maxMintShares,
+              const maxMintShares = minBN(
+                proxyCapacityShares,
+                vaultCapacityShares,
                 maxMintableExternalShares - currentMintedExternalShares,
               );
 

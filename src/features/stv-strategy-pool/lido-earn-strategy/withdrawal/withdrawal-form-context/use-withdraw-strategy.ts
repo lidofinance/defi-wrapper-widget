@@ -15,7 +15,7 @@ import {
   DEFAULT_SIGNING_DESCRIPTION,
   useTransactionModal,
 } from '@/shared/components/transaction-modal';
-import { maxBN, minBN } from '@/utils/bn';
+import { clampZeroBN, minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
 import { useEarnPosition, useEarnStrategy } from '../../hooks';
@@ -65,8 +65,7 @@ export const useWithdrawStrategy = () => {
         const { success } = await withSuccess(
           sendTX({
             successText: `${requestedETHAmount} ${tokenLabel('ETH')} has been requested`,
-            successDescription: `Lido Earn ETH will be withdrawing the requested amount for up 5 to days. After that you will be able to process your withdrawal further.`,
-            AATitleText: `${requestedETHAmount} ${tokenLabel('ETH')} has been requested`,
+            successDescription: `Lido Earn ETH will be withdrawing the requested amount for up to 5 days. After that you will be able to process your withdrawal further.`,
             AASigningDescription: DEFAULT_SIGNING_DESCRIPTION,
             AALoadingDescription: DEFAULT_LOADING_DESCRIPTION,
             flow: 'withdrawal',
@@ -105,14 +104,12 @@ export const useWithdrawStrategy = () => {
               // [ --- EXCESS STETH ---] | [ ------------- LIABILITY (WSTETH) ---------- ]
               //
 
-              const ethToPayForLiability = maxBN(
+              const ethToPayForLiability = clampZeroBN(
                 amount - positionData.strategyVaultStethExcess,
-                0n,
               );
 
-              const stethToWithdrawForExcess = maxBN(
+              const stethToWithdrawForExcess = clampZeroBN(
                 amount - ethToPayForLiability,
-                0n,
               );
 
               const stethSharesToWithdrawForExcess =
@@ -136,15 +133,18 @@ export const useWithdrawStrategy = () => {
                 positionData.strategyStethSharesBalance,
               );
 
-              calls.push({
-                ...lidoEarnStrategy.encode.requestExitByWsteth([
-                  stethSharesToWithdraw,
-                  '0x',
-                ]),
-                loadingText: `Requesting ${requestedETHAmount} ${tokenLabel('ETH')} from the Lido Earn ETH`,
-                signingDescription: DEFAULT_SIGNING_DESCRIPTION,
-                loadingDescription: DEFAULT_LOADING_DESCRIPTION,
-              });
+              // Guard: strategyStethSharesBalance can be 0 if position is empty, producing stethSharesToWithdraw=0
+              if (stethSharesToWithdraw > 0n) {
+                calls.push({
+                  ...lidoEarnStrategy.encode.requestExitByWsteth([
+                    stethSharesToWithdraw,
+                    '0x',
+                  ]),
+                  loadingText: `Requesting ${requestedETHAmount} ${tokenLabel('ETH')} from the Lido Earn ETH`,
+                  signingDescription: DEFAULT_SIGNING_DESCRIPTION,
+                  loadingDescription: DEFAULT_LOADING_DESCRIPTION,
+                });
+              }
 
               return calls;
             },
