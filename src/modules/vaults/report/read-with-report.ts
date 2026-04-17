@@ -73,13 +73,29 @@ export const readWithReport = async <
       report.proof,
     ]);
 
-    const [, ...results] = await publicClient.multicall({
+    const [reportResult, ...contractResults] = await publicClient.multicall({
       contracts: [reportCall, ...contracts] as any,
       batchSize: 0, // this forces to use single call batch for all calls
-      allowFailure: false,
+      allowFailure: true,
     });
 
-    return results as MulticallReturnType<TContracts, false>;
+    if (reportResult.status === 'failure') {
+      // VaultReportIsFreshEnough: another tx already applied this report in the same block.
+      // Contract reads still reflect correct post-report state, so we can continue.
+      console.warn(
+        '[readWithReport] updateVaultData failed — report may already be applied on-chain',
+        reportResult.error,
+      );
+    }
+
+    const failedResult = contractResults.find((r) => r.status === 'failure');
+    if (failedResult) {
+      throw (failedResult as { status: 'failure'; error: Error }).error;
+    }
+
+    return contractResults.map(
+      (r) => (r as { status: 'success'; result: unknown }).result,
+    ) as unknown as MulticallReturnType<TContracts, false>;
   }
 
   // if there is only 1 call we can use readContract directly to avoid multicall overhead

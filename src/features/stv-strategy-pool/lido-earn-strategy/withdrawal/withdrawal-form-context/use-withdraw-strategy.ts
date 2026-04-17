@@ -15,7 +15,7 @@ import {
   DEFAULT_SIGNING_DESCRIPTION,
   useTransactionModal,
 } from '@/shared/components/transaction-modal';
-import { maxBN, minBN } from '@/utils/bn';
+import { clampZeroBN, minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
 import { useEarnPosition, useEarnStrategy } from '../../hooks';
@@ -65,8 +65,7 @@ export const useWithdrawStrategy = () => {
         const { success } = await withSuccess(
           sendTX({
             successText: `${requestedETHAmount} ${tokenLabel('ETH')} has been requested`,
-            successDescription: `Lido Earn ETH will be withdrawing the requested amount for up 5 to days. After that you will be able to process your withdrawal further.`,
-            AATitleText: `${requestedETHAmount} ${tokenLabel('ETH')} has been requested`,
+            successDescription: `Lido Earn ETH will be withdrawing the requested amount for up to 5 days. After that you will be able to process your withdrawal further.`,
             AASigningDescription: DEFAULT_SIGNING_DESCRIPTION,
             AALoadingDescription: DEFAULT_LOADING_DESCRIPTION,
             flow: 'withdrawal',
@@ -105,14 +104,12 @@ export const useWithdrawStrategy = () => {
               // [ --- EXCESS STETH ---] | [ ------------- LIABILITY (WSTETH) ---------- ]
               //
 
-              const ethToPayForLiability = maxBN(
+              const ethToPayForLiability = clampZeroBN(
                 amount - positionData.strategyVaultStethExcess,
-                0n,
               );
 
-              const stethToWithdrawForExcess = maxBN(
+              const stethToWithdrawForExcess = clampZeroBN(
                 amount - ethToPayForLiability,
-                0n,
               );
 
               const stethSharesToWithdrawForExcess =
@@ -135,6 +132,9 @@ export const useWithdrawStrategy = () => {
                   stethSharesToWithdrawForExcess,
                 positionData.strategyStethSharesBalance,
               );
+
+              // Guard: strategyStethSharesBalance can be 0 if position is empty, producing stethSharesToWithdraw=0
+              invariant(stethSharesToWithdraw > 0, 'Nothing to process');
 
               calls.push({
                 ...lidoEarnStrategy.encode.requestExitByWsteth([

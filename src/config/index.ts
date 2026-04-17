@@ -1,6 +1,8 @@
 export * from './provider';
 export * from './network';
 export * from './user-config';
+
+export * from './constants';
 // interval in ms for RPC event polling for token balance and tx updates
 export const PROVIDER_POLLING_INTERVAL = 12_000;
 // how long in ms to wait for RPC batching(multicall and provider)

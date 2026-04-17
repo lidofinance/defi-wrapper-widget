@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
 import { USER_CONFIG } from '@/config';
 
+import { VAULT_REPORT_REFETCH_INTERVAL_MS } from '@/modules/vaults';
 import { useLidoSDK } from '@/modules/web3';
 
 import { BYTES_TO_STRATEGY_ID, STRATEGY_IDS } from '../const';
@@ -123,6 +124,8 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
         chainId: publicClient.chain.id,
       },
     ],
+    // Poll every 60s so pause-state changes (deposits/withdrawals/minting paused) are reflected promptly
+    refetchInterval: VAULT_REPORT_REFETCH_INTERVAL_MS,
     queryFn: async () => {
       const wrapper = stvContractByType(poolType)(poolAddress, publicClient);
 
@@ -168,6 +171,7 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
         strategyAddress
           ? wrapper.read.isAllowListed([strategyAddress])
           : Promise.resolve(false),
+        // Fail-closed: if the call reverts (e.g. old contract without this method), assume no whitelist functionality in the strategy
         strategy
           ? strategy.read.ALLOW_LIST_ENABLED().catch(() => false)
           : Promise.resolve(false),

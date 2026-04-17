@@ -5,7 +5,7 @@ import invariant from 'tiny-invariant';
 import { useStvStrategy } from '@/modules/defi-wrapper';
 import { readWithReport, useVault } from '@/modules/vaults';
 import { useDappStatus, useLidoSDK } from '@/modules/web3';
-import { absBN, minBN, maxBN } from '@/utils/bn';
+import { minBN, clampZeroBN } from '@/utils/bn';
 
 type GetStrategyPositionDynamicParams = {
   // address of the proxy contract, which is used to interact with strategy vault and holds user funds on behalf of strategy
@@ -59,6 +59,7 @@ export const getStrategyPosition = async ({
   //
   // Base state
   //
+  const lidoV3 = await shares.core.getLidoContract();
 
   const [
     stethSharesOnBalance,
@@ -67,6 +68,8 @@ export const getStrategyPosition = async ({
     proxyBalanceStv,
     reserveRatioBP,
     totalPoolLiabilitySharesPerPoolAccounting,
+    lidoCoreMaxMintableExternalShares,
+    lidoCoreCurrentMintedExternalShares,
   ] = await Promise.all([
     strategy.read.wstethOf([address]),
     strategy.read.mintedStethSharesOf([address]),
@@ -74,6 +77,9 @@ export const getStrategyPosition = async ({
     wrapper.read.balanceOf([strategyProxyAddress]),
     wrapper.read.poolReserveRatioBP(),
     wrapper.read.totalLiabilityShares(),
+    // Lido global external shares cap — needed for accurate boost capacity display
+    lidoV3.read.getMaxMintableExternalShares(),
+    lidoV3.read.getExternalShares(),
   ]);
 
   // because vault accounting and user accounting are not directly in sync (esp in case of disconnected vault)
@@ -114,19 +120,16 @@ export const getStrategyPosition = async ({
     totalStethSharesAvailable - totalMintedStethShares;
 
   // steth profit & loss
-  const totalStethSharesExcess = maxBN(totalStethSharesDifference, 0n);
-  const totalStethSharesShortfall = absBN(
-    minBN(totalStethSharesDifference, 0n),
-  );
+  const totalStethSharesExcess = clampZeroBN(totalStethSharesDifference);
+  const totalStethSharesShortfall = clampZeroBN(-totalStethSharesDifference);
 
   ///
   /// Strategy withdrawal
   ///
 
   // total stETH shares that are minted but not on balance (delegated)
-  const totalStethSharesDelegated = maxBN(
+  const totalStethSharesDelegated = clampZeroBN(
     totalMintedStethShares - stethSharesOnBalance,
-    0n,
   );
 
   // total stETH shares that can be withdrawn for repayment of delegated liability
@@ -145,15 +148,13 @@ export const getStrategyPosition = async ({
   // Pending strategy withdraw
   //
 
-  const stethSharesToRepayPendingFromStrategyVault = maxBN(
+  const stethSharesToRepayPendingFromStrategyVault = clampZeroBN(
     strategyWithdrawalStethSharesOffset - totalStethSharesExcess,
-    0n,
   );
 
-  const stethSharesToRecoverPendingFromStrategyVault = maxBN(
+  const stethSharesToRecoverPendingFromStrategyVault = clampZeroBN(
     strategyWithdrawalStethSharesOffset -
       stethSharesToRepayPendingFromStrategyVault,
-    0n,
   );
 
   //
@@ -167,9 +168,8 @@ export const getStrategyPosition = async ({
   //
   // can eq 0n - means only profit was skimmed from strategy vault
   // can eq totalMintedStethShares - means all strategy vault position is withdrawn
-  const stethSharesLiabilityToCover = maxBN(
+  const stethSharesLiabilityToCover = clampZeroBN(
     totalMintedStethShares - totalStrategyBalanceInStethShares,
-    0n,
   );
 
   // out of totalStethSharesLiabilityToCover above:
@@ -200,9 +200,8 @@ export const getStrategyPosition = async ({
 
   // stETH shares that can be recovered as profit above returned liability repayment
   // this can be withdrawn as (w)stETH
-  const stethSharesToRecover = maxBN(
+  const stethSharesToRecover = clampZeroBN(
     stethSharesOnBalance - stethSharesToRepay,
-    0n,
   );
 
   const [
@@ -320,9 +319,8 @@ export const getStrategyPosition = async ({
 
   // eth that will be withdrawn from strategy proxy
   // ONLY FOR DISPLAY: can contain calculation errors due to conversions
-  const totalEthToWithdrawFromProxy = maxBN(
+  const totalEthToWithdrawFromProxy = clampZeroBN(
     withdrawableEthAfterRepay - stethToRebalance,
-    0n,
   );
 
   // this represents value of ether that is pending withdrawal from strategy vault to strategy proxy
@@ -345,6 +343,8 @@ export const getStrategyPosition = async ({
   const availableMintingCapacityStethShares = minBN(
     currentProxyMintingCapacityShares,
     currentVaultMintingCapacityShares,
+    // Lido global cap: prevents boost display exceeding what's actually mintable protocol-wide
+    lidoCoreMaxMintableExternalShares - lidoCoreCurrentMintedExternalShares,
   );
 
   const targetUtilizationBP = 10_000n - reserveRatioBP;
@@ -434,10 +434,9 @@ export const getStrategyPosition = async ({
 export const useStrategyPosition = (
   params: Partial<GetStrategyPositionDynamicParams>,
 ) => {
-  const { publicClient } = useLidoSDK();
+  const { publicClient, shares } = useLidoSDK();
   const { activeVault, queryKeys } = useVault();
   const { address } = useDappStatus();
-  const { shares } = useLidoSDK();
   const { wrapper, strategy, dashboard } = useStvStrategy();
 
   return useQuery({

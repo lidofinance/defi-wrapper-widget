@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useVaultCapacity } from '@/modules/defi-wrapper';
 import { useStethApr, useVaultApr } from '@/modules/vaults';
 
-import { aprToApy } from '@/utils/apr-to-apy';
+import { apyToApr } from '@/utils/apr-to-apy';
 import { calculateStrategyApy } from '../../shared';
 
 import { useEarnApy } from './use-earn-apy';
@@ -34,7 +34,8 @@ export const useEarnStrategyApy = () => {
         ? Number(positionData.currentUtilizationBP) / 10000
         : undefined;
 
-    const mellowApr = aprToApy(mellowApy.apy);
+    // Mellow API returns APY; convert down to APR before passing to calculateStrategyApy
+    const mellowApr = apyToApr(mellowApy.apy);
 
     const {
       netApr: aprSma,
