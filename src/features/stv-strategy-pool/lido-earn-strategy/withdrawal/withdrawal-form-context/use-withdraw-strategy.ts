@@ -134,17 +134,17 @@ export const useWithdrawStrategy = () => {
               );
 
               // Guard: strategyStethSharesBalance can be 0 if position is empty, producing stethSharesToWithdraw=0
-              if (stethSharesToWithdraw > 0n) {
-                calls.push({
-                  ...lidoEarnStrategy.encode.requestExitByWsteth([
-                    stethSharesToWithdraw,
-                    '0x',
-                  ]),
-                  loadingText: `Requesting ${requestedETHAmount} ${tokenLabel('ETH')} from the Lido Earn ETH`,
-                  signingDescription: DEFAULT_SIGNING_DESCRIPTION,
-                  loadingDescription: DEFAULT_LOADING_DESCRIPTION,
-                });
-              }
+              invariant(stethSharesToWithdraw > 0, 'Nothing to process');
+
+              calls.push({
+                ...lidoEarnStrategy.encode.requestExitByWsteth([
+                  stethSharesToWithdraw,
+                  '0x',
+                ]),
+                loadingText: `Requesting ${requestedETHAmount} ${tokenLabel('ETH')} from the Lido Earn ETH`,
+                signingDescription: DEFAULT_SIGNING_DESCRIPTION,
+                loadingDescription: DEFAULT_LOADING_DESCRIPTION,
+              });
 
               return calls;
             },

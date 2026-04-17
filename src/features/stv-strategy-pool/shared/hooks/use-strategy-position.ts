@@ -77,7 +77,7 @@ export const getStrategyPosition = async ({
     wrapper.read.balanceOf([strategyProxyAddress]),
     wrapper.read.poolReserveRatioBP(),
     wrapper.read.totalLiabilityShares(),
-    // Lido global external shares cap — needed for accurate boost capacity display (MEDIUM-8)
+    // Lido global external shares cap — needed for accurate boost capacity display
     lidoV3.read.getMaxMintableExternalShares(),
     lidoV3.read.getExternalShares(),
   ]);
@@ -343,7 +343,7 @@ export const getStrategyPosition = async ({
   const availableMintingCapacityStethShares = minBN(
     currentProxyMintingCapacityShares,
     currentVaultMintingCapacityShares,
-    // Lido global cap: prevents boost display exceeding what's actually mintable protocol-wide (MEDIUM-8)
+    // Lido global cap: prevents boost display exceeding what's actually mintable protocol-wide
     lidoCoreMaxMintableExternalShares - lidoCoreCurrentMintedExternalShares,
   );
 

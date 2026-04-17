@@ -171,9 +171,9 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
         strategyAddress
           ? wrapper.read.isAllowListed([strategyAddress])
           : Promise.resolve(false),
-        // Fail-closed: if the call reverts (e.g. old contract without this method), assume whitelist IS enabled
+        // Fail-closed: if the call reverts (e.g. old contract without this method), assume no whitelist functionality in the strategy
         strategy
-          ? strategy.read.ALLOW_LIST_ENABLED().catch(() => true)
+          ? strategy.read.ALLOW_LIST_ENABLED().catch(() => false)
           : Promise.resolve(false),
       ]);
 
