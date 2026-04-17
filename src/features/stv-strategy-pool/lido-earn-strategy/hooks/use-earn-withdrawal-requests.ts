@@ -180,8 +180,7 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
             // but if value is zero and it's just repay it's healing
             isBelowMinimumThreshold:
               positionData.totalStvToWithdrawFromProxy > 0n &&
-              positionData.totalEthToWithdrawFromProxy -
-                positionData.stethToRebalance <=
+              positionData.totalEthToWithdrawFromProxy <=
                 minProcessableValueInEth,
             isHealing: positionData.totalStvToWithdrawFromProxy <= 0n,
           }
