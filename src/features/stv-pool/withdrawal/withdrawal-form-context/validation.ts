@@ -22,7 +22,7 @@ export const withdrawalFormValidationSchema = ({
     balanceInEth,
     maxWithdrawalInEth ?? undefined,
     'Exceeds maximum withdrawal limit',
-  ).gte(100n, 'Minimum withdrawal is 100 wei');
+  );
 
   if (minWithdrawalInEth !== null) {
     amountSchema = amountSchema.gte(
