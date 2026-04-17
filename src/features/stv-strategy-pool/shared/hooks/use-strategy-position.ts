@@ -59,6 +59,7 @@ export const getStrategyPosition = async ({
   //
   // Base state
   //
+  const lidoV3 = await shares.core.getLidoContract();
 
   const [
     stethSharesOnBalance,
@@ -67,6 +68,8 @@ export const getStrategyPosition = async ({
     proxyBalanceStv,
     reserveRatioBP,
     totalPoolLiabilitySharesPerPoolAccounting,
+    lidoCoreMaxMintableExternalShares,
+    lidoCoreCurrentMintedExternalShares,
   ] = await Promise.all([
     strategy.read.wstethOf([address]),
     strategy.read.mintedStethSharesOf([address]),
@@ -74,6 +77,9 @@ export const getStrategyPosition = async ({
     wrapper.read.balanceOf([strategyProxyAddress]),
     wrapper.read.poolReserveRatioBP(),
     wrapper.read.totalLiabilityShares(),
+    // Lido global external shares cap — needed for accurate boost capacity display (MEDIUM-8)
+    lidoV3.read.getMaxMintableExternalShares(),
+    lidoV3.read.getExternalShares(),
   ]);
 
   // because vault accounting and user accounting are not directly in sync (esp in case of disconnected vault)
@@ -337,6 +343,8 @@ export const getStrategyPosition = async ({
   const availableMintingCapacityStethShares = minBN(
     currentProxyMintingCapacityShares,
     currentVaultMintingCapacityShares,
+    // Lido global cap: prevents boost display exceeding what's actually mintable protocol-wide (MEDIUM-8)
+    lidoCoreMaxMintableExternalShares - lidoCoreCurrentMintedExternalShares,
   );
 
   const targetUtilizationBP = 10_000n - reserveRatioBP;
@@ -426,10 +434,9 @@ export const getStrategyPosition = async ({
 export const useStrategyPosition = (
   params: Partial<GetStrategyPositionDynamicParams>,
 ) => {
-  const { publicClient } = useLidoSDK();
+  const { publicClient, shares } = useLidoSDK();
   const { activeVault, queryKeys } = useVault();
   const { address } = useDappStatus();
-  const { shares } = useLidoSDK();
   const { wrapper, strategy, dashboard } = useStvStrategy();
 
   return useQuery({
