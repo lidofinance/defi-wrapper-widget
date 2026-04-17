@@ -17,7 +17,7 @@ import {
 } from '@/shared/components/transaction-modal';
 import { getReferralAddress } from '@/shared/wrapper/refferals/get-refferal-address';
 import { Token } from '@/types/token';
-import { clampZeroBN, minBN } from '@/utils/bn';
+import { minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
 import type { DepositFormValidatedValues } from './types';
@@ -132,14 +132,13 @@ export const useDepositMint = () => {
                   ],
                 });
 
-                // Subtract 1n to absorb the known 1-wei floor rounding in remainingMintingCapacitySharesOf;
-                // clamp to 0n so capacity=0 doesn't produce a negative mint amount
-                maxMintShares = clampZeroBN(
-                  minBN(
-                    remainingUserMintingCapacityShares,
-                    remainingVaultMintingCapacityShares,
-                    maxMintableExternalShares - currentMintedExternalShares,
-                  ) - 1n,
+                // remainingMintingCapacitySharesOf simulation is already conservative:
+                // post-deposit assetsOf ≥ simulation's assetsOf (proved via floor(a+b)≥floor(a)+floor(b)
+                // and deposit ratio ≥ pre-deposit ratio), so no -1n needed.
+                maxMintShares = minBN(
+                  remainingUserMintingCapacityShares,
+                  remainingVaultMintingCapacityShares,
+                  maxMintableExternalShares - currentMintedExternalShares,
                 );
 
                 const maxMintSteth = await shares.convertToSteth(maxMintShares);

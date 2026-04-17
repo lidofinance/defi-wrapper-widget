@@ -17,6 +17,12 @@ import { useEarnPosition } from './use-earn-position';
 import { encodeEarnSupplyParams } from '../utils';
 import { useEarnStrategy } from './use-earn-strategy';
 
+// Suppress processable request display when ETH amount is rounding dust from
+// the wstETH→stETH→shares double conversion in the Lido Earn withdrawal path.
+// Does not apply to the healing path (stethSharesToRepay > 0n), which is a
+// legitimate liability repay with no ETH withdrawal.
+const PROCESSABLE_ETH_DISPLAY_THRESHOLD = 10n;
+
 const hasProcessRequest = (
   positionData: ReturnType<typeof useEarnPosition>['positionData'],
   minProccessableValueInEth: bigint | undefined,
@@ -25,7 +31,9 @@ const hasProcessRequest = (
 
   if (typeof minProccessableValueInEth === 'undefined') return false;
 
-  if (positionData.totalEthToWithdrawFromProxy > 0n) {
+  if (
+    positionData.totalEthToWithdrawFromProxy > PROCESSABLE_ETH_DISPLAY_THRESHOLD
+  ) {
     return true;
   }
 

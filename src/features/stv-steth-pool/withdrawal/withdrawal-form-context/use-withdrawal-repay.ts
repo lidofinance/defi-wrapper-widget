@@ -19,7 +19,7 @@ import {
   DEFAULT_SIGNING_DESCRIPTION,
   useTransactionModal,
 } from '@/shared/components/transaction-modal';
-import { minBN } from '@/utils/bn';
+import { clampZeroBN, minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
 import type { RepayTokens, WithdrawalFormValidatedValues } from './types';

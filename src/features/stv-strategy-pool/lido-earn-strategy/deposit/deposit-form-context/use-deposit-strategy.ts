@@ -16,7 +16,7 @@ import {
   useTransactionModal,
 } from '@/shared/components/transaction-modal';
 import { getReferralAddress } from '@/shared/wrapper/refferals/get-refferal-address';
-import { clampZeroBN, minBN } from '@/utils/bn';
+import { minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
 import { useEarnStrategy } from '../../hooks/use-earn-strategy';
@@ -95,14 +95,13 @@ export const useDepositStrategy = () => {
                 ],
               });
 
-              // Subtract 1n to absorb the known 1-wei floor rounding in remainingMintingCapacitySharesOf;
-              // clamp to 0n so capacity=0 doesn't produce a negative mint amount
-              const maxMintShares = clampZeroBN(
-                minBN(
-                  proxyCapacityShares,
-                  vaultCapacityShares,
-                  maxMintableExternalShares - currentMintedExternalShares,
-                ) - 1n,
+              // remainingMintingCapacitySharesOf simulation is already conservative:
+              // post-deposit assetsOf ≥ simulation's assetsOf (proved via floor(a+b)≥floor(a)+floor(b)
+              // and deposit ratio ≥ pre-deposit ratio), so no -1n needed.
+              const maxMintShares = minBN(
+                proxyCapacityShares,
+                vaultCapacityShares,
+                maxMintableExternalShares - currentMintedExternalShares,
               );
 
               const reportCalls = prepareReportCalls();
