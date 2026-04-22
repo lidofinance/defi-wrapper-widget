@@ -39,5 +39,14 @@ export default defineConfig(async ({ mode }) => {
     define: {
       'process.env': env,
     },
+    test: {
+      environment: 'node',
+      globals: true,
+      include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+      coverage: {
+        provider: 'v8',
+        include: ['src/utils/**', 'src/features/**/shared/utils.ts'],
+      },
+    },
   };
 });

@@ -15,10 +15,11 @@ import {
   DEFAULT_SIGNING_DESCRIPTION,
   useTransactionModal,
 } from '@/shared/components/transaction-modal';
-import { clampZeroBN, minBN } from '@/utils/bn';
+import { minBN } from '@/utils/bn';
 import { formatBalance } from '@/utils/formatBalance';
 import { tokenLabel } from '@/utils/token-label';
 import { useEarnPosition, useEarnStrategy } from '../../hooks';
+import { splitExcessLiability } from './split-excess-liability';
 
 import type { WithdrawalFormValidatedValues } from './types';
 
@@ -104,13 +105,11 @@ export const useWithdrawStrategy = () => {
               // [ --- EXCESS STETH ---] | [ ------------- LIABILITY (WSTETH) ---------- ]
               //
 
-              const ethToPayForLiability = clampZeroBN(
-                amount - positionData.strategyVaultStethExcess,
-              );
-
-              const stethToWithdrawForExcess = clampZeroBN(
-                amount - ethToPayForLiability,
-              );
+              const { ethToPayForLiability, stethToWithdrawForExcess } =
+                splitExcessLiability(
+                  amount,
+                  positionData.strategyVaultStethExcess,
+                );
 
               const stethSharesToWithdrawForExcess =
                 await shares.convertToShares(stethToWithdrawForExcess);

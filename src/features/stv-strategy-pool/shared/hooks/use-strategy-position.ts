@@ -5,7 +5,8 @@ import invariant from 'tiny-invariant';
 import { useStvStrategy } from '@/modules/defi-wrapper';
 import { readWithReport, useVault } from '@/modules/vaults';
 import { useDappStatus, useLidoSDK } from '@/modules/web3';
-import { minBN, clampZeroBN } from '@/utils/bn';
+import { clampZeroBN, minBN } from '@/utils/bn';
+import { computePositionHealth } from './position-health';
 
 type GetStrategyPositionDynamicParams = {
   // address of the proxy contract, which is used to interact with strategy vault and holds user funds on behalf of strategy
@@ -285,25 +286,20 @@ export const getStrategyPosition = async ({
     stethSharesToRecoverPendingFromStrategyVault,
   ]);
 
-  // represents how much eth is actually locked to cover total liability
-  // can be less than totalMintedStethInEth if position is unhealthy
-  const totalLockedEth = minBN(
+  const {
+    totalLockedEth,
+    assetShortfallInEth,
+    isUnhealthy,
+    isBadDebt,
+    totalUserValueInEth,
+  } = computePositionHealth({
+    proxyBalanceStvInEth,
+    proxyUnlockedBalanceStvInEth,
+    proxyNominalBalanceStvInEth,
     totalStethLiabilityInEth,
-    proxyBalanceStvInEth - proxyUnlockedBalanceStvInEth,
-  );
-
-  // represents how much eth is missing from locked to cover total liability
-  // can be 0n if position is healthy
-  const assetShortfallInEth = totalStethLiabilityInEth - totalLockedEth;
-
-  const isUnhealthy = totalLockedEth < totalStethLiabilityInEth;
-
-  const isBadDebt = proxyBalanceStvInEth < totalStethLiabilityInEth;
-
-  const proxyBalanceInEth = activeVault.isConnected
-    ? proxyBalanceStvInEth
-    : proxyNominalBalanceStvInEth;
-  const totalUserValueInEth = proxyBalanceInEth + totalStethDifference;
+    totalStethDifference,
+    isVaultConnected: activeVault.isConnected,
+  });
 
   // maximum ETH that can be withdrawn from strategy vault (for delegated stETH repayment + excess) assuming healthy position
   // if stv position is unhealthy this number can be higher than user balance in eth
