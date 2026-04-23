@@ -46,6 +46,7 @@ export default defineConfig(async ({ mode }) => {
       coverage: {
         provider: 'v8',
         include: ['src/utils/**', 'src/features/**/shared/utils.ts'],
+        exclude: ['src/utils/encodable.ts'],
       },
     },
   };

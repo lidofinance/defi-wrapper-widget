@@ -94,6 +94,15 @@ describe('formatBalance', () => {
       expect(trimmed.endsWith('...')).toBe(true);
       expect(isTrimmed).toBe(true);
     });
+
+    it('drops trailing .0 cleanly when period lands at cut boundary', () => {
+      // "12345.0" length=7, maxTotalLength=9 → trimmed[5]='.' → slice to "12345", no ellipsis
+      const { trimmed, isTrimmed } = formatBalance(12345n * ETH, {
+        maxTotalLength: 9,
+      });
+      expect(trimmed).toBe('12345');
+      expect(isTrimmed).toBe(false);
+    });
   });
 
   describe('negative bigints — OBS-16 coverage (totalUserValueInEth under Mellow loss)', () => {
