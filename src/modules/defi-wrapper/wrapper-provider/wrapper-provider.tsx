@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo } from 'react';
 import { isAddressEqual, fromHex, zeroHash } from 'viem';
+import { isRevertError } from '@/utils/is-revert-error';
 import { LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk/common';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
@@ -173,7 +174,10 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
           : Promise.resolve(false),
         // Fail-closed: if the call reverts (e.g. old contract without this method), assume no whitelist functionality in the strategy
         strategy
-          ? strategy.read.ALLOW_LIST_ENABLED().catch(() => false)
+          ? strategy.read.ALLOW_LIST_ENABLED().catch((e) => {
+              if (isRevertError(e)) return false;
+              throw e;
+            })
           : Promise.resolve(false),
       ]);
 
