@@ -141,3 +141,30 @@ describe('computePositionHealth — zero position', () => {
     expect(result.totalUserValueInEth).toBe(0n);
   });
 });
+
+describe('computePositionHealth — RISK-3 fix: B-U clamped to zero', () => {
+  // proxyUnlockedBalanceStvInEth > proxyBalanceStvInEth should not produce negative totalLockedEth
+  it('totalLockedEth is 0 when unlocked > balance (defensive clamp)', () => {
+    // B=50, U=80 → without clamp: locked = min(L, 50-80=-30) = -30 (breaks invariant)
+    // with clamp: locked = min(L, max(0, -30)) = min(100, 0) = 0
+    const result = computePositionHealth({
+      ...base,
+      proxyBalanceStvInEth: 50n * ETH,
+      proxyUnlockedBalanceStvInEth: 80n * ETH,
+      totalStethLiabilityInEth: 100n * ETH,
+    });
+    expect(result.totalLockedEth).toBe(0n);
+    expect(result.assetShortfallInEth).toBe(100n * ETH);
+    expect(result.isUnhealthy).toBe(true);
+  });
+
+  it('INVARIANT: totalLockedEth >= 0 even when unlocked > balance', () => {
+    const result = computePositionHealth({
+      ...base,
+      proxyBalanceStvInEth: 10n * ETH,
+      proxyUnlockedBalanceStvInEth: 20n * ETH,
+      totalStethLiabilityInEth: 8n * ETH,
+    });
+    expect(result.totalLockedEth >= 0n).toBe(true);
+  });
+});

@@ -340,7 +340,10 @@ export const getStrategyPosition = async ({
     currentProxyMintingCapacityShares,
     currentVaultMintingCapacityShares,
     // Lido global cap: prevents boost display exceeding what's actually mintable protocol-wide
-    lidoCoreMaxMintableExternalShares - lidoCoreCurrentMintedExternalShares,
+    // Sanity check
+    clampZeroBN(
+      lidoCoreMaxMintableExternalShares - lidoCoreCurrentMintedExternalShares,
+    ),
   );
 
   const targetUtilizationBP = 10_000n - reserveRatioBP;

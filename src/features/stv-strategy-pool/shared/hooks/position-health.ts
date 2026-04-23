@@ -1,4 +1,4 @@
-import { minBN } from '@/utils/bn';
+import { clampZeroBN, minBN } from '@/utils/bn';
 
 type PositionHealthParams = {
   proxyBalanceStvInEth: bigint;
@@ -19,7 +19,8 @@ export const computePositionHealth = ({
 }: PositionHealthParams) => {
   const totalLockedEth = minBN(
     totalStethLiabilityInEth,
-    proxyBalanceStvInEth - proxyUnlockedBalanceStvInEth,
+    // Sanity check
+    clampZeroBN(proxyBalanceStvInEth - proxyUnlockedBalanceStvInEth),
   );
   const assetShortfallInEth = totalStethLiabilityInEth - totalLockedEth;
   const isUnhealthy = totalLockedEth < totalStethLiabilityInEth;
