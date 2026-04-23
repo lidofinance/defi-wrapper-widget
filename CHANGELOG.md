@@ -1,3 +1,9 @@
+# 0.4.3
+- [stvStrategyPool] fix processable request being disabled on wrong condition
+- [stvStrategyPool] fix strategy apy calculation 
+- removed deprecated code for GGV strategy pool
+- test and various code improvements
+
 # 0.4.2
 - correct user value calc for disconnected vault state
 - display withdrawal requests for stvStrategyPool when below min withdrawal value

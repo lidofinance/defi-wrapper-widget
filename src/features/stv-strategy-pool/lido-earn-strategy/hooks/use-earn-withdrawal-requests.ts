@@ -1,5 +1,9 @@
 import { useMemo } from 'react';
 import {
+  SUSTAINABLE_MINT_STETH_THRESHOLD,
+  PROCESSABLE_ETH_DISPLAY_THRESHOLD,
+} from '@/config';
+import {
   useRequests,
   useClaim,
   useWithdrawalQueue,
@@ -25,7 +29,13 @@ const hasProcessRequest = (
 
   if (typeof minProccessableValueInEth === 'undefined') return false;
 
-  if (positionData.totalEthToWithdrawFromProxy > 0n) {
+  // Suppress processable request display when ETH amount is rounding dust from
+  // the wstETH→stETH→shares double conversion in the Lido Earn withdrawal path.
+  // Does not apply to the healing path (stethSharesToRepay > 0n), which is a
+  // legitimate liability repay with no ETH withdrawal.
+  if (
+    positionData.totalEthToWithdrawFromProxy > PROCESSABLE_ETH_DISPLAY_THRESHOLD
+  ) {
     return true;
   }
 
@@ -33,7 +43,10 @@ const hasProcessRequest = (
 };
 
 const canBoost = (boostableStethShares: bigint | undefined) => {
-  return !!boostableStethShares && boostableStethShares > 100n;
+  return (
+    !!boostableStethShares &&
+    boostableStethShares > SUSTAINABLE_MINT_STETH_THRESHOLD
+  );
 };
 
 const canRecover = (
@@ -167,8 +180,7 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
             // but if value is zero and it's just repay it's healing
             isBelowMinimumThreshold:
               positionData.totalStvToWithdrawFromProxy > 0n &&
-              positionData.totalEthToWithdrawFromProxy -
-                positionData.stethToRebalance <=
+              positionData.totalEthToWithdrawFromProxy <=
                 minProcessableValueInEth,
             isHealing: positionData.totalStvToWithdrawFromProxy <= 0n,
           }
