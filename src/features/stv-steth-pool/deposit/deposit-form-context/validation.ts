@@ -16,6 +16,7 @@ import type {
   DepositFormValues,
 } from './types';
 import type { Resolver } from 'react-hook-form';
+import { ASYNC_FORM_CONTEXT_TIMEOUT } from '@/consts/form';
 
 type DepositFormValidationSchemaParams =
   DepositFormValidationAsyncContextType & {
@@ -46,7 +47,10 @@ export const DepositFormResolver: Resolver<
   DepositFormValidatedValues
 > = async (values, context, options) => {
   invariant(context, '[DepositFormResolver] context is undefined');
-  const contextValue = await awaitWithTimeout(context.asyncContext, 4000);
+  const contextValue = await awaitWithTimeout(
+    context.asyncContext,
+    ASYNC_FORM_CONTEXT_TIMEOUT,
+  );
 
   const schema = depositFormValidationSchema({
     ...contextValue,

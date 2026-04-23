@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
 
+import { ASYNC_FORM_CONTEXT_TIMEOUT } from '@/consts/form';
 import { tokenAmountSchema } from '@/shared/hook-form/validation';
 import { awaitWithTimeout } from '@/utils/await-with-timeout';
 
@@ -44,7 +45,10 @@ export const WithdrawalFormResolver: Resolver<
 > = async (values, context, options) => {
   invariant(context, '[WithdrawalFormResolver] context is undefined');
 
-  const contextValue = await awaitWithTimeout(context.asyncContext, 4000);
+  const contextValue = await awaitWithTimeout(
+    context.asyncContext,
+    ASYNC_FORM_CONTEXT_TIMEOUT,
+  );
 
   const schema = withdrawalFormValidationSchema(contextValue);
 
