@@ -599,6 +599,192 @@ describe('post-health derived fields', () => {
   });
 });
 
+// ─── Total user value: proxy balance + stETH difference ──────────────────────
+//
+// totalUserValueInEth = proxyBalanceInEth (Calc/RR-weighted ETH) + totalStethDifference (Lido ≈ 1:1)
+//
+// All three components of S_total (current vault, pending deposit, pending withdrawal)
+// feed into ΔS and thus into totalStethDifference. Only S_vault is requestable.
+
+describe('total user value: proxy balance + stETH difference', () => {
+  it('positive stETH difference adds to proxy ETH balance', async () => {
+    const { params } = buildFixture({
+      rwr: { proxyBalanceStvInEth: 300n },
+      batch: { totalStethDifference: 80n },
+    });
+    const r = await getStrategyPosition(params);
+    expect(r.totalUserValueInEth).toBe(380n);
+  });
+
+  it('negative stETH difference subtracts from proxy ETH balance (loss rebalanced)', async () => {
+    const { params } = buildFixture({
+      rwr: { proxyBalanceStvInEth: 200n },
+      batch: { totalStethDifference: -60n },
+    });
+    const r = await getStrategyPosition(params);
+    expect(r.totalUserValueInEth).toBe(140n);
+  });
+
+  it('pending deposit (S_dep) reduces shortfall vs same position without deposit', async () => {
+    // With S_dep=80: S_total=80, S_mint=100 → shortfall = 100-80 = 20
+    const { params: withDep } = buildFixture({
+      S_mint_user: 100n,
+      S_pool: 100n,
+      S_dep: 80n,
+      S_vault: 0n,
+    });
+    // Without S_dep: S_total=0 → shortfall = 100
+    const { params: noDep } = buildFixture({
+      S_mint_user: 100n,
+      S_pool: 100n,
+    });
+    const rWith = await getStrategyPosition(withDep);
+    const rNo = await getStrategyPosition(noDep);
+    expect(rWith.totalStethSharesShortfall).toBe(20n);
+    expect(rNo.totalStethSharesShortfall).toBe(100n);
+  });
+
+  it('pending withdrawal (S_wdraw) reduces shortfall vs same position without it', async () => {
+    // S_wdraw=60: S_total=60, S_mint=100 → shortfall=40
+    const { params: withWdraw } = buildFixture({
+      S_mint_user: 100n,
+      S_pool: 100n,
+      S_wdraw: 60n,
+      S_vault: 0n,
+    });
+    const { params: noWdraw } = buildFixture({
+      S_mint_user: 100n,
+      S_pool: 100n,
+    });
+    const rWith = await getStrategyPosition(withWdraw);
+    const rNo = await getStrategyPosition(noWdraw);
+    expect(rWith.totalStethSharesShortfall).toBe(40n);
+    expect(rNo.totalStethSharesShortfall).toBe(100n);
+  });
+
+  it('pending deposit reduces S_cov (liability to cover from proxy)', async () => {
+    // S_dep=80 → S_total=80 → S_cov = max(0, 100-80) = 20, not 100
+    const { params: withDep } = buildFixture({
+      S_mint_user: 100n,
+      S_pool: 100n,
+      S_dep: 80n,
+    });
+    const { params: noDep } = buildFixture({
+      S_mint_user: 100n,
+      S_pool: 100n,
+    });
+    const rWith = await getStrategyPosition(withDep);
+    const rNo = await getStrategyPosition(noDep);
+    expect(rWith.totalStethSharesToRepay).toBe(20n);
+    expect(rNo.totalStethSharesToRepay).toBe(100n);
+  });
+
+  it('pending deposit is part of S_total but does NOT increase requestable vault balance', async () => {
+    // S_dep=80 counts toward ΔS but S_vault=0 → nothing to request from vault
+    const { params } = buildFixture({
+      S_mint_user: 100n,
+      S_pool: 100n,
+      S_dep: 80n,
+      S_vault: 0n,
+    });
+    const r = await getStrategyPosition(params);
+    // S_avail_ret = min(S_vault=0, S_deleg) = 0 → totalStethSharesAvailableForReturn = 0
+    expect(r.strategyStethSharesBalance).toBe(0n);
+    // S_cov = max(0, 100-80) = 20 (deposit reduced it, but S_vault=0 still means proxy must cover all remaining)
+    expect(r.totalStethSharesToRepay).toBe(20n);
+  });
+});
+
+// ─── Withdrawable from Lido Earn: only S_vault, two-rate conversion ───────────
+//
+// totalEthToWithdrawFromStrategyVault = totalStethSharesAvailableForReturnInEth (Calc)
+//                                     + strategyVaultStethExcess (Lido rate)
+//
+// S_dep and S_wdraw count toward ΔS / total value but are NOT withdrawable from vault.
+
+describe('withdrawable from Lido Earn: S_vault only, two-rate conversion', () => {
+  it('pending deposit excluded from withdrawable: totalEthToWithdrawFromStrategyVault=0 when S_vault=0', async () => {
+    const { params } = buildFixture({
+      S_mint_user: 100n,
+      S_pool: 100n,
+      S_dep: 80n,
+      S_vault: 0n,
+      rwr: { totalStethSharesAvailableForReturnInEth: 0n },
+      batch: { strategyVaultStethExcess: 0n },
+    });
+    const r = await getStrategyPosition(params);
+    expect(r.totalEthToWithdrawFromStrategyVault).toBe(0n);
+  });
+
+  it('pending withdrawal excluded from withdrawable: already in queue, S_vault=0', async () => {
+    const { params } = buildFixture({
+      S_mint_user: 100n,
+      S_pool: 100n,
+      S_wdraw: 80n,
+      S_vault: 0n,
+      rwr: { totalStethSharesAvailableForReturnInEth: 0n },
+      batch: { strategyVaultStethExcess: 0n },
+    });
+    const r = await getStrategyPosition(params);
+    expect(r.totalEthToWithdrawFromStrategyVault).toBe(0n);
+  });
+
+  it('liability portion (Calc, RR-discounted) and excess portion (Lido rate) sum correctly', async () => {
+    // S_vault=200, S_mint=100, S_ret=0
+    // S_deleg=100, S_avail_ret=min(200,100)=100, S_vault_exc=100
+    // RWR provides 80 for liability portion (Calc: RR discount applied)
+    // batch provides 100 for excess (Lido rate: 1:1 to stETH)
+    // result = 80 + 100 = 180
+    const { params } = buildFixture({
+      S_mint_user: 100n,
+      S_pool: 100n,
+      S_vault: 200n,
+      rwr: { totalStethSharesAvailableForReturnInEth: 80n },
+      batch: { strategyVaultStethExcess: 100n },
+    });
+    const r = await getStrategyPosition(params);
+    expect(r.totalEthToWithdrawFromStrategyVault).toBe(180n);
+    expect(r.strategyVaultStethExcess).toBe(100n); // Lido-rate portion
+  });
+
+  it('no excess: withdrawable equals only the Calc-rate liability portion', async () => {
+    // S_vault=80, S_mint=100 → S_vault_exc=0; only liability portion via Calc
+    const { params } = buildFixture({
+      S_mint_user: 100n,
+      S_pool: 100n,
+      S_vault: 80n,
+      rwr: { totalStethSharesAvailableForReturnInEth: 70n },
+      batch: { strategyVaultStethExcess: 0n },
+    });
+    const r = await getStrategyPosition(params);
+    expect(r.totalEthToWithdrawFromStrategyVault).toBe(70n);
+  });
+
+  it('withdrawable < total user value when inflight deposits exist (S_dep not requestable)', async () => {
+    // S_dep=80 contributes to ΔS (total value) but not to withdrawable vault balance
+    // S_vault=50 is all that can be requested
+    const { params } = buildFixture({
+      S_mint_user: 100n,
+      S_pool: 100n,
+      S_dep: 80n,
+      S_vault: 50n,
+      rwr: {
+        proxyBalanceStvInEth: 300n,
+        totalStethSharesAvailableForReturnInEth: 45n, // S_avail_ret=min(50,100)=50 via Calc
+      },
+      batch: {
+        totalStethDifference: 30n,
+        strategyVaultStethExcess: 0n, // S_vault_exc = 50-50 = 0
+      },
+    });
+    const r = await getStrategyPosition(params);
+    // total user value = 300 + 30 = 330 (includes S_dep contribution via diff)
+    expect(r.totalUserValueInEth).toBe(330n);
+    // withdrawable from vault = 45 + 0 = 45 (only S_vault portion, not S_dep)
+    expect(r.totalEthToWithdrawFromStrategyVault).toBe(45n);
+  });
+});
+
 // ─── Disconnected vault: liability zeroed via pool cap ────────────────────────
 //
 // Protocol invariant: a vault can only be disconnected when its global pool
