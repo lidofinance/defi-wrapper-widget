@@ -1,4 +1,6 @@
 # 0.4.3
+
+- tx error when deposit capacity is full for lido earn strategy
 - Fix wallet connections issues 
 
 # 0.4.2
