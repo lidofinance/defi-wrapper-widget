@@ -47,7 +47,6 @@ const WALLETS_SHOWN: WalletIdsEthereum[] = [
   'ambire',
   'safe',
   'dappBrowserInjected',
-  'coinbaseSmartWallet',
 ];
 export const wagmiChainMap = Object.values(WagmiChains).reduce(
   (acc, chain) => {
