@@ -1,3 +1,8 @@
+# 0.4.3
+
+- tx error when deposit capacity is full for lido earn strategy
+- Fix wallet connections issues 
+
 # 0.4.2
 - correct user value calc for disconnected vault state
 - display withdrawal requests for stvStrategyPool when below min withdrawal value

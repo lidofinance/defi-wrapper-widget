@@ -1,7 +1,12 @@
 import { useCallback } from 'react';
 import invariant from 'tiny-invariant';
 import { useStvStrategy } from '@/modules/defi-wrapper';
-import { readWithReport, useReportCalls, useVault } from '@/modules/vaults';
+import {
+  DisplayableError,
+  readWithReport,
+  useReportCalls,
+  useVault,
+} from '@/modules/vaults';
 import {
   TransactionEntry,
   useDappStatus,
@@ -103,6 +108,13 @@ export const useDepositStrategy = () => {
                 maxMintShares,
                 maxMintableExternalShares - currentMintedExternalShares,
               );
+
+              if (maxMintShares <= 0n) {
+                throw new DisplayableError(
+                  'Deposit capacity is full. Try again later.',
+                  true,
+                );
+              }
 
               const reportCalls = prepareReportCalls();
               calls.push(...reportCalls);
