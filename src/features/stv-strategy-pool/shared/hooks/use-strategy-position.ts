@@ -178,7 +178,7 @@ export const getStrategyPosition = async ({
   // stETH shares that can be repaid from returned balance and unlock user ETH
   // can eq 0n - no stETH is to be repaid(only rewards to skim) or all stETH is lost and must be rebalanced
   // can eq stethSharesLiabilityToCover - all repayment can be done from returned balance
-  const stethSharesToRepay = minBN(
+  let stethSharesToRepay = minBN(
     stethSharesOnBalance,
     stethSharesLiabilityToCover,
   );
@@ -190,6 +190,12 @@ export const getStrategyPosition = async ({
   const stethSharesRepaidAfterWstethUnwrap = await shares.convertToShares(
     await shares.convertToSteth(stethSharesToRepay),
   );
+
+  if (stethSharesRepaidAfterWstethUnwrap === 0n && stethSharesToRepay > 0) {
+    // this means that the amount to repay is so small that after wstETH wrap/unwrap it becomes 0
+    // this will revert repay transaction so we have to round down to 0 and skip repay
+    stethSharesToRepay = 0n;
+  }
 
   // stETH shares that user is missing, it will be rebalanced and
   // essentially reduced from locked ETH

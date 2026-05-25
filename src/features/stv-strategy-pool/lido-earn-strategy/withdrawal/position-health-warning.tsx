@@ -15,17 +15,16 @@ export const PositionHealthWarning = () => {
   return (
     <Alert.Root status="warning">
       <Alert.Title>
-        Your stVault position is unhealthy. Your provided assets are shortfall
-        of{' '}
+        Your stVault position is unhealthy. Strategy withdrawal amounts are
+        denominated as for healthy position for precision. Your position value
+        is less by an equivalent of{' '}
         <FormatToken
           amount={positionData?.assetShortfallInEth}
           token={'ETH'}
           fallback="N/A"
           trimEllipsis
         />{' '}
-        to cover for strategy liabilities and your position will be rebalanced
-        during stage 2 of withdrawal. Strategy withdrawal amounts are
-        denominated as for healthy position.
+        and real position value can be seen in the dashboard tab.
       </Alert.Title>
     </Alert.Root>
   );

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import {
   SUSTAINABLE_MINT_STETH_THRESHOLD,
   PROCESSABLE_ETH_DISPLAY_THRESHOLD,
+  HEALING_STETH_SHARES_THRESHOLD,
 } from '@/config';
 import {
   useRequests,
@@ -39,7 +40,7 @@ const hasProcessRequest = (
     return true;
   }
 
-  return positionData.stethSharesToRepay > 0n;
+  return positionData.stethSharesToRepay > HEALING_STETH_SHARES_THRESHOLD;
 };
 
 const canBoost = (boostableStethShares: bigint | undefined) => {
@@ -176,6 +177,7 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
             ethToReceive: positionData.totalEthToWithdrawFromProxy,
             stethSharesToRebalance: positionData.stethSharesToRebalance,
             stethSharesToRepay: positionData.stethSharesToRepay,
+            stethToRepay: positionData.stethToRepay,
             // we can't process withdrawals below the minimum threshold
             // but if value is zero and it's just repay it's healing
             isBelowMinimumThreshold:
