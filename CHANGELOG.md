@@ -1,8 +1,14 @@
-# 0.4.3
+# 0.4.4
+
 - [stvStrategyPool] fix processable request being disabled on wrong condition
 - [stvStrategyPool] fix strategy apy calculation 
 - removed deprecated code for GGV strategy pool
-- test and various code improvements
+- tests and various code improvements
+
+# 0.4.3
+
+- tx error when deposit capacity is full for lido earn strategy
+- Fix wallet connections issues 
 
 # 0.4.2
 - correct user value calc for disconnected vault state
