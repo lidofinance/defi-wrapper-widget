@@ -7471,6 +7471,7 @@ __metadata:
     viem: "npm:2.50.4"
     vite: "npm:^7.3.2"
     vite-plugin-checker: "npm:^0.12.0"
+    vite-plugin-sri-gen: "npm:1.5.1"
     vite-plugin-svgr: "npm:^4.5.0"
     vitest: "npm:^4.1.5"
     wagmi: "npm:3.6.15"
@@ -13331,6 +13332,17 @@ __metadata:
     vue-tsc:
       optional: true
   checksum: 10c0/50b5805488771bdd08c806647d68812088bd747044deb89cb838c140302c3ab45fb78e88cfc25fa32568a2b6a57dd7c25b1739ab1a1c4e41dafb5b16378a1c78
+  languageName: node
+  linkType: hard
+
+"vite-plugin-sri-gen@npm:1.5.1":
+  version: 1.5.1
+  resolution: "vite-plugin-sri-gen@npm:1.5.1"
+  dependencies:
+    parse5: "npm:^8.0.0"
+  peerDependencies:
+    vite: ">=4.0.0"
+  checksum: 10c0/f865dacbd8a376e2e95cb801c27c46ac1aa6db0c9f547963c1496132935b9f0a7ecdb1bb9ee5844cf52b4904d71a45baa2db58224773ea95a4e2a115095bba82
   languageName: node
   linkType: hard
 

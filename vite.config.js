@@ -5,6 +5,7 @@ import svgr from 'vite-plugin-svgr';
 
 export default defineConfig(async ({ mode }) => {
   const checker = (await import('vite-plugin-checker')).default;
+  const sri = (await import('vite-plugin-sri-gen')).default;
   mode = mode === 'production' || mode === 'development' ? '' : mode;
 
   const env = loadEnv(mode, process.cwd());
@@ -22,6 +23,7 @@ export default defineConfig(async ({ mode }) => {
       }),
       svgr(),
       react(),
+      sri(),
     ],
     server: {
       port,
