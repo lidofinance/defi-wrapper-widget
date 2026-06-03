@@ -1,5 +1,6 @@
 # 0.4.4
 
+- improved withdrawal validation error message
 - Added SRI hashes for scripts
 - WalletConnect is disabled when no VITE_WALLETCONNECT_PROJECT_ID is provided
 - [stvStrategyPool] add deposit warning for healing deposits that do not mint steth shares

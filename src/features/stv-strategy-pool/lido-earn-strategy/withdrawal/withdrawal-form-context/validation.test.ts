@@ -88,8 +88,8 @@ describe('withdrawalFormValidationSchema (earn strategy)', () => {
       const result = parse(ctx as any, { token: 'ETH', amount: ETH / 2n });
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
-          'Below minimum withdrawal limit',
+        expect(result.error.issues[0].message).toContain(
+          'Below minimum withdrawal',
         );
       }
     });

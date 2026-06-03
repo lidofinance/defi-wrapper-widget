@@ -120,8 +120,8 @@ describe('withdrawalFormValidationSchema (StvStETHPool)', () => {
       });
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
-          'Below minimum withdrawal limit',
+        expect(result.error.issues[0].message).toContain(
+          'Below minimum withdrawal',
         );
       }
     });

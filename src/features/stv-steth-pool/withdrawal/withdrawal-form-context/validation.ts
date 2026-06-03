@@ -1,3 +1,4 @@
+import { formatEther } from 'viem';
 import { zodResolver } from '@hookform/resolvers/zod';
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
@@ -36,7 +37,7 @@ export const withdrawalFormValidationSchema = (
   if (minWithdrawalInEth !== null) {
     amountSchema = amountSchema.gte(
       minWithdrawalInEth,
-      'Below minimum withdrawal limit',
+      `Below minimum withdrawal amount of ${formatEther(minWithdrawalInEth)} ETH`,
     );
 
     amountSchema = amountSchema.refine((value) => {
