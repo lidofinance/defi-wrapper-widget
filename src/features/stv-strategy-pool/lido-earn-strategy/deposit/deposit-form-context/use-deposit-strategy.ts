@@ -109,13 +109,6 @@ export const useDepositStrategy = () => {
                 maxMintableExternalShares - currentMintedExternalShares,
               );
 
-              if (maxMintShares <= 0n) {
-                throw new DisplayableError(
-                  'Deposit capacity is full. Try again later.',
-                  true,
-                );
-              }
-
               const reportCalls = prepareReportCalls();
               calls.push(...reportCalls);
 

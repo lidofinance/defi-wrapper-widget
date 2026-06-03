@@ -264,6 +264,37 @@ export const getStrategyPosition = async ({
     ] as const,
   });
 
+  // Maximum liability in stETH shares that can be minted with for all user assets
+  // if >= totalMintedStethShares - there is some minting capacity due to rewards/repayment
+  // if<= totalMintedStethShares - user position is unhealthy, his actual liability is higher than allowed, but not funds are lost yet
+  //
+  // later case is most interesting because it creates double sided dis-balance, that can exist simultaneously:
+  // - 1. totalMintedStethShares >= totalAvailableStethShares creates shortfall that must be rebalanced from user locked ETH (reduces user total value)
+  // - 2. totalMintedStethShares >= maxLiabilityAvailableStethShares creates shortfall that just has be repaid and messes up numbers in inputs(otherwise no value is lost from it)
+  const [maxLiabilityAvailableStethShares] = await (proxyNominalBalanceStvInEth
+    ? await readWithReport({
+        publicClient,
+        report: activeVault.report,
+        contracts: [
+          wrapper.prepare.calcStethSharesToMintForAssets([
+            proxyNominalBalanceStvInEth,
+          ]),
+        ] as const,
+      })
+    : [0n]);
+
+  // case 1. this must be rebalanced from user value,
+  // e.g. strategy lost money
+  const liabilityReturnShortfallStethShares = clampZeroBN(
+    totalMintedStethShares - totalStethSharesAvailableForReturnInEth,
+  );
+
+  // case 2. this just must be repaid first so user can start unlocking their assets
+  // e.g. vault is not working and lido fees pile up and reduce stv share / eth price
+  const liabilityMintingShortfallStethShares = clampZeroBN(
+    totalMintedStethShares - maxLiabilityAvailableStethShares,
+  );
+
   const [
     totalStrategyBalanceInSteth,
     stethOnBalance,
@@ -277,6 +308,9 @@ export const getStrategyPosition = async ({
     stethToRebalance,
     stethToRecover,
     stethToRecoverPendingFromStrategyVault,
+    //
+    liabilityReturnShortfallSteth,
+    liabilityMintingShortfallSteth,
   ] = await shares.convertBatchSharesToSteth([
     totalStrategyBalanceInStethShares,
     stethSharesOnBalance,
@@ -290,6 +324,9 @@ export const getStrategyPosition = async ({
     stethSharesToRebalance,
     stethSharesToRecover,
     stethSharesToRecoverPendingFromStrategyVault,
+    //
+    liabilityReturnShortfallStethShares,
+    liabilityMintingShortfallStethShares,
   ]);
 
   const {
@@ -397,6 +434,8 @@ export const getStrategyPosition = async ({
     isBadDebt,
     totalLockedEth,
     assetShortfallInEth,
+    liabilityReturnShortfallSteth,
+    liabilityMintingShortfallSteth,
 
     //
     // Withdrawing delegated stETH from Strategy Vault

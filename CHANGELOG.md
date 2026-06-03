@@ -1,5 +1,7 @@
 # 0.4.4
 
+- Added SRI hashes for scripts
+- [stvStrategyPool] add deposit warning for healing deposits that do not mint steth shares
 - [stvStrategyPool] fix processable request being disabled on wrong condition
 - [stvStrategyPool] fix strategy apy calculation 
 - removed deprecated code for GGV strategy pool

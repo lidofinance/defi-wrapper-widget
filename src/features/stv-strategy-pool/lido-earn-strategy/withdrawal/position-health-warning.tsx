@@ -1,9 +1,11 @@
-import { Alert } from '@chakra-ui/react';
+import { Alert, Link } from '@chakra-ui/react';
 import { FormatToken } from '@/shared/formatters';
+import { useNavigation } from '@/shared/wrapper/navigation';
 import { useEarnPosition } from '../hooks';
 
 export const PositionHealthWarning = () => {
   const { positionData } = useEarnPosition();
+  const { setMode } = useNavigation();
   if (
     !positionData ||
     !positionData.isUnhealthy ||
@@ -15,16 +17,27 @@ export const PositionHealthWarning = () => {
   return (
     <Alert.Root status="warning">
       <Alert.Title>
-        Your stVault position is unhealthy. Strategy withdrawal amounts are
-        denominated as for healthy position for precision. Your position value
-        is less by an equivalent of{' '}
+        <b>Your stVault position is unhealthy.</b> Strategy withdrawal input
+        amounts are denominated as for healthy position for precision. Your
+        actual position value is less by an equivalent of{' '}
         <FormatToken
-          amount={positionData?.assetShortfallInEth}
+          amount={positionData.assetShortfallInEth}
           token={'ETH'}
           fallback="N/A"
           trimEllipsis
         />{' '}
-        and real position value can be seen in the dashboard tab.
+        and can be seen in the{' '}
+        <Link
+          variant="underline"
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            setMode('dashboard');
+          }}
+        >
+          dashboard tab
+        </Link>
+        .
       </Alert.Title>
     </Alert.Root>
   );
