@@ -148,6 +148,7 @@ function buildFixture(opts: FixtureInput = {}) {
       unlockedAssetsOf: vi.fn().mockReturnValue({}),
       unlockedStvOf: unlockedStvOfSpy,
       calcAssetsToLockForStethShares: vi.fn().mockReturnValue({}),
+      calcStethSharesToMintForAssets: vi.fn().mockReturnValue({}),
       remainingMintingCapacitySharesOf: vi.fn().mockReturnValue({}),
     },
   };
