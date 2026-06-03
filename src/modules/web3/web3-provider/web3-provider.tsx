@@ -23,6 +23,7 @@ import {
   PROVIDER_BATCH_TIME,
   PROVIDER_MAX_BATCH,
   PROVIDER_POLLING_INTERVAL,
+  USER_CONFIG,
   useUserConfig,
 } from '@/config';
 import type {
@@ -41,7 +42,7 @@ const WALLETS_SHOWN: WalletIdsEthereum[] = [
   'okx',
   'ledgerHID',
   'ledgerLive',
-  'walletConnect',
+  ...(USER_CONFIG.walletconnectProjectId ? (['walletConnect'] as const) : []),
   'bitget',
   'imToken',
   'ambire',

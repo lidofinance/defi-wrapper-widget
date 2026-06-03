@@ -1,6 +1,7 @@
 # 0.4.4
 
 - Added SRI hashes for scripts
+- WalletConnect is disabled when no VITE_WALLETCONNECT_PROJECT_ID is provided
 - [stvStrategyPool] add deposit warning for healing deposits that do not mint steth shares
 - [stvStrategyPool] fix processable request being disabled on wrong condition
 - [stvStrategyPool] fix strategy apy calculation 
