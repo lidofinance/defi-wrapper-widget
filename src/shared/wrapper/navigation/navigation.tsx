@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import invariant from 'tiny-invariant';
 import { useDappStatus } from '@/modules/web3';
 import { SplashScreen } from '@/shared/components/splash-screen';
 
@@ -17,6 +18,17 @@ export type TAB = {
 type TabNavigatonProps = {
   tabs: TAB[];
   showDashboard?: boolean;
+};
+
+const NavigationContext = React.createContext<{
+  mode: WidgetState;
+  setMode: (mode: WidgetState) => void;
+} | null>(null);
+
+export const useNavigation = () => {
+  const context = React.useContext(NavigationContext);
+  invariant(context, 'useNavigation must be used within a NavigationProvider');
+  return context;
 };
 
 export const Navigation = ({
@@ -63,28 +75,32 @@ export const Navigation = ({
     });
   }, [showDashboard, visibleTabs, modePristine]);
 
+  const contextValue = useMemo(() => ({ mode, setMode }), [mode]);
+
   return (
-    <WrapperLayout>
-      <SplashScreen isLoading={showSplashScreen}>
-        <TransactionModal
-          backToDashboard={() => setMode('dashboard')}
-          onModalOpen={() => {
-            setModePristine(false);
-          }}
-        >
-          <WidgetTabNavigation
-            mode={mode}
-            mb={6}
-            tabs={visibleTabs}
-            onTabClick={(value: WidgetState) => {
-              setMode(value);
+    <NavigationContext.Provider value={contextValue}>
+      <WrapperLayout>
+        <SplashScreen isLoading={showSplashScreen}>
+          <TransactionModal
+            backToDashboard={() => setMode('dashboard')}
+            onModalOpen={() => {
               setModePristine(false);
             }}
-          />
-          {selectedTab?.component && <selectedTab.component />}
-        </TransactionModal>
-        <WhitelistedModal />
-      </SplashScreen>
-    </WrapperLayout>
+          >
+            <WidgetTabNavigation
+              mode={mode}
+              mb={6}
+              tabs={visibleTabs}
+              onTabClick={(value: WidgetState) => {
+                setMode(value);
+                setModePristine(false);
+              }}
+            />
+            {selectedTab?.component && <selectedTab.component />}
+          </TransactionModal>
+          <WhitelistedModal />
+        </SplashScreen>
+      </WrapperLayout>
+    </NavigationContext.Provider>
   );
 };

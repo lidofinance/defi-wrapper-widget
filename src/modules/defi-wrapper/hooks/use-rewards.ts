@@ -1,4 +1,4 @@
-import { Address, isAddressEqual } from 'viem';
+import { Address, erc20Abi, getContract, isAddressEqual } from 'viem';
 import { usePublicClient } from 'wagmi';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
@@ -42,6 +42,8 @@ export const useRewards = (addressOverride?: Address) => {
 
       const rewardsInfo: RewardsInfoEntry[] = [];
 
+      const tokenBalances = new Map<Address, bigint>();
+
       for (const [index, record] of merkleTree.values.entries()) {
         const recipientAddress = record.value[0] as Address;
         const rewardToken = record.value[1] as Address;
@@ -73,6 +75,26 @@ export const useRewards = (addressOverride?: Address) => {
         ]);
 
         if (previewClaim === 0n) {
+          continue;
+        }
+
+        if (!tokenBalances.has(rewardToken)) {
+          const tokenContract = getContract({
+            address: rewardToken,
+            abi: erc20Abi,
+            client: publicClient,
+          });
+          const balance = await tokenContract.read.balanceOf([
+            distributor.address,
+          ]);
+          tokenBalances.set(rewardToken, balance);
+        }
+
+        const tokenBalance = tokenBalances.get(rewardToken);
+        invariant(tokenBalance !== undefined, 'Token balance is not defined');
+
+        if (previewClaim > tokenBalance) {
+          // if distributor doesn't have enough balance, we skip this reward to prevent failed transactions
           continue;
         }
 

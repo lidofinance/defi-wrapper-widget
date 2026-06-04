@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 
 import invariant from 'tiny-invariant';
 
+import { USER_CONFIG } from '@/config';
 import { ReportMissingError } from '../consts';
 import { useVault } from '../vault-context';
 
@@ -12,13 +13,16 @@ export const useReportCalls = () => {
 
     const { report, isReportFresh, lazyOracle } = activeVault;
 
-    void lazyOracle.read.latestReportData().then((latestReport) => {
-      console.debug('DEBUGGING INFO, SCREENSHOT ME', {
-        latestReport,
-        report,
-        isReportFresh,
+    // Debug logging intended for devs only — do not ship to production
+    if (USER_CONFIG.isDev) {
+      void lazyOracle.read.latestReportData().then((latestReport) => {
+        console.debug('DEBUGGING INFO, SCREENSHOT ME', {
+          latestReport,
+          report,
+          isReportFresh,
+        });
       });
-    });
+    }
 
     if (!report) {
       if (!isReportFresh) {

@@ -1,6 +1,7 @@
 import { usePublicClient } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
+import { SUSTAINABLE_MINT_STETH_THRESHOLD } from '@/config';
 import { useStvSteth } from '@/modules/defi-wrapper';
 import { readWithReport, useVault } from '@/modules/vaults';
 import { useDappStatus, useLidoSDK } from '@/modules/web3';
@@ -27,6 +28,8 @@ export const useAvailableMint = () => {
         totalMintedStethShares,
         remainingMintableVaultShares,
         remainingMintableUserShares,
+        maxMintableExternalShares,
+        currentMintedExternalShares,
       ] = await readWithReport({
         publicClient,
         report: activeVault?.report,
@@ -34,20 +37,15 @@ export const useAvailableMint = () => {
           wrapper.prepare.totalMintingCapacitySharesOf([address]),
           dashboard.prepare.remainingMintingCapacityShares([0n]),
           wrapper.prepare.remainingMintingCapacitySharesOf([address, 0n]),
+          // not dependant on report but benefit from batch
+          lidoV3.prepare.getMaxMintableExternalShares(),
+          lidoV3.prepare.getExternalShares(),
         ],
       });
 
-      const [maxMintableExternalShares, currentMintedExternalShares] =
-        await Promise.all([
-          lidoV3.read.getMaxMintableExternalShares(),
-          lidoV3.read.getExternalShares(),
-        ]);
-
       const mintableShares = minBN(
-        minBN(
-          remainingMintableVaultShares,
-          maxMintableExternalShares - currentMintedExternalShares,
-        ),
+        remainingMintableVaultShares,
+        maxMintableExternalShares - currentMintedExternalShares,
         remainingMintableUserShares,
       );
 
@@ -56,7 +54,9 @@ export const useAvailableMint = () => {
         shares.convertToSteth(mintableShares),
       ]);
 
-      const isSustainableMint = mintableSteth > 10000n;
+      // 0.001 ETH minimum to treat minting as viable
+      const isSustainableMint =
+        mintableSteth > SUSTAINABLE_MINT_STETH_THRESHOLD;
 
       const isEmpty = totalMintedSteth === 0n && !isSustainableMint;
 

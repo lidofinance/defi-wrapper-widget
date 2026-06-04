@@ -6,7 +6,7 @@ import { useStvSteth } from '@/modules/defi-wrapper';
 import { readWithReport, useVault } from '@/modules/vaults';
 import { useDappStatus, useLidoSDK } from '@/modules/web3';
 
-import { isEqualEpsilonBN, maxBN, minBN } from '@/utils/bn';
+import { clampZeroBN, isEqualEpsilonBN, minBN } from '@/utils/bn';
 
 import { DepositFormValues } from '../deposit-form-context/types';
 
@@ -62,6 +62,8 @@ export const usePreviewMint = () => {
         expectedMintedStethShares,
         userAssets,
         userMintedShares,
+        maxMintableExternalShares,
+        currentMintedExternalShares,
       ] = await readWithReport({
         publicClient,
         report: activeVault?.report,
@@ -71,18 +73,14 @@ export const usePreviewMint = () => {
           wrapper.prepare.calcStethSharesToMintForAssets([amount]),
           wrapper.prepare.assetsOf([address]),
           wrapper.prepare.mintedStethSharesOf([address]),
+          // not dependant on report but benefit from batch
+          lidoV3.prepare.getMaxMintableExternalShares(),
+          lidoV3.prepare.getExternalShares(),
         ],
       });
 
-      const [maxMintableExternalShares, currentMintedExternalShares] =
-        await Promise.all([
-          lidoV3.read.getMaxMintableExternalShares(),
-          lidoV3.read.getExternalShares(),
-        ]);
-
-      const remainingLidoCapacityShares = maxBN(
+      const remainingLidoCapacityShares = clampZeroBN(
         maxMintableExternalShares - currentMintedExternalShares,
-        0n,
       );
 
       const [actualUserLiability] = await readWithReport({
@@ -94,14 +92,14 @@ export const usePreviewMint = () => {
       });
 
       // how much of capacity of the user is taken by existing liability
-      const takenMintingCapacity = maxBN(
+      const takenMintingCapacity = clampZeroBN(
         userMintedShares - actualUserLiability,
-        0n,
       );
 
       const maxToMintShares = minBN(
         remainingUserMintingCapacityShares,
-        minBN(remainingVaultMintingCapacityShares, remainingLidoCapacityShares),
+        remainingVaultMintingCapacityShares,
+        remainingLidoCapacityShares,
       );
 
       const isLimitedByVaultCapacity =

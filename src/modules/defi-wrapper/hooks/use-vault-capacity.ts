@@ -8,7 +8,7 @@ import {
   VAULT_TOTAL_BASIS_POINTS,
 } from '@/modules/vaults';
 import { useLidoSDK } from '@/modules/web3';
-import { maxBN, minBN } from '@/utils/bn';
+import { clampZeroBN, minBN } from '@/utils/bn';
 
 export const useVaultCapacity = () => {
   const { publicClient, shares, core } = useLidoSDK();
@@ -51,8 +51,7 @@ export const useVaultCapacity = () => {
       const reserveRatioPercent =
         (Number(reserveRatioBP) / VAULT_TOTAL_BASIS_POINTS) * 100;
 
-      const remainingLidoExternalSharesCapacity = maxBN(
-        0n,
+      const remainingLidoExternalSharesCapacity = clampZeroBN(
         maxMintableExternalShares - currentMintedExternalShares,
       );
 
@@ -78,8 +77,7 @@ export const useVaultCapacity = () => {
         ],
       });
 
-      const remainingDepositCapacityEth = maxBN(
-        0n,
+      const remainingDepositCapacityEth = clampZeroBN(
         totalDepositCapacityEth - currentVaultDepositEth,
       );
 

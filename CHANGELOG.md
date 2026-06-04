@@ -1,3 +1,14 @@
+# 0.4.4
+
+- improved withdrawal validation error message
+- Added SRI hashes for scripts
+- WalletConnect is disabled when no VITE_WALLETCONNECT_PROJECT_ID is provided
+- [stvStrategyPool] add deposit warning for healing deposits that do not mint steth shares
+- [stvStrategyPool] fix processable request being disabled on wrong condition
+- [stvStrategyPool] fix strategy apy calculation 
+- removed deprecated code for GGV strategy pool
+- tests and various code improvements
+
 # 0.4.3
 
 - tx error when deposit capacity is full for lido earn strategy

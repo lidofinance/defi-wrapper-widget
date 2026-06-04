@@ -5,6 +5,7 @@ import svgr from 'vite-plugin-svgr';
 
 export default defineConfig(async ({ mode }) => {
   const checker = (await import('vite-plugin-checker')).default;
+  const sri = (await import('vite-plugin-sri-gen')).default;
   mode = mode === 'production' || mode === 'development' ? '' : mode;
 
   const env = loadEnv(mode, process.cwd());
@@ -22,6 +23,7 @@ export default defineConfig(async ({ mode }) => {
       }),
       svgr(),
       react(),
+      sri(),
     ],
     server: {
       port,
@@ -38,6 +40,16 @@ export default defineConfig(async ({ mode }) => {
     // Define environment variables to be injected at build time
     define: {
       'process.env': env,
+    },
+    test: {
+      environment: 'node',
+      globals: true,
+      include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+      coverage: {
+        provider: 'v8',
+        include: ['src/utils/**', 'src/features/**/shared/utils.ts'],
+        exclude: ['src/utils/encodable.ts'],
+      },
     },
   };
 });
