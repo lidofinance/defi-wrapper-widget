@@ -493,6 +493,7 @@ export const useStrategyPosition = (
         ...params,
       },
     ],
+    throwOnError: true,
     // this is large query so we must be conservative with refetches
     refetchOnWindowFocus: false,
     refetchOnMount: false,
