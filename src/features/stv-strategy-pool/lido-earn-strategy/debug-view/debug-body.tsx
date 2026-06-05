@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BarSegment, useChart } from '@chakra-ui/charts';
 import { Box, HStack, Span, Spinner, Switch, Text } from '@chakra-ui/react';
 import { useVaultCapacity } from '@/modules/defi-wrapper';
-import { factorMulBN } from '@/utils/bn';
+import { factorMulBN, clampZeroBN } from '@/utils/bn';
 import { useEarnPosition, useStrategyWithdrawalRequestsRead } from '../hooks';
 import {
   ChartItem,
@@ -121,7 +121,7 @@ export const DebugBody = () => {
     positionData?.balanceInWsteth,
     positionData?.claimableDepositInWsteth,
     positionData?.pendingWithdrawalsInWsteth,
-    positionData.totalStrategyBalanceInStethShares,
+    positionData?.totalStrategyBalanceInStethShares,
   ] as const);
 
   const queryError =
@@ -165,6 +165,14 @@ export const DebugBody = () => {
     earnTotalBalanceInSteth,
   ] = batchToStethData;
 
+  const totalStethDelegated = clampZeroBN(
+    positionData.totalMintedSteth - positionData.stethOnBalance,
+  );
+
+  const shortfallStethFromDeposited = clampZeroBN(
+    totalStethDelegated - earnTotalBalanceInSteth,
+  );
+
   // EARN position
 
   const earnItems: ChartItem[] = [
@@ -178,11 +186,49 @@ export const DebugBody = () => {
     ),
   ];
 
+  // Liability position
+  const liabilityItems: ChartItem[] = [
+    toChartItem('In lido earn', earnTotalBalanceInSteth, 'teal.solid'),
+    toChartItem(
+      'Processable withdrawal (Rebalance)',
+      positionData.stethToRebalance,
+      'orange.solid',
+    ),
+    toChartItem(
+      'Processable withdrawal (Repay)',
+      positionData.stethToRepay,
+      'blue.emphasized',
+    ),
+    toChartItem(
+      'Processable withdrawal (Recover)',
+      positionData.stethToRecover,
+      'green.solid',
+    ),
+  ];
+
   // Proxy position
 
   const proxyItems: ChartItem[] = [
-    toChartItem('Deposited into Earn', earnTotalBalanceInSteth, 'purple.solid'),
+    toChartItem(
+      'Deposited to Lido Earn(returnable)',
+      totalStethDelegated,
+      'purple.solid',
+    ),
+    ...(shortfallStethFromDeposited > 0n
+      ? [
+          toChartItem(
+            'Unavailable to return(shortfall from deposited)',
+            shortfallStethFromDeposited,
+            'red.600',
+          ),
+        ]
+      : []),
     toChartItem('On proxy balance', positionData.stethOnBalance, 'blue.solid'),
+    toChartItem(
+      'Excess (can be withdrawn directly)',
+      positionData.strategyStethSharesExcess,
+      'green.solid',
+    ),
   ];
 
   // User value position
@@ -251,6 +297,7 @@ export const DebugBody = () => {
     showZeroValues ? items : items.filter((item) => item.value !== 0);
 
   const filteredEarnItems = filterZeros(earnItems);
+  const filteredLiabilityItems = filterZeros(liabilityItems);
   const filteredProxyItems = filterZeros(proxyItems);
   const filteredUserValueItems = filterZeros(userValueItems);
 
@@ -260,6 +307,7 @@ export const DebugBody = () => {
       itemsSum(filteredEarnItems),
       itemsSum(filteredProxyItems),
       itemsSum(filteredUserValueItems),
+      itemsSum(filteredLiabilityItems),
     ],
   );
 
@@ -275,7 +323,7 @@ export const DebugBody = () => {
           <Switch.Control />
           <Switch.Label>
             <Text textStyle="sm" color="fg.muted">
-              Display 0 values
+              Display 0 values (brakes proportions)
             </Text>
           </Switch.Label>
         </Switch.Root>
@@ -288,7 +336,14 @@ export const DebugBody = () => {
         minSegmentWidth={showZeroValues}
       />
       <DebugChart
-        title="Proxy Position"
+        title="Liability Position"
+        items={filteredLiabilityItems}
+        maxTotal={maxTotal}
+        token="stETH"
+        minSegmentWidth={showZeroValues}
+      />
+      <DebugChart
+        title="Proxy Balance Position"
         items={filteredProxyItems}
         maxTotal={maxTotal}
         token="stETH"
