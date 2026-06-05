@@ -309,6 +309,7 @@ export const getStrategyPosition = async ({
     stethToRecover,
     stethToRecoverPendingFromStrategyVault,
     //
+    maxLiabilityAvailableSteth,
     liabilityReturnShortfallSteth,
     liabilityMintingShortfallSteth,
   ] = await shares.convertBatchSharesToSteth([
@@ -325,6 +326,7 @@ export const getStrategyPosition = async ({
     stethSharesToRecover,
     stethSharesToRecoverPendingFromStrategyVault,
     //
+    maxLiabilityAvailableStethShares,
     liabilityReturnShortfallStethShares,
     liabilityMintingShortfallStethShares,
   ]);
@@ -434,6 +436,7 @@ export const getStrategyPosition = async ({
     isBadDebt,
     totalLockedEth,
     assetShortfallInEth,
+    maxLiabilityAvailableSteth,
     liabilityReturnShortfallSteth,
     liabilityMintingShortfallSteth,
 
