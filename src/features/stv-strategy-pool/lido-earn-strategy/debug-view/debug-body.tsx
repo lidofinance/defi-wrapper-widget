@@ -22,6 +22,7 @@ import {
   DebugInfoSection,
   DebugAddressRow,
   DebugBooleanRow,
+  DebugRow,
 } from './debug-info';
 import {
   ChartItem,
@@ -519,6 +520,17 @@ export const DebugBody = () => {
             label="stVault"
             address={stvStrategy.stakingVault?.address}
           />
+        </DebugInfoSection>
+        <DebugInfoSection title="Vault Params">
+          <DebugRow label="RR">{vaultCapacity.reserveRatioPercent}%</DebugRow>
+          <DebugRow label="Force Rebalance Threshold">
+            {vaultCapacity.poolForcedRebalanceThresholdPercent}%
+          </DebugRow>
+          <DebugRow label="Vault RR">
+            {vaultCapacity.reserveRatioPercent -
+              vaultCapacity.reserveRatioGapPercent}
+            %
+          </DebugRow>
         </DebugInfoSection>
         <DebugInfoSection title="Pause State">
           <DebugBooleanRow

@@ -84,6 +84,16 @@ export const DebugBooleanRow = ({
   </HStack>
 );
 
+export const DebugRow = ({
+  children,
+  label,
+}: React.PropsWithChildren<{ label: string }>) => (
+  <HStack gap="3" textStyle="xs">
+    <RowLabel>{label}</RowLabel>
+    {children}
+  </HStack>
+);
+
 export const DebugTokenAmountRow = ({
   label,
   amount,
