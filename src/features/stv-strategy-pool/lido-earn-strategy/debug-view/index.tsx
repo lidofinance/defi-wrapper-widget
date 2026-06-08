@@ -18,8 +18,9 @@ const debugDialog = createOverlay((props) => {
           <Dialog.Content
             w="full"
             maxW="full"
-            maxH="calc(100vh - 2rem)"
+            maxH="calc(80vh)"
             overflow="auto"
+            bg="bg.emphasized"
           >
             <Dialog.Header>
               <Dialog.Title>Lido Earn Strategy Debug</Dialog.Title>

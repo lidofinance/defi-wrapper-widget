@@ -1,9 +1,28 @@
 import { useState } from 'react';
+import { formatEther } from 'viem';
 import { BarSegment, useChart } from '@chakra-ui/charts';
-import { Box, HStack, Span, Spinner, Switch, Text } from '@chakra-ui/react';
-import { useVaultCapacity } from '@/modules/defi-wrapper';
-import { factorMulBN, clampZeroBN } from '@/utils/bn';
-import { useEarnPosition, useStrategyWithdrawalRequestsRead } from '../hooks';
+import {
+  Box,
+  HStack,
+  Span,
+  Spinner,
+  Stack,
+  Switch,
+  Text,
+} from '@chakra-ui/react';
+import { useStvStrategy, useVaultCapacity } from '@/modules/defi-wrapper';
+import { useDappStatus } from '@/modules/web3';
+import { factorMulBN, clampZeroBN, minBN } from '@/utils/bn';
+import {
+  useEarnPosition,
+  useEarnStrategy,
+  useStrategyWithdrawalRequestsRead,
+} from '../hooks';
+import {
+  DebugInfoSection,
+  DebugAddressRow,
+  DebugBooleanRow,
+} from './debug-info';
 import {
   ChartItem,
   ChartReference,
@@ -57,7 +76,8 @@ const DebugChart = ({
                   pos="absolute"
                   top="-8"
                   right="4"
-                  bg="bg.panel"
+                  bg="gray.800"
+                  color="white"
                   textStyle="xs"
                   zIndex="1"
                   px="2.5"
@@ -74,13 +94,17 @@ const DebugChart = ({
               );
             }}
           >
-            {references?.map((ref, i) => (
-              <BarSegment.Reference
-                key={i}
-                value={ref.value}
-                label={ref.label}
-              />
-            ))}
+            {references
+              ?.slice()
+              .sort((a, b) => a.value - b.value)
+              .map((ref, i, arr) => (
+                <BarSegment.Reference
+                  key={i}
+                  value={ref.value}
+                  h={`${150 + (arr.length - 1 - i) * 50}%`}
+                  label={ref.label}
+                />
+              ))}
           </BarSegment.Bar>
         </BarSegment.Content>
       </BarSegment.Root>
@@ -103,8 +127,20 @@ const DebugChart = ({
 
 export const DebugBody = () => {
   const [showZeroValues, setShowZeroValues] = useState(false);
+
+  const { address } = useDappStatus();
+  const {
+    isLoading: isStvStrategyLoading,
+    error: stvStrategyError,
+    ...stvStrategy
+  } = useStvStrategy();
   const { isLoading: isWithdarawalRequestsLoading, withdrawalRequests } =
     useStrategyWithdrawalRequestsRead(true);
+  const {
+    data: earnStrategy,
+    error: earnStrategyError,
+    isLoading: isEarnStrategyLoading,
+  } = useEarnStrategy();
   const {
     data: vaultCapacity,
     error: vaultCapacityError,
@@ -125,12 +161,18 @@ export const DebugBody = () => {
   ] as const);
 
   const queryError =
-    positionQuery.error || vaultCapacityError || batchToStethError;
+    positionQuery.error ||
+    vaultCapacityError ||
+    batchToStethError ||
+    earnStrategyError ||
+    stvStrategyError;
   const isLoading =
     isPositionLoading ||
     isVaultCapacityLoading ||
     isWithdarawalRequestsLoading ||
-    isBatchSharesLoading;
+    isBatchSharesLoading ||
+    isEarnStrategyLoading ||
+    isStvStrategyLoading;
 
   if (queryError) {
     return (
@@ -152,7 +194,9 @@ export const DebugBody = () => {
     !positionData ||
     !vaultCapacity ||
     !withdrawalRequests ||
-    !batchToStethData
+    !batchToStethData ||
+    !earnStrategy ||
+    !stvStrategy
   ) {
     return <Box p="4">Queries not enabled</Box>;
   }
@@ -173,6 +217,14 @@ export const DebugBody = () => {
     totalStethDelegated - earnTotalBalanceInSteth,
   );
 
+  // clamped to zero as max avaliable liability can be more then minted if the position is repaid/overcollateralized
+  const totalStethToHeal = clampZeroBN(
+    positionData.totalMintedSteth - positionData.maxLiabilityAvailableSteth,
+  );
+
+  const stethRepaidToHeal = minBN(positionData.stethToRepay, totalStethToHeal);
+  const stethRepaidToUnlock = positionData.stethToRepay - stethRepaidToHeal;
+
   // EARN position
 
   const earnItems: ChartItem[] = [
@@ -189,20 +241,37 @@ export const DebugBody = () => {
   // Liability position
   const liabilityItems: ChartItem[] = [
     toChartItem('In lido earn', earnTotalBalanceInSteth, 'teal.solid'),
+
+    toChartItem(
+      'Processable withdrawal (Repay, Heal)',
+      stethRepaidToHeal,
+      'blue.emphasized',
+    ),
+    toChartItem(
+      'Processable withdrawal (Repay,Unlock)',
+      stethRepaidToUnlock,
+      'green.emphasized',
+    ),
     toChartItem(
       'Processable withdrawal (Rebalance)',
       positionData.stethToRebalance,
-      'orange.solid',
-    ),
-    toChartItem(
-      'Processable withdrawal (Repay)',
-      positionData.stethToRepay,
-      'blue.emphasized',
+      'red.solid',
     ),
     toChartItem(
       'Processable withdrawal (Recover)',
       positionData.stethToRecover,
       'green.solid',
+    ),
+  ];
+
+  const liabilityReferences: ChartReference[] = [
+    toChartReference(
+      `Max liability by current collateral -${formatEther(positionData.maxLiabilityAvailableSteth)} stETH`,
+      positionData.maxLiabilityAvailableSteth,
+    ),
+    toChartReference(
+      `Total liability minted - ${formatEther(positionData.totalMintedSteth)} stETH`,
+      positionData.totalMintedSteth,
     ),
   ];
 
@@ -231,6 +300,45 @@ export const DebugBody = () => {
     ),
   ];
 
+  const ethToBeUnlocked = minBN(
+    positionData.stethLiabilityToRepayInEth,
+    positionData.withdrawableEthAfterRepay,
+  );
+
+  const ethShortfall =
+    positionData.stethLiabilityToRepayInEth - ethToBeUnlocked;
+
+  const lockedInEarn =
+    positionData.lockedEthForTotalMintedSteth -
+    positionData.totalValuePendingFromStrategyVaultInEth -
+    ethToBeUnlocked -
+    positionData.stethToRebalance -
+    ethShortfall;
+
+  // User value position change
+
+  const userValueChangeItems: ChartItem[] = [
+    toChartItem('Locked in Earn', lockedInEarn, 'red.600'),
+    toChartItem(
+      'Pending withdrawal from Earn',
+      positionData.totalValuePendingFromStrategyVaultInEth,
+      'orange.solid',
+    ),
+    toChartItem(
+      'Process withdrawal - to be unlocked',
+      positionData.withdrawableEthAfterRepay,
+      'green.solid',
+    ),
+    ...(ethShortfall > 0n
+      ? [toChartItem('Missing collateral', ethShortfall, 'red.800')]
+      : []),
+    toChartItem(
+      'Process withdrawal - to be rebalanced',
+      positionData.stethToRebalance,
+      'gray.solid',
+    ),
+  ];
+
   // User value position
 
   const [pendingStVaultWithdrawals, claimableStVaultWithdrawals] =
@@ -249,7 +357,7 @@ export const DebugBody = () => {
       'Locked user balance',
       positionData.proxyBalanceStvInEth -
         positionData.proxyUnlockedBalanceStvInEth,
-      'red.600',
+      'orange.600',
     ),
     toChartItem(
       'Unlocked user balance',
@@ -284,13 +392,35 @@ export const DebugBody = () => {
     ),
   ];
 
+  const rrCapUnit = 1 - vaultCapacity.reserveRatioUnit;
+
   const referenceAtRR = factorMulBN(
     positionData.proxyBalanceStvInEth,
-    1 - vaultCapacity.reserveRationUnit,
+    rrCapUnit,
+  );
+
+  const forceRebalanceUnit = 1 - vaultCapacity.poolForcedRebalanceThresholdUnit;
+
+  const referenceAtForcedRebalance = factorMulBN(
+    positionData.proxyBalanceStvInEth,
+    forceRebalanceUnit,
+  );
+
+  const actualRRUnit =
+    1 - (vaultCapacity.reserveRatioUnit - vaultCapacity.reserveRatioGapUnit);
+
+  const actualRRreference = factorMulBN(
+    positionData.proxyBalanceStvInEth,
+    actualRRUnit,
   );
 
   const userValueReferences: ChartReference[] = [
-    toChartReference('RR cap', referenceAtRR),
+    toChartReference(`RR cap(${rrCapUnit * 100}%)`, referenceAtRR),
+    toChartReference(
+      `Forced Rebalance(${forceRebalanceUnit * 100}%)`,
+      referenceAtForcedRebalance,
+    ),
+    toChartReference(`Vault RR cap(${actualRRUnit * 100}%)`, actualRRreference),
   ];
 
   const filterZeros = <T extends { value: number }>(items: T[]): T[] =>
@@ -300,6 +430,7 @@ export const DebugBody = () => {
   const filteredLiabilityItems = filterZeros(liabilityItems);
   const filteredProxyItems = filterZeros(proxyItems);
   const filteredUserValueItems = filterZeros(userValueItems);
+  const filteredUserChangeItems = filterZeros(userValueChangeItems);
 
   // For each chart we calculate max of their sums, stabilizing values
   const maxTotal = Math.max(
@@ -308,6 +439,7 @@ export const DebugBody = () => {
       itemsSum(filteredProxyItems),
       itemsSum(filteredUserValueItems),
       itemsSum(filteredLiabilityItems),
+      itemsSum(filteredUserChangeItems),
     ],
   );
 
@@ -323,41 +455,116 @@ export const DebugBody = () => {
           <Switch.Control />
           <Switch.Label>
             <Text textStyle="sm" color="fg.muted">
-              Display 0 values (brakes proportions)
+              Display ~0 values (brakes proportions)
             </Text>
           </Switch.Label>
         </Switch.Root>
       </HStack>
-      <DebugChart
-        title="Earn Position"
-        items={filteredEarnItems}
-        maxTotal={maxTotal}
-        token="stETH"
-        minSegmentWidth={showZeroValues}
-      />
-      <DebugChart
-        title="Liability Position"
-        items={filteredLiabilityItems}
-        maxTotal={maxTotal}
-        token="stETH"
-        minSegmentWidth={showZeroValues}
-      />
-      <DebugChart
-        title="Proxy Balance Position"
-        items={filteredProxyItems}
-        maxTotal={maxTotal}
-        token="stETH"
-        minSegmentWidth={showZeroValues}
-      />
-      <DebugChart
-        title="Eth value Position"
-        items={filteredUserValueItems}
-        // only correctly displayed when zero values are hidden
-        references={!showZeroValues ? userValueReferences : []}
-        maxTotal={maxTotal}
-        token="ETH"
-        minSegmentWidth={showZeroValues}
-      />
+      <Stack gap="10">
+        <DebugChart
+          title="Earn Position"
+          items={filteredEarnItems}
+          maxTotal={maxTotal}
+          token="stETH"
+          minSegmentWidth={showZeroValues}
+        />
+        <DebugChart
+          title="Liability Position"
+          items={filteredLiabilityItems}
+          maxTotal={maxTotal}
+          token="stETH"
+          minSegmentWidth={showZeroValues}
+          references={!showZeroValues ? liabilityReferences : []}
+        />
+        <DebugChart
+          title="Proxy Balance Position"
+          items={filteredProxyItems}
+          maxTotal={maxTotal}
+          token="stETH"
+          minSegmentWidth={showZeroValues}
+        />
+        <DebugChart
+          title="Eth position to change"
+          items={filteredUserChangeItems}
+          // only correctly displayed when zero values are hidden
+          references={!showZeroValues ? userValueReferences : []}
+          maxTotal={maxTotal}
+          token="ETH"
+          minSegmentWidth={showZeroValues}
+        />
+        <DebugChart
+          title="Eth value Position"
+          items={filteredUserValueItems}
+          // only correctly displayed when zero values are hidden
+          references={!showZeroValues ? userValueReferences : []}
+          maxTotal={maxTotal}
+          token="ETH"
+          minSegmentWidth={showZeroValues}
+        />
+        <DebugInfoSection title="Vault Addresses">
+          <DebugAddressRow label="User" address={address} />
+          <DebugAddressRow
+            label="Strategy Proxy (user)"
+            address={earnStrategy?.strategyProxyAddress}
+          />
+          <DebugAddressRow
+            label="Lido Earn Strategy"
+            address={earnStrategy?.lidoEarnStrategy.address}
+          />
+          <DebugAddressRow
+            label="Wrapper"
+            address={stvStrategy.wrapper?.address}
+          />
+          <DebugAddressRow
+            label="stVault"
+            address={stvStrategy.stakingVault?.address}
+          />
+        </DebugInfoSection>
+        <DebugInfoSection title="Pause State">
+          <DebugBooleanRow
+            label="Deposit paused"
+            value={earnStrategy?.state.isDepositPaused ?? false}
+          />
+          <DebugBooleanRow
+            label="Withdrawal paused"
+            value={earnStrategy?.state.isWithdrawalPaused ?? false}
+          />
+          <DebugBooleanRow
+            label="Supply feature paused"
+            value={earnStrategy?.state.isSupplyPaused ?? false}
+          />
+          <DebugBooleanRow
+            label="Redeem feature paused"
+            value={earnStrategy?.state.isRedeemPaused ?? false}
+          />
+          <DebugBooleanRow
+            label="Async deposit queue paused"
+            value={earnStrategy?.state.isAsyncDepositQueuePaused ?? false}
+          />
+          <DebugBooleanRow
+            label="Async redeem queue paused"
+            value={earnStrategy?.state.isAsyncRedeemQueuePaused ?? false}
+          />
+        </DebugInfoSection>
+        <DebugInfoSection title="Lido Earn Contracts">
+          <DebugAddressRow
+            label="Earn Vault"
+            address={earnStrategy?.earnVault.address}
+          />
+          <DebugAddressRow
+            label="Share Manager"
+            address={earnStrategy?.shareManager.address}
+          />
+          <DebugAddressRow
+            label="Async Deposit Queue"
+            address={earnStrategy?.asyncDepositQueue.address}
+          />
+          <DebugAddressRow
+            label="Async Redeem Queue"
+            address={earnStrategy?.asyncRedeemQueue.address}
+          />
+        </DebugInfoSection>
+      </Stack>
     </Box>
   );
 };

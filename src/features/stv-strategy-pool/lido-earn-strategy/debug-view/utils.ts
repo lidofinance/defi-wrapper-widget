@@ -12,10 +12,15 @@ export type ChartItem = {
 
 const FILLER_NAME = '__filler__';
 
+const VALUE_NORMALIZER = 10n ** 9n;
+
+export const toChartValue = (value: bigint | undefined): number =>
+  value === undefined ? 0 : Number(value / VALUE_NORMALIZER);
+
 const toDataNumber = (value: bigint | undefined) => {
   if (value === undefined) return { num: 0, formatted: '0' };
   return {
-    num: Number(value / 10n ** 9n),
+    num: toChartValue(value),
     formatted: formatEther(value),
   };
 };
@@ -24,9 +29,6 @@ export type ChartReference = {
   value: number;
   label?: string;
 };
-
-export const toChartValue = (value: bigint | undefined): number =>
-  value === undefined ? 0 : Number(value / 10n ** 9n);
 
 export const toChartItem = (
   name: string,

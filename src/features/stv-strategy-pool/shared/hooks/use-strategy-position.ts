@@ -220,8 +220,10 @@ export const getStrategyPosition = async ({
     strategyDepositOffsetInLockedEth,
     totalStethLiabilityInEth,
     totalStethSharesAvailableForReturnInEth,
+    //
     withdrawableStvAfterRepay,
     withdrawableEthAfterRepay,
+    stethLiabilityToRepayInEth,
     pendingUnlockFromStrategyVaultInEth,
     //
     currentProxyMintingCapacityShares,
@@ -242,16 +244,24 @@ export const getStrategyPosition = async ({
       wrapper.prepare.calcAssetsToLockForStethShares([
         totalStethSharesAvailableForReturn,
       ]),
+      //
+      // how much stv can be withdrawn after repay+rebalance
       wrapper.prepare.unlockedStvOf([
         strategyProxyAddress,
         // this includes unlocked by repayment + rebalanced because it's the value passed to withdrawal queue
         stethSharesLiabilityToCover,
       ]),
+      // how much eth will be withdrawn after repay(incl wsteth unwrap)
       wrapper.prepare.unlockedAssetsOf([
         strategyProxyAddress,
         // this includes unlocked ONLY by repayment(wsteth unwrap adjusted) because that's what user will actually receive
         stethSharesRepaidAfterWstethUnwrap,
       ]),
+      // how much eth would be unlocked after repay for healthy position
+      wrapper.prepare.calcAssetsToLockForStethShares([
+        stethSharesRepaidAfterWstethUnwrap,
+      ]),
+      // how much eth would be unlocked for healthy position with funds pending from strategy vault
       wrapper.prepare.calcAssetsToLockForStethShares([
         stethSharesToRepayPendingFromStrategyVault,
       ]),
@@ -457,6 +467,7 @@ export const getStrategyPosition = async ({
 
     stethToRepay,
     stethSharesToRepay,
+    stethLiabilityToRepayInEth, // value that repaid shares should free up in healthy position
 
     stethToRebalance,
     stethSharesToRebalance,
@@ -470,6 +481,7 @@ export const getStrategyPosition = async ({
     //
     totalStvToWithdrawFromProxy,
     totalEthToWithdrawFromProxy,
+    withdrawableEthAfterRepay,
     totalValuePendingFromStrategyVaultInEth,
     // Minting capacity
     availableMintingCapacityStethShares,
