@@ -27,7 +27,7 @@ export const useEarnStrategyApy = () => {
       return undefined;
     }
 
-    const defaultUtilizationRate = 1 - vaultCapacity.reserveRationUnit;
+    const defaultUtilizationRate = 1 - vaultCapacity.reserveRatioUnit;
 
     const currentUtilizationRate =
       positionData?.currentUtilizationBP !== undefined

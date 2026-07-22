@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useMemo } from 'react';
 import { isAddressEqual, fromHex, zeroHash } from 'viem';
-import { isRevertError } from '@/utils/is-revert-error';
 import { LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk/common';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'tiny-invariant';
@@ -8,6 +7,7 @@ import { USER_CONFIG } from '@/config';
 
 import { VAULT_REPORT_REFETCH_INTERVAL_MS } from '@/modules/vaults';
 import { useLidoSDK } from '@/modules/web3';
+import { isRevertError } from '@/utils/is-revert-error';
 
 import { BYTES_TO_STRATEGY_ID, STRATEGY_IDS } from '../const';
 import {
@@ -125,6 +125,7 @@ export const WrapperProvider = ({ children }: React.PropsWithChildren) => {
         chainId: publicClient.chain.id,
       },
     ],
+    throwOnError: true,
     // Poll every 60s so pause-state changes (deposits/withdrawals/minting paused) are reflected promptly
     refetchInterval: VAULT_REPORT_REFETCH_INTERVAL_MS,
     queryFn: async () => {

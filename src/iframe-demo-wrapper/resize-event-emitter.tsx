@@ -3,8 +3,29 @@ import { RefObject, useEffect, useRef } from 'react';
 const EVENT = 'iframe-resize';
 
 type ResizeMessage = {
-  type: 'iframe-resize';
+  type: typeof EVENT;
   height: number;
+};
+
+export const initResizeEventEmitter = (rootElementId = 'root') => {
+  let lastHeight = 0;
+
+  const send = (height: number) => {
+    window.parent.postMessage({ type: EVENT, height }, '*');
+  };
+
+  const el = document.getElementById(rootElementId);
+  if (!el) return;
+
+  const ro = new ResizeObserver((entries) => {
+    const h = Math.round(entries[0].contentRect.height);
+    if (Math.abs(h - lastHeight) < 2) return;
+    lastHeight = h;
+    send(h);
+  });
+
+  ro.observe(el);
+  send(el.getBoundingClientRect().height);
 };
 
 export const useIframeResize = (
@@ -33,36 +54,4 @@ export const useIframeResize = (
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
   }, [iframeRef]);
-};
-
-export const usePostMessageAutoHeight = (rootSelector: string = '#root') => {
-  const lastHeightRef = useRef(0);
-
-  const send = (height: number) => {
-    window.parent.postMessage({ type: EVENT, height }, '*');
-  };
-
-  useEffect(() => {
-    const root = document.querySelector(rootSelector);
-
-    if (!root) return;
-
-    const ro = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      const h = Math.round(entry.contentRect.height);
-
-      if (Math.abs(h - lastHeightRef.current) < 2) return;
-
-      lastHeightRef.current = h;
-
-      send(h);
-    });
-
-    ro.observe(root);
-
-    const newSize = root.getBoundingClientRect().height;
-    send(newSize);
-
-    return () => ro.disconnect();
-  }, [rootSelector]);
 };

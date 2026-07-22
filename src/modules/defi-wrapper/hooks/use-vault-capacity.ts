@@ -42,14 +42,25 @@ export const useVaultCapacity = () => {
         maxMintableExternalShares,
         currentMintedExternalShares,
         reserveRatioBP,
+        reserveRatioGapBP,
+        poolForcedRebalanceThresholdBP,
       ] = await Promise.all([
         lidoV3.read.getMaxMintableExternalShares(),
         lidoV3.read.getExternalShares(),
         wrapper.read.poolReserveRatioBP(),
+        wrapper.read.RESERVE_RATIO_GAP_BP(),
+        wrapper.read.poolForcedRebalanceThresholdBP(),
       ]);
 
       const reserveRatioPercent =
         (Number(reserveRatioBP) / VAULT_TOTAL_BASIS_POINTS) * 100;
+
+      const reserveRatioGapPercent =
+        (Number(reserveRatioGapBP) / VAULT_TOTAL_BASIS_POINTS) * 100;
+
+      const poolForcedRebalanceThresholdPercent =
+        (Number(poolForcedRebalanceThresholdBP) / VAULT_TOTAL_BASIS_POINTS) *
+        100;
 
       const remainingLidoExternalSharesCapacity = clampZeroBN(
         maxMintableExternalShares - currentMintedExternalShares,
@@ -108,7 +119,16 @@ export const useVaultCapacity = () => {
         // RR
         reserveRatioPercent,
         reserveRatioBP,
-        reserveRationUnit: reserveRatioPercent / 100,
+        reserveRatioUnit: reserveRatioPercent / 100,
+        // RR gap
+        reserveRatioGapPercent,
+        reserveRatioGapBP,
+        reserveRatioGapUnit: reserveRatioGapPercent / 100,
+        // forced rebalance threshold
+        poolForcedRebalanceThresholdPercent,
+        poolForcedRebalanceThresholdBP,
+        poolForcedRebalanceThresholdUnit:
+          poolForcedRebalanceThresholdPercent / 100,
       };
     },
   });
