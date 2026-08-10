@@ -45,7 +45,7 @@ export const useMintRequest = () => {
 
       const { success } = await withSuccess(
         sendTX({
-          successText: `${formattedAmount} ${label} has been minter`,
+          successText: `${formattedAmount} ${label} has been minted`,
           AATitleText: `Minting ${formattedAmount} ${label}`,
           flow: 'mint',
           AASigningDescription: DEFAULT_SIGNING_DESCRIPTION,

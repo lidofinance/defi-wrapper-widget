@@ -5,7 +5,8 @@ import invariant from 'tiny-invariant';
 import { useStvStrategy } from '@/modules/defi-wrapper';
 import { readWithReport, useVault } from '@/modules/vaults';
 import { useDappStatus, useLidoSDK } from '@/modules/web3';
-import { absBN, minBN, maxBN } from '@/utils/bn';
+import { clampZeroBN, minBN } from '@/utils/bn';
+import { computePositionHealth } from './position-health';
 
 type GetStrategyPositionDynamicParams = {
   // address of the proxy contract, which is used to interact with strategy vault and holds user funds on behalf of strategy
@@ -59,6 +60,7 @@ export const getStrategyPosition = async ({
   //
   // Base state
   //
+  const lidoV3 = await shares.core.getLidoContract();
 
   const [
     stethSharesOnBalance,
@@ -67,6 +69,8 @@ export const getStrategyPosition = async ({
     proxyBalanceStv,
     reserveRatioBP,
     totalPoolLiabilitySharesPerPoolAccounting,
+    lidoCoreMaxMintableExternalShares,
+    lidoCoreCurrentMintedExternalShares,
   ] = await Promise.all([
     strategy.read.wstethOf([address]),
     strategy.read.mintedStethSharesOf([address]),
@@ -74,6 +78,9 @@ export const getStrategyPosition = async ({
     wrapper.read.balanceOf([strategyProxyAddress]),
     wrapper.read.poolReserveRatioBP(),
     wrapper.read.totalLiabilityShares(),
+    // Lido global external shares cap — needed for accurate boost capacity display
+    lidoV3.read.getMaxMintableExternalShares(),
+    lidoV3.read.getExternalShares(),
   ]);
 
   // because vault accounting and user accounting are not directly in sync (esp in case of disconnected vault)
@@ -114,19 +121,16 @@ export const getStrategyPosition = async ({
     totalStethSharesAvailable - totalMintedStethShares;
 
   // steth profit & loss
-  const totalStethSharesExcess = maxBN(totalStethSharesDifference, 0n);
-  const totalStethSharesShortfall = absBN(
-    minBN(totalStethSharesDifference, 0n),
-  );
+  const totalStethSharesExcess = clampZeroBN(totalStethSharesDifference);
+  const totalStethSharesShortfall = clampZeroBN(-totalStethSharesDifference);
 
   ///
   /// Strategy withdrawal
   ///
 
   // total stETH shares that are minted but not on balance (delegated)
-  const totalStethSharesDelegated = maxBN(
+  const totalStethSharesDelegated = clampZeroBN(
     totalMintedStethShares - stethSharesOnBalance,
-    0n,
   );
 
   // total stETH shares that can be withdrawn for repayment of delegated liability
@@ -145,15 +149,13 @@ export const getStrategyPosition = async ({
   // Pending strategy withdraw
   //
 
-  const stethSharesToRepayPendingFromStrategyVault = maxBN(
+  const stethSharesToRepayPendingFromStrategyVault = clampZeroBN(
     strategyWithdrawalStethSharesOffset - totalStethSharesExcess,
-    0n,
   );
 
-  const stethSharesToRecoverPendingFromStrategyVault = maxBN(
+  const stethSharesToRecoverPendingFromStrategyVault = clampZeroBN(
     strategyWithdrawalStethSharesOffset -
       stethSharesToRepayPendingFromStrategyVault,
-    0n,
   );
 
   //
@@ -167,9 +169,8 @@ export const getStrategyPosition = async ({
   //
   // can eq 0n - means only profit was skimmed from strategy vault
   // can eq totalMintedStethShares - means all strategy vault position is withdrawn
-  const stethSharesLiabilityToCover = maxBN(
+  const stethSharesLiabilityToCover = clampZeroBN(
     totalMintedStethShares - totalStrategyBalanceInStethShares,
-    0n,
   );
 
   // out of totalStethSharesLiabilityToCover above:
@@ -177,7 +178,7 @@ export const getStrategyPosition = async ({
   // stETH shares that can be repaid from returned balance and unlock user ETH
   // can eq 0n - no stETH is to be repaid(only rewards to skim) or all stETH is lost and must be rebalanced
   // can eq stethSharesLiabilityToCover - all repayment can be done from returned balance
-  const stethSharesToRepay = minBN(
+  let stethSharesToRepay = minBN(
     stethSharesOnBalance,
     stethSharesLiabilityToCover,
   );
@@ -190,6 +191,12 @@ export const getStrategyPosition = async ({
     await shares.convertToSteth(stethSharesToRepay),
   );
 
+  if (stethSharesRepaidAfterWstethUnwrap === 0n && stethSharesToRepay > 0) {
+    // this means that the amount to repay is so small that after wstETH wrap/unwrap it becomes 0
+    // this will revert repay transaction so we have to round down to 0 and skip repay
+    stethSharesToRepay = 0n;
+  }
+
   // stETH shares that user is missing, it will be rebalanced and
   // essentially reduced from locked ETH
   // can eq 0n - all repayment can be done from returned balance
@@ -200,9 +207,8 @@ export const getStrategyPosition = async ({
 
   // stETH shares that can be recovered as profit above returned liability repayment
   // this can be withdrawn as (w)stETH
-  const stethSharesToRecover = maxBN(
+  const stethSharesToRecover = clampZeroBN(
     stethSharesOnBalance - stethSharesToRepay,
-    0n,
   );
 
   const [
@@ -214,8 +220,10 @@ export const getStrategyPosition = async ({
     strategyDepositOffsetInLockedEth,
     totalStethLiabilityInEth,
     totalStethSharesAvailableForReturnInEth,
+    //
     withdrawableStvAfterRepay,
     withdrawableEthAfterRepay,
+    stethLiabilityToRepayInEth,
     pendingUnlockFromStrategyVaultInEth,
     //
     currentProxyMintingCapacityShares,
@@ -236,16 +244,24 @@ export const getStrategyPosition = async ({
       wrapper.prepare.calcAssetsToLockForStethShares([
         totalStethSharesAvailableForReturn,
       ]),
+      //
+      // how much stv can be withdrawn after repay+rebalance
       wrapper.prepare.unlockedStvOf([
         strategyProxyAddress,
         // this includes unlocked by repayment + rebalanced because it's the value passed to withdrawal queue
         stethSharesLiabilityToCover,
       ]),
+      // how much eth will be withdrawn after repay(incl wsteth unwrap)
       wrapper.prepare.unlockedAssetsOf([
         strategyProxyAddress,
         // this includes unlocked ONLY by repayment(wsteth unwrap adjusted) because that's what user will actually receive
         stethSharesRepaidAfterWstethUnwrap,
       ]),
+      // how much eth would be unlocked after repay for healthy position
+      wrapper.prepare.calcAssetsToLockForStethShares([
+        stethSharesRepaidAfterWstethUnwrap,
+      ]),
+      // how much eth would be unlocked for healthy position with funds pending from strategy vault
       wrapper.prepare.calcAssetsToLockForStethShares([
         stethSharesToRepayPendingFromStrategyVault,
       ]),
@@ -257,6 +273,37 @@ export const getStrategyPosition = async ({
       dashboard.prepare.remainingMintingCapacityShares([0n]),
     ] as const,
   });
+
+  // Maximum liability in stETH shares that can be minted with for all user assets
+  // if >= totalMintedStethShares - there is some minting capacity due to rewards/repayment
+  // if<= totalMintedStethShares - user position is unhealthy, his actual liability is higher than allowed, but not funds are lost yet
+  //
+  // later case is most interesting because it creates double sided dis-balance, that can exist simultaneously:
+  // - 1. totalMintedStethShares >= totalAvailableStethShares creates shortfall that must be rebalanced from user locked ETH (reduces user total value)
+  // - 2. totalMintedStethShares >= maxLiabilityAvailableStethShares creates shortfall that just has be repaid and messes up numbers in inputs(otherwise no value is lost from it)
+  const [maxLiabilityAvailableStethShares] = await (proxyNominalBalanceStvInEth
+    ? await readWithReport({
+        publicClient,
+        report: activeVault.report,
+        contracts: [
+          wrapper.prepare.calcStethSharesToMintForAssets([
+            proxyNominalBalanceStvInEth,
+          ]),
+        ] as const,
+      })
+    : [0n]);
+
+  // case 1. this must be rebalanced from user value,
+  // e.g. strategy lost money
+  const liabilityReturnShortfallStethShares = clampZeroBN(
+    totalMintedStethShares - totalStethSharesAvailableForReturnInEth,
+  );
+
+  // case 2. this just must be repaid first so user can start unlocking their assets
+  // e.g. vault is not working and lido fees pile up and reduce stv share / eth price
+  const liabilityMintingShortfallStethShares = clampZeroBN(
+    totalMintedStethShares - maxLiabilityAvailableStethShares,
+  );
 
   const [
     totalStrategyBalanceInSteth,
@@ -271,6 +318,10 @@ export const getStrategyPosition = async ({
     stethToRebalance,
     stethToRecover,
     stethToRecoverPendingFromStrategyVault,
+    //
+    maxLiabilityAvailableSteth,
+    liabilityReturnShortfallSteth,
+    liabilityMintingShortfallSteth,
   ] = await shares.convertBatchSharesToSteth([
     totalStrategyBalanceInStethShares,
     stethSharesOnBalance,
@@ -284,27 +335,26 @@ export const getStrategyPosition = async ({
     stethSharesToRebalance,
     stethSharesToRecover,
     stethSharesToRecoverPendingFromStrategyVault,
+    //
+    maxLiabilityAvailableStethShares,
+    liabilityReturnShortfallStethShares,
+    liabilityMintingShortfallStethShares,
   ]);
 
-  // represents how much eth is actually locked to cover total liability
-  // can be less than totalMintedStethInEth if position is unhealthy
-  const totalLockedEth = minBN(
+  const {
+    totalLockedEth,
+    assetShortfallInEth,
+    isUnhealthy,
+    isBadDebt,
+    totalUserValueInEth,
+  } = computePositionHealth({
+    proxyBalanceStvInEth,
+    proxyUnlockedBalanceStvInEth,
+    proxyNominalBalanceStvInEth,
     totalStethLiabilityInEth,
-    proxyBalanceStvInEth - proxyUnlockedBalanceStvInEth,
-  );
-
-  // represents how much eth is missing from locked to cover total liability
-  // can be 0n if position is healthy
-  const assetShortfallInEth = totalStethLiabilityInEth - totalLockedEth;
-
-  const isUnhealthy = totalLockedEth < totalStethLiabilityInEth;
-
-  const isBadDebt = proxyBalanceStvInEth < totalStethLiabilityInEth;
-
-  const proxyBalanceInEth = activeVault.isConnected
-    ? proxyBalanceStvInEth
-    : proxyNominalBalanceStvInEth;
-  const totalUserValueInEth = proxyBalanceInEth + totalStethDifference;
+    totalStethDifference,
+    isVaultConnected: activeVault.isConnected,
+  });
 
   // maximum ETH that can be withdrawn from strategy vault (for delegated stETH repayment + excess) assuming healthy position
   // if stv position is unhealthy this number can be higher than user balance in eth
@@ -320,9 +370,8 @@ export const getStrategyPosition = async ({
 
   // eth that will be withdrawn from strategy proxy
   // ONLY FOR DISPLAY: can contain calculation errors due to conversions
-  const totalEthToWithdrawFromProxy = maxBN(
+  const totalEthToWithdrawFromProxy = clampZeroBN(
     withdrawableEthAfterRepay - stethToRebalance,
-    0n,
   );
 
   // this represents value of ether that is pending withdrawal from strategy vault to strategy proxy
@@ -345,6 +394,11 @@ export const getStrategyPosition = async ({
   const availableMintingCapacityStethShares = minBN(
     currentProxyMintingCapacityShares,
     currentVaultMintingCapacityShares,
+    // Lido global cap: prevents boost display exceeding what's actually mintable protocol-wide
+    // Sanity check
+    clampZeroBN(
+      lidoCoreMaxMintableExternalShares - lidoCoreCurrentMintedExternalShares,
+    ),
   );
 
   const targetUtilizationBP = 10_000n - reserveRatioBP;
@@ -392,6 +446,9 @@ export const getStrategyPosition = async ({
     isBadDebt,
     totalLockedEth,
     assetShortfallInEth,
+    maxLiabilityAvailableSteth,
+    liabilityReturnShortfallSteth,
+    liabilityMintingShortfallSteth,
 
     //
     // Withdrawing delegated stETH from Strategy Vault
@@ -410,6 +467,7 @@ export const getStrategyPosition = async ({
 
     stethToRepay,
     stethSharesToRepay,
+    stethLiabilityToRepayInEth, // value that repaid shares should free up in healthy position
 
     stethToRebalance,
     stethSharesToRebalance,
@@ -423,6 +481,7 @@ export const getStrategyPosition = async ({
     //
     totalStvToWithdrawFromProxy,
     totalEthToWithdrawFromProxy,
+    withdrawableEthAfterRepay,
     totalValuePendingFromStrategyVaultInEth,
     // Minting capacity
     availableMintingCapacityStethShares,
@@ -434,10 +493,9 @@ export const getStrategyPosition = async ({
 export const useStrategyPosition = (
   params: Partial<GetStrategyPositionDynamicParams>,
 ) => {
-  const { publicClient } = useLidoSDK();
+  const { publicClient, shares } = useLidoSDK();
   const { activeVault, queryKeys } = useVault();
   const { address } = useDappStatus();
-  const { shares } = useLidoSDK();
   const { wrapper, strategy, dashboard } = useStvStrategy();
 
   return useQuery({
@@ -450,6 +508,7 @@ export const useStrategyPosition = (
         ...params,
       },
     ],
+    throwOnError: true,
     // this is large query so we must be conservative with refetches
     refetchOnWindowFocus: false,
     refetchOnMount: false,

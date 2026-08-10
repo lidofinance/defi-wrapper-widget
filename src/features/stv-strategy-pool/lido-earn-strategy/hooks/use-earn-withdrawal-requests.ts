@@ -1,5 +1,10 @@
 import { useMemo } from 'react';
 import {
+  SUSTAINABLE_MINT_STETH_THRESHOLD,
+  PROCESSABLE_ETH_DISPLAY_THRESHOLD,
+  HEALING_STETH_SHARES_THRESHOLD,
+} from '@/config';
+import {
   useRequests,
   useClaim,
   useWithdrawalQueue,
@@ -25,15 +30,24 @@ const hasProcessRequest = (
 
   if (typeof minProccessableValueInEth === 'undefined') return false;
 
-  if (positionData.totalEthToWithdrawFromProxy > 0n) {
+  // Suppress processable request display when ETH amount is rounding dust from
+  // the wstETH→stETH→shares double conversion in the Lido Earn withdrawal path.
+  // Does not apply to the healing path (stethSharesToRepay > 0n), which is a
+  // legitimate liability repay with no ETH withdrawal.
+  if (
+    positionData.totalEthToWithdrawFromProxy > PROCESSABLE_ETH_DISPLAY_THRESHOLD
+  ) {
     return true;
   }
 
-  return positionData.stethSharesToRepay > 0n;
+  return positionData.stethSharesToRepay > HEALING_STETH_SHARES_THRESHOLD;
 };
 
 const canBoost = (boostableStethShares: bigint | undefined) => {
-  return !!boostableStethShares && boostableStethShares > 100n;
+  return (
+    !!boostableStethShares &&
+    boostableStethShares > SUSTAINABLE_MINT_STETH_THRESHOLD
+  );
 };
 
 const canRecover = (
@@ -163,12 +177,12 @@ export const useStrategyWithdrawalRequests = (includeBoost?: boolean) => {
             ethToReceive: positionData.totalEthToWithdrawFromProxy,
             stethSharesToRebalance: positionData.stethSharesToRebalance,
             stethSharesToRepay: positionData.stethSharesToRepay,
+            stethToRepay: positionData.stethToRepay,
             // we can't process withdrawals below the minimum threshold
             // but if value is zero and it's just repay it's healing
             isBelowMinimumThreshold:
               positionData.totalStvToWithdrawFromProxy > 0n &&
-              positionData.totalEthToWithdrawFromProxy -
-                positionData.stethToRebalance <=
+              positionData.totalEthToWithdrawFromProxy <=
                 minProcessableValueInEth,
             isHealing: positionData.totalStvToWithdrawFromProxy <= 0n,
           }

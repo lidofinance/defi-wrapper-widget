@@ -137,39 +137,68 @@ export const VaultStatus = ({
             ))}
           </VaultInfoSection>
         )}
-        {processableRequest && (
-          <VaultInfoSection
-            label={'Processable withdrawal requests to stVault'}
-          >
-            <VaultInfoEntry
-              token={'ETH'}
-              amount={processableRequest.ethToReceive}
-              suffix={
-                <Tooltip
-                  content={
-                    processableRequest.isBelowMinimumThreshold
-                      ? 'The total amount of ETH to withdraw is below the minimum threshold for processing.'
-                      : processableRequest.isHealing
-                        ? 'This will repay liability to the vault without withdrawing ETH.'
-                        : 'Create a withdrawal request from stVault to later claim your ETH'
-                  }
-                >
-                  <Button
-                    disabled={
-                      !processWithdrawalRequest ||
+
+        {
+          // UI for processable withdrawal request
+          processableRequest && !processableRequest.isHealing && (
+            <VaultInfoSection
+              label={'Processable withdrawal requests to stVault'}
+            >
+              <VaultInfoEntry
+                token={'ETH'}
+                amount={processableRequest.ethToReceive}
+                suffix={
+                  <Tooltip
+                    content={
                       processableRequest.isBelowMinimumThreshold
+                        ? 'The total amount of ETH to withdraw is below the minimum threshold for processing.'
+                        : 'Create a withdrawal request from stVault to later claim your ETH'
                     }
-                    loading={isPendingAction}
-                    onClick={() => processWithdrawalRequest?.()}
-                    size={'xs'}
                   >
-                    {processableRequest.isHealing ? 'Heal Position' : 'Process'}
-                  </Button>
-                </Tooltip>
-              }
-            />
-          </VaultInfoSection>
-        )}
+                    <Button
+                      disabled={
+                        !processWithdrawalRequest ||
+                        processableRequest.isBelowMinimumThreshold
+                      }
+                      loading={isPendingAction}
+                      onClick={() => processWithdrawalRequest?.()}
+                      size={'xs'}
+                    >
+                      {'Process'}
+                    </Button>
+                  </Tooltip>
+                }
+              />
+            </VaultInfoSection>
+          )
+        }
+        {
+          // UI for healing
+          processableRequest && processableRequest.isHealing && (
+            <VaultInfoSection label={'Heal your position'}>
+              <VaultInfoEntry
+                token={'STETH'}
+                amount={processableRequest.stethToRepay}
+                suffix={
+                  <Tooltip
+                    content={
+                      'This will use stETH available in strategy to repay liability to the vault without withdrawing ETH and partially heal your unbalanced position.'
+                    }
+                  >
+                    <Button
+                      disabled={!processWithdrawalRequest}
+                      loading={isPendingAction}
+                      onClick={() => processWithdrawalRequest?.()}
+                      size={'xs'}
+                    >
+                      Heal Position
+                    </Button>
+                  </Tooltip>
+                }
+              />
+            </VaultInfoSection>
+          )
+        }
 
         <PendingRequests
           label={'Pending withdrawal requests from stVault'}

@@ -8,7 +8,7 @@ import {
   VAULT_TOTAL_BASIS_POINTS,
 } from '@/modules/vaults';
 import { useLidoSDK } from '@/modules/web3';
-import { maxBN, minBN } from '@/utils/bn';
+import { clampZeroBN, minBN } from '@/utils/bn';
 
 export const useVaultCapacity = () => {
   const { publicClient, shares, core } = useLidoSDK();
@@ -42,17 +42,27 @@ export const useVaultCapacity = () => {
         maxMintableExternalShares,
         currentMintedExternalShares,
         reserveRatioBP,
+        reserveRatioGapBP,
+        poolForcedRebalanceThresholdBP,
       ] = await Promise.all([
         lidoV3.read.getMaxMintableExternalShares(),
         lidoV3.read.getExternalShares(),
         wrapper.read.poolReserveRatioBP(),
+        wrapper.read.RESERVE_RATIO_GAP_BP(),
+        wrapper.read.poolForcedRebalanceThresholdBP(),
       ]);
 
       const reserveRatioPercent =
         (Number(reserveRatioBP) / VAULT_TOTAL_BASIS_POINTS) * 100;
 
-      const remainingLidoExternalSharesCapacity = maxBN(
-        0n,
+      const reserveRatioGapPercent =
+        (Number(reserveRatioGapBP) / VAULT_TOTAL_BASIS_POINTS) * 100;
+
+      const poolForcedRebalanceThresholdPercent =
+        (Number(poolForcedRebalanceThresholdBP) / VAULT_TOTAL_BASIS_POINTS) *
+        100;
+
+      const remainingLidoExternalSharesCapacity = clampZeroBN(
         maxMintableExternalShares - currentMintedExternalShares,
       );
 
@@ -78,8 +88,7 @@ export const useVaultCapacity = () => {
         ],
       });
 
-      const remainingDepositCapacityEth = maxBN(
-        0n,
+      const remainingDepositCapacityEth = clampZeroBN(
         totalDepositCapacityEth - currentVaultDepositEth,
       );
 
@@ -110,7 +119,16 @@ export const useVaultCapacity = () => {
         // RR
         reserveRatioPercent,
         reserveRatioBP,
-        reserveRationUnit: reserveRatioPercent / 100,
+        reserveRatioUnit: reserveRatioPercent / 100,
+        // RR gap
+        reserveRatioGapPercent,
+        reserveRatioGapBP,
+        reserveRatioGapUnit: reserveRatioGapPercent / 100,
+        // forced rebalance threshold
+        poolForcedRebalanceThresholdPercent,
+        poolForcedRebalanceThresholdBP,
+        poolForcedRebalanceThresholdUnit:
+          poolForcedRebalanceThresholdPercent / 100,
       };
     },
   });

@@ -16,12 +16,14 @@ import {
   type EthShareManagerAbiType,
 } from './abi';
 
+type GetLidoEarnStrategyContractReturnType = EncodableContract<
+  GetContractReturnType<EthEarnStrategyAbiType, RegisteredPublicClient>
+>;
+
 export const getLidoEarnStrategyContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-): EncodableContract<
-  GetContractReturnType<EthEarnStrategyAbiType, RegisteredPublicClient>
-> => {
+): GetLidoEarnStrategyContractReturnType => {
   return getEncodable(
     getContract({
       address,
@@ -31,12 +33,14 @@ export const getLidoEarnStrategyContract = (
   );
 };
 
+type GetLidoEarnVaultContractReturnType = EncodableContract<
+  GetContractReturnType<EthVaultAbiType, RegisteredPublicClient>
+>;
+
 export const getLidoEarnVaultContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-): EncodableContract<
-  GetContractReturnType<EthVaultAbiType, RegisteredPublicClient>
-> => {
+): GetLidoEarnVaultContractReturnType => {
   return getEncodable(
     getContract({
       address,
@@ -61,12 +65,14 @@ export const getLidoEarnVaultContract = (
 //   );
 // };
 
+type GetLidoEarnAsyncDepositQueueContractReturnType = EncodableContract<
+  GetContractReturnType<EthDepositQueueAbiType, RegisteredPublicClient>
+>;
+
 export const getLidoEarnAsyncDepositQueueContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-): EncodableContract<
-  GetContractReturnType<EthDepositQueueAbiType, RegisteredPublicClient>
-> => {
+): GetLidoEarnAsyncDepositQueueContractReturnType => {
   return getEncodable(
     getContract({
       address,
@@ -76,12 +82,14 @@ export const getLidoEarnAsyncDepositQueueContract = (
   );
 };
 
+type GetLidoEarnRedeemQueueContractReturnType = EncodableContract<
+  GetContractReturnType<EthRedeemQueueAbiType, RegisteredPublicClient>
+>;
+
 export const getLidoEarnRedeemQueueContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-): EncodableContract<
-  GetContractReturnType<EthRedeemQueueAbiType, RegisteredPublicClient>
-> => {
+): GetLidoEarnRedeemQueueContractReturnType => {
   return getEncodable(
     getContract({
       address,
@@ -91,12 +99,14 @@ export const getLidoEarnRedeemQueueContract = (
   );
 };
 
+type GetLidoEarnShareManagerContractReturnType = EncodableContract<
+  GetContractReturnType<EthShareManagerAbiType, RegisteredPublicClient>
+>;
+
 export const getLidoEarnShareManagerContract = (
   address: Address,
   publicClient: RegisteredPublicClient,
-): EncodableContract<
-  GetContractReturnType<EthShareManagerAbiType, RegisteredPublicClient>
-> => {
+): GetLidoEarnShareManagerContractReturnType => {
   return getEncodable(
     getContract({
       address,

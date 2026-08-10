@@ -5,6 +5,7 @@ import { VaultDetails } from '../vault-details';
 
 import { DepositApy } from './deposit-apy';
 import { DepositFormProvider } from './deposit-form-context';
+import { DepositHealingWarning } from './deposit-healing-warning';
 import { DepositInputGroup } from './deposit-input-group';
 import { DepositPendingWarning } from './deposit-pending-warning';
 import { useEarnStrategy } from '../hooks';
@@ -18,6 +19,7 @@ export const Deposit = () => {
           isPaused={earnStrategy?.state.isDepositPaused}
         />
         <DepositPendingWarning />
+        <DepositHealingWarning />
         <DepositInputGroup />
         <DepositApy />
         <VaultDetails />

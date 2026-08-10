@@ -1,40 +1,15 @@
-import React from 'react';
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
-import { ConfigProvider } from '@/config';
-import { STRATEGY_LAZY } from '@/consts/react-query-strategies';
+import invariant from 'tiny-invariant';
+import { App } from './app';
+import { initResizeEventEmitter } from './iframe-demo-wrapper/resize-event-emitter';
 
-import { WrapperProvider } from '@/modules/defi-wrapper';
-import { VaultProvider } from '@/modules/vaults';
-import { Web3Provider } from '@/modules/web3/web3-provider';
+const ROOT_ELEMENT_ID = 'root';
 
-import App from './app';
-import { bigIntHashKey } from './utils/bn-int-hash-key';
+const container = document.getElementById(ROOT_ELEMENT_ID);
+invariant(container, `Root element with id '${ROOT_ELEMENT_ID}' not found`);
+const root = createRoot(container); // Use createRoot for React 18+
 
-const container = document.getElementById('root');
-const root = createRoot(container!); // Use createRoot for React 18+
+// emits event to top parent window with height of the app
+initResizeEventEmitter(ROOT_ELEMENT_ID);
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      queryKeyHashFn: bigIntHashKey,
-      ...STRATEGY_LAZY,
-    },
-  },
-});
-
-root.render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ConfigProvider>
-        <Web3Provider>
-          <WrapperProvider>
-            <VaultProvider>
-              <App />
-            </VaultProvider>
-          </WrapperProvider>
-        </Web3Provider>
-      </ConfigProvider>
-    </QueryClientProvider>
-  </React.StrictMode>,
-);
+root.render(<App />);

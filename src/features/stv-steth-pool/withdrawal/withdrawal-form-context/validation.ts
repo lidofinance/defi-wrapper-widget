@@ -1,7 +1,9 @@
+import { formatEther } from 'viem';
 import { zodResolver } from '@hookform/resolvers/zod';
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
 
+import { ASYNC_FORM_CONTEXT_TIMEOUT } from '@/consts/form';
 import {
   mintTokenSchema,
   tokenAmountSchema,
@@ -35,7 +37,7 @@ export const withdrawalFormValidationSchema = (
   if (minWithdrawalInEth !== null) {
     amountSchema = amountSchema.gte(
       minWithdrawalInEth,
-      'Below minimum withdrawal limit',
+      `Below minimum withdrawal amount of ${formatEther(minWithdrawalInEth)} ETH`,
     );
 
     amountSchema = amountSchema.refine((value) => {
@@ -61,7 +63,10 @@ export const WithdrawalFormResolver: Resolver<
 > = async (values, context, options) => {
   invariant(context, '[WithdrawalFormResolver] context is undefined');
 
-  const contextValue = await awaitWithTimeout(context.asyncContext, 4000);
+  const contextValue = await awaitWithTimeout(
+    context.asyncContext,
+    ASYNC_FORM_CONTEXT_TIMEOUT,
+  );
 
   const schema = withdrawalFormValidationSchema(
     values.repayToken,
