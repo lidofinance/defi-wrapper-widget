@@ -1,0 +1,89 @@
+name: UI tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      chain:
+        description: 'chain_id'
+        type: choice
+        default: mainnet
+        options:
+          - mainnet
+          - hoodi
+      rpc_url:
+        description: 'Override fork RPC URL (optional — falls back to secrets.RPC_URL, then a public RPC)'
+        required: false
+        type: string
+      wallet:
+        description: 'wallet'
+        type: choice
+        default: walletconnect
+        options:
+          - walletconnect
+          - metamask
+
+jobs:
+  ui_test:
+    name: Run e2e tests(stv-pool/stv-steth/stv-strategy)
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ui-tests-${{ github.ref }}
+      cancel-in-progress: true
+    env:
+      WALLET_NAME: ${{ (github.event_name == 'workflow_dispatch' && inputs.wallet) || 'walletconnect' }}
+      WALLET_SECRET_PHRASE: ${{ secrets.WALLET_SECRET_PHRASE }}
+      WALLET_PASSWORD: ${{ secrets.WALLET_PASSWORD }}
+      WC_PROJECT_ID: ${{ secrets.WC_PROJECT_ID }}
+      RPC_URL: ${{ (github.event_name == 'workflow_dispatch' && inputs.rpc_url) || secrets.RPC_URL }}
+      CHAIN_ID: ${{ (github.event_name == 'workflow_dispatch' && inputs.chain == 'hoodi') && '560048' || '1' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: corepack enable
+        run: corepack enable
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+          cache: true
+
+      - name: Cache Playwright browsers
+        id: cache-playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('yarn.lock') }}
+
+      - name: Install Playwright browsers
+        run: |
+          if [ "${{ steps.cache-playwright.outputs.cache-hit }}" == "true" ]; then
+            yarn playwright install-deps chromium
+          else
+            yarn playwright install chromium --with-deps
+          fi
+
+      - name: Run E2E tests
+        run: yarn test:e2e
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 5

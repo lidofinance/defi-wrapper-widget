@@ -1,0 +1,31 @@
+name: Static checks
+
+on: pull_request
+
+jobs:
+  security:
+    uses: lidofinance/linters/.github/workflows/security.yml@master
+    permissions:
+      security-events: write
+      contents: read
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: corepack enable
+        run: corepack enable
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Yarn lint
+        run: yarn lint
