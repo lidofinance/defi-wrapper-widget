@@ -35,3 +35,16 @@ node_modules
 .yarn
 dist-iframe
 tsconfig.tsbuildinfo
+
+# tests
+tests/state.*.json
+tests/pools.*.json
+playwright-report/
+test-results/
+.browser_context_*/
+
+# playwright mcp artifacts
+.playwright-mcp/
+
+# local anvil fork config
+local_fork_config.json
