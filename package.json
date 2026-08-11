@@ -15,7 +15,11 @@
     "prune:abi": "node scripts/prune-abis.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:stv-pool": "playwright test -c tests/playwright.config.ts --project=stv-pool-ui",
+    "test:stv-steth": "playwright test -c tests/playwright.config.ts --project=stv-steth-ui",
+    "test:stv-strategy": "playwright test -c tests/playwright.config.ts --project=stv-strategy-ui",
+    "test:e2e": "playwright test -c tests/playwright.config.ts"
   },
   "dependencies": {
     "@chakra-ui/react": "3.33.0",
@@ -45,6 +49,11 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@lidofinance/browser-service": "1.11.5",
+    "@lidofinance/secret-guard-reporter": "1.1.0",
+    "@lidofinance/wallets-testing-nodes": "1.10.0",
+    "@lidofinance/wallets-testing-wallets": "1.51.1",
+    "@playwright/test": "1.61.0",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@types/node": "^24.5.2",
@@ -52,6 +61,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "4.6.0",
     "@vitest/coverage-v8": "^4.1.5",
+    "dotenv": "^17.2.3",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-node": "^0.3.6",
