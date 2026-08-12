@@ -36,7 +36,8 @@ const schema = z
 
 export const testEnv = schema.parse({
   CHAIN_ID: process.env.CHAIN_ID,
-  RPC_URL: process.env.RPC_URL,
+  // GitHub Actions resolves an unset secret to an empty string.
+  RPC_URL: process.env.RPC_URL || undefined,
   TEST_WALLET_SEED_PHRASE: process.env.TEST_WALLET_SEED_PHRASE,
   TEST_WALLET_PASSWORD: process.env.TEST_WALLET_PASSWORD,
   WALLET_NAME: process.env.WALLET_NAME,
