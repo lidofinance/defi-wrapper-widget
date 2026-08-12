@@ -79,7 +79,23 @@ jobs:
 
       # Chromium runs headed (browser-service default), so it needs a display.
       - name: Run E2E tests
-        run: xvfb-run --auto-servernum -- yarn test:e2e
+        run: |
+          chain_name="mainnet"
+          [ "$CHAIN_ID" = "560048" ] && chain_name="hoodi"
+
+          rpc_source="public fallback"
+          [ -n "$RPC_URL" ] && rpc_source="configured"
+
+          {
+            echo "## 🚀 E2E run"
+            echo
+            echo "- 🌐 Chain: $chain_name ($CHAIN_ID)"
+            echo "- 👛 Wallet: $WALLET_NAME"
+            echo "- 🔌 RPC: $rpc_source"
+            echo "- 🌱 Branch: ${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+          xvfb-run --auto-servernum -- yarn test:e2e
 
       - name: Upload Playwright report
         if: always()
