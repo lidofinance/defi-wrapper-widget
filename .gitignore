@@ -48,3 +48,6 @@ test-results/
 
 # local anvil fork config
 local_fork_config.json
+
+# anvil stdout, if forkLog is ever enabled — contains the fork URL with its key
+anvil-log/

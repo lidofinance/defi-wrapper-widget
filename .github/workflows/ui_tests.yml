@@ -28,6 +28,8 @@ jobs:
     name: Run e2e tests(stv-pool/stv-steth/stv-strategy)
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    # Caps the whole job if any step hangs: install, browser download, or a test.
+    timeout-minutes: 90
     concurrency:
       group: ui-tests-${{ github.ref }}
       cancel-in-progress: true
@@ -52,7 +54,7 @@ jobs:
           cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --immutable
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
@@ -75,8 +77,9 @@ jobs:
             yarn playwright install chromium --with-deps
           fi
 
+      # Chromium runs headed (browser-service default), so it needs a display.
       - name: Run E2E tests
-        run: yarn test:e2e
+        run: xvfb-run --auto-servernum -- yarn test:e2e
 
       - name: Upload Playwright report
         if: always()

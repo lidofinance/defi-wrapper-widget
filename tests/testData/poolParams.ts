@@ -8,14 +8,9 @@ import type { EthereumNodeService } from '@lidofinance/wallets-testing-nodes';
 export const vaultConfig = (nodeService: EthereumNodeService) => ({
   nodeOperator: getRoleAddress(nodeService, 'nodeOperator'),
   nodeOperatorManager: getRoleAddress(nodeService, 'nodeOperatorManager'),
-  // 0 for the E2E suite: a single manually-injected no-op report can't
-  // correctly roll the LazyOracle refSlot inOutDelta cache, so any nonzero
-  // fee rate charges phantom "growth" equal to deposits made after pool
-  // creation (confirmed live: nodeOperatorFeeBP=10 ate exactly 0.1% of a
-  // post-creation 1 ETH deposit out of withdrawableValue, failing
-  // finalize() for a full-balance withdrawal). Fee economics are out of
-  // scope for the happy-path milestone; revisit alongside the milestone-2
-  // reward/lazyOracle work if fee behavior needs coverage.
+  // Must stay 0: a single injected no-op report can't roll the LazyOracle
+  // refSlot inOutDelta cache, so any nonzero fee charges phantom growth on
+  // post-creation deposits and breaks full-balance finalize().
   nodeOperatorFeeBP: 0n,
   confirmExpiry: 3600n,
 });
@@ -26,19 +21,25 @@ export const timelockConfig = (nodeService: EthereumNodeService) => ({
   executor: getRoleAddress(nodeService, 'timelockExecutor'),
 });
 
+export const MIN_WITHDRAWAL_DELAY_TIME = 3600n;
+
+// Clears MIN_WITHDRAWAL_DELAY_TIME with a margin, so finalize() stops gating on
+// the delay.
+export const WITHDRAWAL_DELAY_ADVANCE_SECONDS =
+  Number(MIN_WITHDRAWAL_DELAY_TIME) + 100;
+
 export const commonPoolConfig = (
   nodeService: EthereumNodeService,
   namePrefix: string,
 ) => ({
-  minWithdrawalDelayTime: 3600n,
+  minWithdrawalDelayTime: MIN_WITHDRAWAL_DELAY_TIME,
   name: `${namePrefix} E2E Pool`,
   symbol: 'E2E',
   emergencyCommittee: getRoleAddress(nodeService, 'emergencyCommittee'),
 });
 
-// Per pool-type params for createPoolStvStart / createPoolFinish.
-// StvPool is deliberately allowListEnabled=false (open to all) per QA decision —
-// no allow-list grants are needed for the happy-path suite.
+// Per pool-type params for createPoolStvStart / createPoolFinish. StvPool keeps
+// allowListEnabled=false, so the happy path needs no allow-list grants.
 export const POOL_PARAMS: Record<
   DefiWrapperTypes,
   {

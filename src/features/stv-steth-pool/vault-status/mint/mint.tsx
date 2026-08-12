@@ -28,6 +28,7 @@ const MintedSteth = ({ token, onTokenChange, amount }: MintedStethProps) => {
 
   return (
     <VaultInfoSection
+      data-testid="mintedStethSection"
       label={
         <MintTokenSwitch
           label={'Minted'}

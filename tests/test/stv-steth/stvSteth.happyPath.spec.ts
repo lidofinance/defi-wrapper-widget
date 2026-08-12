@@ -10,6 +10,7 @@ import { advanceTime, getPublicClient } from '../../providers';
 import { readPoolRegistry } from '../../setup/poolRegistry';
 import { test } from '../../test.fixture';
 import { getRoleSigner } from '../../testData/accounts';
+import { WITHDRAWAL_DELAY_ADVANCE_SECONDS } from '../../testData/poolParams';
 import { finalizeWithdrawals } from '../../utils/nodeHelpers/finalize';
 import { applyVaultReport } from '../../utils/nodeHelpers/lazyOracleMock';
 
@@ -17,16 +18,8 @@ test.use({ poolType: 'StvStETHPool' });
 
 const depositAmountEth = 1;
 
-// Milestone 4a: StvStETHPool happy path, allowListEnabled=false (open to all —
-// see docs/plan/e2e-testing-plan.md). Deposit permissionlessly mints stETH in
-// the same tx (depositETHAndMintStethShares, tokenToMint defaults to 'STETH',
-// mints the maximum available capacity automatically — there's no separate
-// "enable minting" toggle in the UI). Withdrawal does a full exit: it repays
-// 100% of the minted stETH as part of the same submit, which — because the
-// connected wallet isn't AA (WalletConnect headless, not sendCalls) — sends
-// up to 3 sequential signed txs: approve stETH, burnStethShares (repay),
-// requestWithdrawal. Finalize is an operator action never exposed in the UI,
-// same as StvPool.
+// Deposit mints stETH in the same tx, at max capacity — no UI toggle for it.
+// Full-repay withdrawal isn't AA, so it needs 3 txs: approve, burn, request.
 test('deposit+mint, request withdrawal with full repay, finalize, claim', async ({
   browserWithWallet,
   dwService,
@@ -111,7 +104,7 @@ test('deposit+mint, request withdrawal with full repay, finalize, claim', async 
     ).toHaveText(new RegExp(`^${depositAmountEth}(\\.0+)?\\s*ETH$`));
 
     await expect(
-      dwService.dashboardPage.mintedStethLabel,
+      dwService.dashboardPage.mintedStethSection,
       'minted stETH section should be visible',
     ).toBeVisible();
   });
@@ -146,12 +139,14 @@ test('deposit+mint, request withdrawal with full repay, finalize, claim', async 
     }
 
     const request = await getWithdrawalRequest();
-    expect(request.owner.toLowerCase(), 'request owner').toBe(
-      depositor.address.toLowerCase(),
-    );
-    expect(request.amountOfAssets, 'request assets').toBe(
-      assetsBeforeWithdrawal,
-    );
+    expect(
+      request.owner.toLowerCase(),
+      'request owner should be the depositor',
+    ).toBe(depositor.address.toLowerCase());
+    expect(
+      request.amountOfAssets,
+      'request assets should match the pre-withdrawal balance',
+    ).toBe(assetsBeforeWithdrawal);
     expect(
       request.amountOfStethShares,
       'full stETH repay should not require rebalancing',
@@ -177,7 +172,7 @@ test('deposit+mint, request withdrawal with full repay, finalize, claim', async 
       'pending withdrawal section should be visible',
     ).toBeVisible();
     await expect(
-      dwService.dashboardPage.mintedStethLabel,
+      dwService.dashboardPage.mintedStethSection,
       'minted stETH section should disappear after full repay',
     ).not.toBeVisible();
     await expect(
@@ -187,12 +182,9 @@ test('deposit+mint, request withdrawal with full repay, finalize, claim', async 
   });
 
   await test.step('Finalize (operator action, off-UI)', async () => {
-    // WithdrawalQueue.finalize() gates on both MIN_WITHDRAWAL_DELAY_TIME
-    // (3600s since the request) and the request's timestamp <= the latest
-    // report timestamp — advancing time alone doesn't create a new report,
-    // so after clearing the delay we re-inject one (unchanged value) dated
-    // after the withdrawal request.
-    await advanceTime(3700);
+    // finalize() needs both the 3600s delay cleared and a report newer than the
+    // request — advancing time alone doesn't produce one.
+    await advanceTime(WITHDRAWAL_DELAY_ADVANCE_SECONDS);
     await applyVaultReport(deployment.vault, deployment.dashboard);
     await finalizeWithdrawals(
       browserWithWallet.ethereumNodeService,
@@ -205,19 +197,19 @@ test('deposit+mint, request withdrawal with full repay, finalize, claim', async 
       false,
     );
 
-    // Finalize runs off-UI (direct on-chain calls, not through the widget),
-    // so the widget's cached query state doesn't know the request is
-    // finalized until a reload re-fetches it.
+    // Finalize ran off-UI, so react-query still holds stale state.
     await dwService.dashboardPage.reload();
 
-    await expect(
-      dwService.dashboardPage.pendingWithdrawalRequestsSection,
-      'pending withdrawal section should disappear after finalization',
-    ).not.toBeVisible();
+    // Assert the section that must appear first: a negative check on a page that
+    // is still loading passes without proving anything.
     await expect(
       dwService.dashboardPage.availableToClaimSection,
       'available to claim section should be visible',
     ).toBeVisible();
+    await expect(
+      dwService.dashboardPage.pendingWithdrawalRequestsSection,
+      'pending withdrawal section should disappear after finalization',
+    ).not.toBeVisible();
     await expect(
       dwService.dashboardPage.claimButton(),
       'claim button should be enabled',
@@ -229,7 +221,22 @@ test('deposit+mint, request withdrawal with full repay, finalize, claim', async 
       publicClient.getBalance({ address: depositor.address });
 
     const requestBeforeClaim = await getWithdrawalRequest();
+    if (withdrawalRequestId === undefined) {
+      throw new Error('Created withdrawal request was not found');
+    }
+    // Checkpoint rounding and finalize()'s gas-cost coverage can make the
+    // claimable amount smaller than the requested assets.
+    const claimableEther =
+      await withdrawalQueueContract.getClaimableEther(withdrawalRequestId);
     const balanceBefore = await getEthBalance();
+
+    expect(claimableEther, 'claimable ETH should be positive').toBeGreaterThan(
+      0n,
+    );
+    expect(
+      claimableEther,
+      'claimable ETH should not exceed the requested assets',
+    ).toBeLessThanOrEqual(requestBeforeClaim.amountOfAssets);
 
     await dwService.navigation.goToDashboard();
     await dwService.claimStVault();
@@ -251,8 +258,8 @@ test('deposit+mint, request withdrawal with full repay, finalize, claim', async 
 
     expect(
       netReceived,
-      'depositor should receive exactly the finalized request assets',
-    ).toBe(requestBeforeClaim.amountOfAssets);
+      'depositor should receive exactly the checkpoint-adjusted claimable ETH',
+    ).toBe(claimableEther);
 
     const requestAfterClaim = await getWithdrawalRequest();
     expect(requestAfterClaim.isFinalized, 'request should stay finalized').toBe(
@@ -261,6 +268,10 @@ test('deposit+mint, request withdrawal with full repay, finalize, claim', async 
     expect(requestAfterClaim.isClaimed, 'request should be claimed').toBe(true);
 
     await expect(
+      dwService.navigation.tab('Deposit'),
+      'deposit tab should remain available',
+    ).toBeVisible();
+    await expect(
       dwService.dashboardPage.availableToClaimSection,
       'available to claim section should disappear',
     ).not.toBeVisible();
@@ -268,9 +279,5 @@ test('deposit+mint, request withdrawal with full repay, finalize, claim', async 
       dwService.navigation.tab('Dashboard'),
       'dashboard should be hidden for an empty position',
     ).not.toBeVisible();
-    await expect(
-      dwService.navigation.tab('Deposit'),
-      'deposit tab should remain available',
-    ).toBeVisible();
   });
 });

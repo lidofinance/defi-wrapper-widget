@@ -1,9 +1,13 @@
 import path from 'path';
 
-// Single source of truth for the tests/ root, so state.<type>.json and
-// pools.<type>.json paths can't drift between the setup entrypoint (which
-// writes them) and the worker fixture (which reads them).
+import type { DefiWrapperTypes } from '../../src/modules/defi-wrapper';
+
+// Single source of truth for the tests/ root, so the setup entrypoint and the
+// worker fixture can't disagree on where state/pools files live.
 export const TESTS_ROOT = path.resolve(__dirname, '..');
 
-export const statePath = (poolType: string) =>
+export const statePath = (poolType: DefiWrapperTypes) =>
   path.join(TESTS_ROOT, `state.${poolType}.json`);
+
+export const poolRegistryPath = (poolType: DefiWrapperTypes) =>
+  path.join(TESTS_ROOT, `pools.${poolType}.json`);

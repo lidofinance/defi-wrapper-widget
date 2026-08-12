@@ -5,15 +5,17 @@ import { Tooltip } from '../tooltip';
 type VaultInfoSectionProps = React.PropsWithChildren<{
   label?: React.ReactNode;
   hint?: React.ReactNode;
+  'data-testid'?: string;
 }>;
 
 export const VaultInfoSection = ({
   label,
   children,
   hint,
+  'data-testid': testId,
 }: VaultInfoSectionProps) => {
   return (
-    <VStack align="stretch">
+    <VStack align="stretch" data-testid={testId}>
       <Box fontSize="sm" fontWeight="normal" color="fg">
         {label}{' '}
         {hint && (

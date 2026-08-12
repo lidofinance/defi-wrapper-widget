@@ -2,10 +2,19 @@ import { defineConfig } from '@playwright/test';
 
 import { getReporters } from './reportSettings';
 import type { TestOptions } from './test.fixture';
+import { SETUP_PROJECT_TIMEOUT, UI_TEST_TIMEOUT } from './testData/timeouts';
+
+// Anvil port / dev server port are per-type in chainConfig.ts + here; keep this
+// table as the single source for the UI project's port (see tests/CLAUDE.md).
+const DEV_SERVER_PORT = {
+  StvPool: 4100,
+  StvStETHPool: 4200,
+  StvStrategyPool: 4300,
+} as const;
 
 // One {type}-setup / {type}-ui project pair per pool type.
 export default defineConfig<TestOptions>({
-  timeout: 220 * 1000,
+  timeout: UI_TEST_TIMEOUT,
   workers: 1,
   fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
@@ -18,7 +27,7 @@ export default defineConfig<TestOptions>({
     {
       name: 'stv-pool-setup',
       testMatch: /setup\/stvPool\.setup\.ts/,
-      timeout: 480 * 1000,
+      timeout: SETUP_PROJECT_TIMEOUT,
       use: { poolType: 'StvPool' },
     },
     {
@@ -26,15 +35,15 @@ export default defineConfig<TestOptions>({
       testDir: './test/stv-pool',
       dependencies: ['stv-pool-setup'],
       use: {
-        baseURL: 'http://localhost:4100',
+        baseURL: `http://localhost:${DEV_SERVER_PORT.StvPool}`,
         poolType: 'StvPool',
-        devServerBasePort: 4100,
+        devServerBasePort: DEV_SERVER_PORT.StvPool,
       },
     },
     {
       name: 'stv-steth-setup',
       testMatch: /setup\/stvSteth\.setup\.ts/,
-      timeout: 480 * 1000,
+      timeout: SETUP_PROJECT_TIMEOUT,
       use: { poolType: 'StvStETHPool' },
     },
     {
@@ -42,15 +51,15 @@ export default defineConfig<TestOptions>({
       testDir: './test/stv-steth',
       dependencies: ['stv-steth-setup'],
       use: {
-        baseURL: 'http://localhost:4200',
+        baseURL: `http://localhost:${DEV_SERVER_PORT.StvStETHPool}`,
         poolType: 'StvStETHPool',
-        devServerBasePort: 4200,
+        devServerBasePort: DEV_SERVER_PORT.StvStETHPool,
       },
     },
     {
       name: 'stv-strategy-setup',
       testMatch: /setup\/stvStrategy\.setup\.ts/,
-      timeout: 480 * 1000,
+      timeout: SETUP_PROJECT_TIMEOUT,
       use: { poolType: 'StvStrategyPool' },
     },
     {
@@ -58,9 +67,9 @@ export default defineConfig<TestOptions>({
       testDir: './test/stv-strategy',
       dependencies: ['stv-strategy-setup'],
       use: {
-        baseURL: 'http://localhost:4300',
+        baseURL: `http://localhost:${DEV_SERVER_PORT.StvStrategyPool}`,
         poolType: 'StvStrategyPool',
-        devServerBasePort: 4300,
+        devServerBasePort: DEV_SERVER_PORT.StvStrategyPool,
       },
     },
   ],

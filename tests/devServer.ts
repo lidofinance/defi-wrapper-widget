@@ -3,7 +3,11 @@ import { spawn, type ChildProcess } from 'child_process';
 import path from 'path';
 
 import { getChainConfig, MAINNET_CHAIN_ID } from './config/chainConfig';
-import { DEV_SERVER_READY_TIMEOUT } from './testData/timeouts';
+import { testEnv } from './config/env';
+import {
+  DEV_SERVER_POLL_INTERVAL,
+  DEV_SERVER_READY_TIMEOUT,
+} from './testData/timeouts';
 import type { DefiWrapperTypes } from '../src/modules/defi-wrapper';
 
 const WIDGET_ROOT = path.resolve(__dirname, '..');
@@ -26,7 +30,7 @@ const waitForReady = async (
     } catch {
       // not up yet
     }
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, DEV_SERVER_POLL_INTERVAL));
   }
   throw new Error(`Widget dev server did not become ready at ${url}`);
 };

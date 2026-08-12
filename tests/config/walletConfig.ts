@@ -5,9 +5,6 @@ import {
   type CommonWalletConfig,
 } from '@lidofinance/wallets-testing-wallets';
 
-// Ported from lido-autotests/tests/vaults/config/vaultsConfig.ts
-// getWalletConfigByName — maps the WALLET_NAME env var to the wallet's
-// CommonWalletConfig.
 export const getWalletConfigByName = (
   walletName: string,
 ): CommonWalletConfig => {

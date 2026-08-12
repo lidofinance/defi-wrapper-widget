@@ -89,7 +89,7 @@ export const submitMellowReport = async () => {
     await testClient.mine({ blocks: 1 });
   }
 
-  const submitReportsRoleHex = await mellowOracleContract.getSumbitReportRole();
+  const submitReportsRoleHex = await mellowOracleContract.getSubmitReportRole();
   // Oracle roles are enumerable on the vault.
   const oracleSubmitter =
     await vaultContract.getRoleMember(submitReportsRoleHex);

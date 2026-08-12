@@ -1,7 +1,5 @@
-// getPooledEthByShares/getSharesByPooledEth ported from
-// lido-autotests/tests/vaults/contracts/abi/stethAbi.ts; balanceOf added
-// (standard ERC20) since the E2E suite needs to assert the depositor's
-// minted stETH balance.
+// Only the share-conversion getters plus balanceOf, used to assert the
+// depositor's minted stETH.
 export const STETH_ABI = [
   {
     inputs: [

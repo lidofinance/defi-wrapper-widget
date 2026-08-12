@@ -56,7 +56,7 @@ export class MellowOracleContract {
     return getPublicClient().waitForTransactionReceipt({ hash });
   }
 
-  getSumbitReportRole() {
+  getSubmitReportRole() {
     return this.getContract().read.SUBMIT_REPORTS_ROLE();
   }
 

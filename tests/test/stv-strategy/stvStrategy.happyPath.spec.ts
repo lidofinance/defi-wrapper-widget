@@ -6,6 +6,7 @@ import { advanceTime, getPublicClient } from '../../providers';
 import { readPoolRegistry } from '../../setup/poolRegistry';
 import { test } from '../../test.fixture';
 import { getRoleSigner } from '../../testData/accounts';
+import { WITHDRAWAL_DELAY_ADVANCE_SECONDS } from '../../testData/poolParams';
 import { finalizeWithdrawals } from '../../utils/nodeHelpers/finalize';
 import { applyVaultReport } from '../../utils/nodeHelpers/lazyOracleMock';
 import {
@@ -286,14 +287,16 @@ test('deposit, exit Mellow, process, finalize, claim', async ({
     await dwService.dashboardPage.reload();
     await dwService.navigation.goToDashboard();
 
-    await expect(
-      dwService.dashboardPage.pendingEarnWithdrawalsSection,
-      'pending Lido Earn withdrawal should disappear',
-    ).not.toBeVisible();
+    // Assert the section that must appear first: a negative check on a page that
+    // is still loading passes without proving anything.
     await expect(
       dwService.dashboardPage.claimableEarnWithdrawalsSection,
       'claimable Lido Earn withdrawal should be visible',
     ).toBeVisible();
+    await expect(
+      dwService.dashboardPage.pendingEarnWithdrawalsSection,
+      'pending Lido Earn withdrawal should disappear',
+    ).not.toBeVisible();
     await expect(
       dwService.dashboardPage.claimButton(),
       'Mellow claim button should be enabled',
@@ -321,13 +324,13 @@ test('deposit, exit Mellow, process, finalize, claim', async ({
     await dwService.dashboardPage.reload();
     await dwService.navigation.goToDashboard();
     await expect(
-      dwService.dashboardPage.claimableEarnWithdrawalsSection,
-      'claimable Lido Earn withdrawal should disappear',
-    ).not.toBeVisible();
-    await expect(
       dwService.dashboardPage.processableStvaultWithdrawalsSection,
       'processable stVault withdrawal should be visible',
     ).toBeVisible();
+    await expect(
+      dwService.dashboardPage.claimableEarnWithdrawalsSection,
+      'claimable Lido Earn withdrawal should disappear',
+    ).not.toBeVisible();
     await expect(
       dwService.dashboardPage.processButton,
       'Process button should be enabled',
@@ -364,14 +367,18 @@ test('deposit, exit Mellow, process, finalize, claim', async ({
     }
 
     const request = await getLidoWithdrawalRequest();
-    expect(request.owner.toLowerCase(), 'Lido request owner').toBe(
-      depositor.address.toLowerCase(),
-    );
+    expect(
+      request.owner.toLowerCase(),
+      'Lido request owner should be the depositor',
+    ).toBe(depositor.address.toLowerCase());
     expect(
       request.amountOfStv,
       'Lido request should contain the full stv position',
     ).toBe(stvBeforeProcess - initialStv);
-    expect(request.amountOfAssets, 'Lido request assets').toBeGreaterThan(0n);
+    expect(
+      request.amountOfAssets,
+      'Lido request assets should be positive',
+    ).toBeGreaterThan(0n);
     expect(request.isFinalized, 'Lido request should be pending').toBe(false);
     expect(request.isClaimed, 'Lido request should not be claimed').toBe(false);
     expect(
@@ -389,17 +396,17 @@ test('deposit, exit Mellow, process, finalize, claim', async ({
 
     await dwService.navigation.goToDashboard();
     await expect(
-      dwService.dashboardPage.processableStvaultWithdrawalsSection,
-      'processable stVault withdrawal should disappear',
-    ).not.toBeVisible();
-    await expect(
       dwService.dashboardPage.pendingStvaultWithdrawalsSection,
       'pending stVault withdrawal should be visible',
     ).toBeVisible();
+    await expect(
+      dwService.dashboardPage.processableStvaultWithdrawalsSection,
+      'processable stVault withdrawal should disappear',
+    ).not.toBeVisible();
   });
 
   await test.step('Finalize the Lido withdrawal', async () => {
-    await advanceTime(3700);
+    await advanceTime(WITHDRAWAL_DELAY_ADVANCE_SECONDS);
     await applyVaultReport(deployment.vault, deployment.dashboard);
     await finalizeWithdrawals(
       browserWithWallet.ethereumNodeService,
@@ -414,13 +421,13 @@ test('deposit, exit Mellow, process, finalize, claim', async ({
 
     await dwService.dashboardPage.reload();
     await expect(
-      dwService.dashboardPage.pendingStvaultWithdrawalsSection,
-      'pending stVault withdrawal should disappear',
-    ).not.toBeVisible();
-    await expect(
       dwService.dashboardPage.availableToClaimSection,
       'available to claim section should be visible',
     ).toBeVisible();
+    await expect(
+      dwService.dashboardPage.pendingStvaultWithdrawalsSection,
+      'pending stVault withdrawal should disappear',
+    ).not.toBeVisible();
     await expect(
       dwService.dashboardPage.claimButton(),
       'Lido claim button should be enabled',
@@ -477,6 +484,10 @@ test('deposit, exit Mellow, process, finalize, claim', async ({
     expect(requestAfterClaim.isClaimed, 'request should be claimed').toBe(true);
 
     await expect(
+      dwService.navigation.tab('Deposit'),
+      'deposit tab should remain available',
+    ).toBeVisible();
+    await expect(
       dwService.dashboardPage.availableToClaimSection,
       'available to claim section should disappear',
     ).not.toBeVisible();
@@ -484,9 +495,5 @@ test('deposit, exit Mellow, process, finalize, claim', async ({
       dwService.navigation.tab('Dashboard'),
       'dashboard should be hidden for an empty position',
     ).not.toBeVisible();
-    await expect(
-      dwService.navigation.tab('Deposit'),
-      'deposit tab should remain available',
-    ).toBeVisible();
   });
 });

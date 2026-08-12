@@ -3,7 +3,7 @@ import type { Account, Address } from 'viem';
 
 import { getViemChain } from '../config/chainConfig';
 import { getPublicClient, getSharedWalletClient } from '../providers';
-import { WITHDRAWAL_QUEUE_ABI } from './abi/harness-abi';
+import { WITHDRAWAL_QUEUE_ABI } from './abi/withdrawal-queue-abi';
 
 export class WithdrawalQueueContract {
   constructor(private readonly address: Address) {}

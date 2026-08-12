@@ -11,13 +11,8 @@ import { ConnectWalletModal } from '../pages/elements/common/element.connectWall
 import { NavigationPage } from '../pages/navigation.page';
 import { WithdrawalPage } from '../pages/withdrawal.page';
 
-// Composes page/element objects into the multi-step flows a spec actually
-// calls. Page objects (and ConnectWalletModal) only expose locators and
-// atomic single-step actions; anything that chains several of those, or
-// branches on business logic (e.g. WalletConnect vs. extension wallet), lives
-// here — same split as lido-autotests' VaultsService, which is also why
-// there's no dedicated ConnectPage: the modal is just an element, and the
-// connect flow is this service's job.
+// Multi-step flows and wallet-type branching; page objects stay atomic.
+// See .claude/skills/e2e-pom-convention.
 export class DwService {
   readonly header: BasePage;
   readonly connectWalletModal: ConnectWalletModal;
@@ -54,11 +49,8 @@ export class DwService {
       await this.walletPage.connectWallet();
     }
 
-    // connectedAddress only renders inside the account modal (opened by
-    // clicking the header's wallet-badge trigger) — the "Connect wallet"
-    // button disappearing is the simplest visible proxy for "connected"
-    // (confirmed live: header shows the truncated address + 100 ETH deposit
-    // limit once connected).
+    // connectedAddress only renders inside the account modal, so the connect
+    // button disappearing is the available proxy for "connected".
     await expect(
       this.header.connectButton,
       'connect button should disappear once the wallet is connected',
@@ -92,10 +84,8 @@ export class DwService {
     await this.dashboardPage.claimButton(requestIndex).click();
   }
 
-  // StvStrategyPool-only: the "Process" button in the dashboard's
-  // "Processable withdrawal requests to stVault" section — creates the
-  // actual Lido WithdrawalQueue request after Mellow's own redeem has been
-  // claimed.
+  // StvStrategyPool-only: creates the Lido WithdrawalQueue request after
+  // Mellow's own redeem has been claimed.
   async processWithdrawal() {
     await this.dashboardPage.processButton.click();
   }

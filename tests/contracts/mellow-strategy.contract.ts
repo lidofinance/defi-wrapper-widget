@@ -1,4 +1,4 @@
-import { getContract } from 'viem';
+import { getContract, maxUint256 } from 'viem';
 import type { Address } from 'viem';
 
 import { getPublicClient } from '../providers';
@@ -45,11 +45,7 @@ export class MellowStrategyContract {
     return this.getContract().read.mintedStethSharesOf([account]);
   }
 
-  getRedeemQueueRequests(
-    account: Address,
-    offset = 0n,
-    limit = 2n ** 256n - 1n,
-  ) {
+  getRedeemQueueRequests(account: Address, offset = 0n, limit = maxUint256) {
     return this.getContract().read.getRedeemQueueRequests([
       account,
       offset,

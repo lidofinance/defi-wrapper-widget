@@ -9,8 +9,8 @@ export class DashboardPage extends BasePage {
     return this.page.getByText('Available to claim', { exact: true });
   }
 
-  get mintedStethLabel() {
-    return this.page.getByText('Minted', { exact: true });
+  get mintedStethSection() {
+    return this.page.getByTestId('mintedStethSection');
   }
 
   get pendingEarnWithdrawalsSection() {
@@ -50,6 +50,6 @@ export class DashboardPage extends BasePage {
   }
 
   getVaultBalanceValue() {
-    return this.getVaultBalanceLabel().locator('xpath=following-sibling::*[1]');
+    return this.page.getByTestId('vaultBalanceValue');
   }
 }

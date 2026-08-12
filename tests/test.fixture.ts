@@ -1,3 +1,4 @@
+import { zeroAddress } from 'viem';
 import { BrowserService } from '@lidofinance/browser-service';
 import { test as base } from '@playwright/test';
 
@@ -43,18 +44,16 @@ export const test = base.extend<object, TestOptions & Fixtures>({
         networkConfig,
         accountConfig: {
           SECRET_PHRASE: testEnv.WALLET_SECRET_PHRASE,
-          PASSWORD: testEnv.WALLET_PASSWORD,
+          // Only extension wallets read this; config/env.ts requires it there.
+          PASSWORD: testEnv.WALLET_PASSWORD ?? '',
         },
         walletConfig: getWalletConfigByName(testEnv.WALLET_NAME),
         nodeConfig: {
           rpcUrl: networkConfig.rpcUrl,
           mockConfig: { rpcUrlToMock: [], mockEnabled: false },
           runOptions: nodeRunOptions,
-          // Pin the port explicitly to the same static config
-          // providers/clients.ts's getNodeUrl() reads (config/chainConfig.ts's
-          // ChainConfig.nodeConfig) — one source of truth for "where the
-          // fork node listens", not an assumption that the library's default
-          // happens to match.
+          // Same port providers/clients.ts's getNodeUrl() reads — don't rely on
+          // the library's default matching it.
           port: getChainConfig().nodeConfig.port,
         },
         browserOptions: { cookies: [] },
@@ -97,10 +96,8 @@ export const test = base.extend<object, TestOptions & Fixtures>({
 
   devServer: [
     async (
-      // browserWithWallet isn't read here anymore (nodeUrl now comes from
-      // static config via getNodeUrl()), but it must stay a fixture
-      // dependency — Playwright only guarantees the Anvil node is up before
-      // devServer starts because this destructure pulls it in.
+      // Unused, but keep it: this dependency is the only thing guaranteeing the
+      // Anvil node is up before the dev server starts.
       { poolType, devServerBasePort, browserWithWallet: _browserWithWallet },
       use,
     ) => {
@@ -111,9 +108,7 @@ export const test = base.extend<object, TestOptions & Fixtures>({
         poolType,
         poolAddress: deployment.pool,
         strategyAddress:
-          deployment.strategy === '0x0000000000000000000000000000000000000000'
-            ? undefined
-            : deployment.strategy,
+          deployment.strategy === zeroAddress ? undefined : deployment.strategy,
         nodeUrl: getNodeUrl(),
       });
 
@@ -123,6 +118,3 @@ export const test = base.extend<object, TestOptions & Fixtures>({
     { scope: 'worker' },
   ],
 });
-
-export const skipIf = (condition: boolean, message: string) =>
-  condition ? { annotation: { type: 'skip', description: message } } : {};

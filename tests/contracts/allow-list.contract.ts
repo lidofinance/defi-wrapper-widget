@@ -3,7 +3,7 @@ import type { Account, Address } from 'viem';
 
 import { getViemChain } from '../config/chainConfig';
 import { getPublicClient, getSharedWalletClient } from '../providers';
-import { ALLOW_LIST_ABI } from './abi/harness-abi';
+import { ALLOW_LIST_ABI } from './abi/allow-list-abi';
 
 export class AllowListContract {
   constructor(private readonly address: Address) {}

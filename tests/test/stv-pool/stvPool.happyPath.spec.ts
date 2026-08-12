@@ -7,22 +7,14 @@ import { advanceTime, getPublicClient } from '../../providers';
 import { readPoolRegistry } from '../../setup/poolRegistry';
 import { test } from '../../test.fixture';
 import { getRoleSigner } from '../../testData/accounts';
+import { WITHDRAWAL_DELAY_ADVANCE_SECONDS } from '../../testData/poolParams';
 import { finalizeWithdrawals } from '../../utils/nodeHelpers/finalize';
 import { applyVaultReport } from '../../utils/nodeHelpers/lazyOracleMock';
 
 test.use({ poolType: 'StvPool' });
 
-// Milestone 1: StvPool happy path, allowListEnabled=false (open to all — see
-// docs/plan/e2e-testing-plan.md). Deposit/requestWithdrawal/claim are all
-// permissionless on StvPool; finalize is an operator action never exposed in
-// the UI, so it's driven directly via finalizeWithdrawals() rather than a
-// page object.
-//
-// Wallet: WalletConnect (headless SignClient), not a MetaMask extension —
-// see pages/elements/common/element.connectWalletModal.ts,
-// services/dw.service.ts (connectWallet) and config/walletConfig.ts.
-// The worker-scoped dwService fixture imports the role accounts and activates
-// the depositor before the scenario starts.
+// allowListEnabled=false, so deposit/request/claim are permissionless.
+// finalize has no UI — it's an operator action, called on-chain directly.
 test('deposit, request withdrawal, finalize, claim', async ({
   browserWithWallet,
   dwService,
@@ -105,10 +97,14 @@ test('deposit, request withdrawal, finalize, claim', async ({
     }
 
     const request = await getWithdrawalRequest();
-    expect(request.owner.toLowerCase(), 'request owner').toBe(
-      depositor.address.toLowerCase(),
-    );
-    expect(request.amountOfAssets, 'request assets').toBeGreaterThan(0n);
+    expect(
+      request.owner.toLowerCase(),
+      'request owner should be the depositor',
+    ).toBe(depositor.address.toLowerCase());
+    expect(
+      request.amountOfAssets,
+      'request assets should be positive',
+    ).toBeGreaterThan(0n);
     expect(request.isFinalized, 'request should be pending').toBe(false);
     expect(request.isClaimed, 'request should not be claimed').toBe(false);
     expect(
@@ -123,12 +119,9 @@ test('deposit, request withdrawal, finalize, claim', async ({
   });
 
   await test.step('Finalize (operator action, off-UI)', async () => {
-    // WithdrawalQueue.finalize() gates on both MIN_WITHDRAWAL_DELAY_TIME
-    // (3600s since the request) and the request's timestamp <= the latest
-    // report timestamp — advancing time alone doesn't create a new report,
-    // so after clearing the delay we re-inject one (unchanged value) dated
-    // after the withdrawal request.
-    await advanceTime(3700);
+    // finalize() needs both the 3600s delay cleared and a report newer than the
+    // request — advancing time alone doesn't produce one.
+    await advanceTime(WITHDRAWAL_DELAY_ADVANCE_SECONDS);
     await applyVaultReport(deployment.vault, deployment.dashboard);
     await finalizeWithdrawals(
       browserWithWallet.ethereumNodeService,
@@ -141,20 +134,20 @@ test('deposit, request withdrawal, finalize, claim', async ({
       false,
     );
 
-    // Finalize runs off-UI (direct on-chain calls, not through the widget),
-    // so the widget's cached query state doesn't know the request is
-    // finalized until a reload re-fetches it — confirmed live: without this
-    // the Claim button stays disabled/stale.
+    // Finalize ran off-UI, so react-query still holds stale state — without
+    // this reload the Claim button stays disabled.
     await dwService.dashboardPage.reload();
 
-    await expect(
-      dwService.dashboardPage.pendingWithdrawalRequestsSection,
-      'pending withdrawal section should disappear after finalization',
-    ).not.toBeVisible();
+    // Assert the section that must appear first: a negative check on a page that
+    // is still loading passes without proving anything.
     await expect(
       dwService.dashboardPage.availableToClaimSection,
       'available to claim section should be visible',
     ).toBeVisible();
+    await expect(
+      dwService.dashboardPage.pendingWithdrawalRequestsSection,
+      'pending withdrawal section should disappear after finalization',
+    ).not.toBeVisible();
     await expect(
       dwService.dashboardPage.claimButton(),
       'claim button should be enabled',
@@ -166,7 +159,22 @@ test('deposit, request withdrawal, finalize, claim', async ({
       publicClient.getBalance({ address: depositor.address });
 
     const requestBeforeClaim = await getWithdrawalRequest();
+    if (withdrawalRequestId === undefined) {
+      throw new Error('Created withdrawal request was not found');
+    }
+    // Checkpoint rounding and finalize()'s gas-cost coverage can make the
+    // claimable amount smaller than the requested assets.
+    const claimableEther =
+      await withdrawalQueueContract.getClaimableEther(withdrawalRequestId);
     const balanceBefore = await getEthBalance();
+
+    expect(claimableEther, 'claimable ETH should be positive').toBeGreaterThan(
+      0n,
+    );
+    expect(
+      claimableEther,
+      'claimable ETH should not exceed the requested assets',
+    ).toBeLessThanOrEqual(requestBeforeClaim.amountOfAssets);
 
     await dwService.navigation.goToDashboard();
     await dwService.claimStVault();
@@ -188,8 +196,8 @@ test('deposit, request withdrawal, finalize, claim', async ({
 
     expect(
       netReceived,
-      'depositor should receive exactly the finalized request assets',
-    ).toBe(requestBeforeClaim.amountOfAssets);
+      'depositor should receive exactly the checkpoint-adjusted claimable ETH',
+    ).toBe(claimableEther);
 
     const requestAfterClaim = await getWithdrawalRequest();
     expect(requestAfterClaim.isFinalized, 'request should stay finalized').toBe(
@@ -198,6 +206,10 @@ test('deposit, request withdrawal, finalize, claim', async ({
     expect(requestAfterClaim.isClaimed, 'request should be claimed').toBe(true);
 
     await expect(
+      dwService.navigation.tab('Deposit'),
+      'deposit tab should remain available',
+    ).toBeVisible();
+    await expect(
       dwService.dashboardPage.availableToClaimSection,
       'available to claim section should disappear',
     ).not.toBeVisible();
@@ -205,9 +217,5 @@ test('deposit, request withdrawal, finalize, claim', async ({
       dwService.navigation.tab('Dashboard'),
       'dashboard should be hidden for an empty position',
     ).not.toBeVisible();
-    await expect(
-      dwService.navigation.tab('Deposit'),
-      'deposit tab should remain available',
-    ).toBeVisible();
   });
 });

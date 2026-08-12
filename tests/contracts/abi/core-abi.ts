@@ -1,8 +1,5 @@
-// Minimal ABI fragments for core Lido protocol contracts (LidoLocator,
-// LazyOracle, VaultHub, a base-oracle getConsensusContract, HashConsensus),
-// needed only to inject/refresh oracle reports on the fork. Ported from
-// vaults-wrapper/test/utils/CoreHarness.sol (applyVaultReport) and
-// src/interfaces/core/*.sol.
+// Core Lido ABIs, only the parts needed to inject and refresh oracle reports on
+// the fork. Source: vaults-wrapper/test/utils/CoreHarness.sol.
 export const LIDO_LOCATOR_ABI = [
   {
     type: 'function',

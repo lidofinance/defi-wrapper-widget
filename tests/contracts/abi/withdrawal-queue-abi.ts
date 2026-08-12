@@ -1,27 +1,3 @@
-// Small ABI fragments needed only by the test harness (setup / teardown),
-// not by the widget itself — e.g. AccessControl role management and
-// WithdrawalQueue.finalize (an operator action, never called from the UI).
-// src/AllowList.sol — addToAllowList requires the caller to already hold
-// ALLOW_LIST_MANAGER_ROLE (granted directly to the timelock at
-// initialize()-time via _initializeAllowList, both on the pool and on a
-// strategy contract).
-export const ALLOW_LIST_ABI = [
-  {
-    type: 'function',
-    name: 'addToAllowList',
-    stateMutability: 'nonpayable',
-    inputs: [{ name: '_user', type: 'address' }],
-    outputs: [],
-  },
-  {
-    type: 'function',
-    name: 'isAllowListed',
-    stateMutability: 'view',
-    inputs: [{ name: '_user', type: 'address' }],
-    outputs: [{ name: '', type: 'bool' }],
-  },
-] as const;
-
 export const WITHDRAWAL_QUEUE_ABI = [
   {
     type: 'function',

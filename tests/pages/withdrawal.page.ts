@@ -2,7 +2,7 @@ import { BasePage } from './base.page';
 
 export class WithdrawalPage extends BasePage {
   get amountInput() {
-    return this.page.getByRole('textbox').first();
+    return this.page.getByPlaceholder(/amount/i);
   }
 
   get submitButton() {

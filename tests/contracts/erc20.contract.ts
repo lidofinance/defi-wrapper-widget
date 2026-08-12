@@ -3,7 +3,7 @@ import type { Account, Address } from 'viem';
 
 import { getViemChain } from '../config/chainConfig';
 import { getPublicClient, getSharedWalletClient } from '../providers';
-import { ERC20_ABI } from './abi/mellow-abi';
+import { ERC20_ABI } from './abi/erc20-abi';
 
 export class Erc20Contract {
   constructor(private readonly address: Address) {}

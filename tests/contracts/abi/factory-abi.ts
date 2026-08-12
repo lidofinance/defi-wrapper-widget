@@ -1,5 +1,4 @@
-// Minimal Factory ABI (createPoolStvStart / createPoolStvStETHStart /
-// createPoolStart / createPoolFinish) extracted from
+// Minimal Factory ABI, extracted from
 // vaults-wrapper/out/Factory.sol/Factory.json.
 export const FACTORY_ABI = [
   {
@@ -338,10 +337,8 @@ export const FACTORY_ABI = [
       },
     ],
   },
-  // Custom errors from Factory.sol + anything a strategy factory's deploy()
-  // call can bubble up (MellowStrategy.sol) — included so viem can decode a
-  // revert during createPoolFinish (which calls IStrategyFactory.deploy())
-  // instead of reporting an opaque "execution reverted".
+  // Custom errors from Factory.sol and MellowStrategy.sol, so a createPoolFinish
+  // revert decodes instead of reporting an opaque "execution reverted".
   {
     type: 'error',
     name: 'InvalidConfiguration',

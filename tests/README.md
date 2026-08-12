@@ -95,7 +95,6 @@ server and one wallet exist at a time.
 | `tests/state.<type>.json` | Anvil state snapshot of the created pool                              |
 | `tests/pools.<type>.json` | Addresses of the created pool                                         |
 | `local_fork_config.json`  | Fork metadata written by the node service (accounts, block, endpoint) |
-| `anvil-log/`              | Raw Anvil stdout/stderr                                               |
 
 ## How it works
 
@@ -123,8 +122,8 @@ The setup project writes two artifacts that the UI project consumes:
   already created and, for `StvStrategyPool`, the depositor allow-listed and the
   Mellow vault topped up with liquidity.
 - `pools.<type>.json` — the deployed addresses (pool, vault, dashboard,
-  withdrawal queue, strategy, timelock), read by the specs and by the dev
-  server fixture.
+  withdrawal queue, distributor, timelock, strategy) plus `poolType`, read by
+  the specs and by the dev server fixture.
 
 **The snapshot is reusable.** The UI project only loads the state, it never
 dumps it back, so `state.<type>.json` keeps representing "pool exists, no
@@ -148,8 +147,11 @@ itself, with the right env, after setup has run, instead of using Playwright's
 ## Wallets
 
 `walletconnect` is the default and the recommended path: a headless
-WalletConnect SignClient signs transactions directly, with no browser extension,
-no popup windows and no `xvfb-run` in CI.
+WalletConnect SignClient signs transactions directly, with no browser extension
+and no popup windows.
+
+Chromium itself still runs headed on every wallet — `browser-service` defaults to
+`headless: false` — so CI wraps `yarn test:e2e` in `xvfb-run --auto-servernum`.
 
 `metamask` and `okx` drive a real extension instead. They are supported and
 selectable via `WALLET_NAME`, but need `WALLET_PASSWORD`, are slower and are

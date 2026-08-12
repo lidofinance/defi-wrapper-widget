@@ -41,10 +41,7 @@ export const getTestClient = () => {
 
 /**
  * Advances the fork clock by `seconds` and mines a block. Used to clear
- * WithdrawalQueue.minWithdrawalDelayTime (3600s on Hoodi, see
- * config/hoodi-stv.json) before finalize() — well short of the 2-day
- * report-freshness window, so no oracle re-report is needed for the
- * happy-path milestone (see docs/context/contracts.md).
+ * WithdrawalQueue.minWithdrawalDelayTime before finalize().
  */
 export const advanceTime = async (seconds: number) => {
   const testClient = getTestClient();
