@@ -43,9 +43,9 @@ export const test = base.extend<object, TestOptions & Fixtures>({
       const browserService = new BrowserService({
         networkConfig,
         accountConfig: {
-          SECRET_PHRASE: testEnv.WALLET_SECRET_PHRASE,
+          SECRET_PHRASE: testEnv.TEST_WALLET_SEED_PHRASE,
           // Only extension wallets read this; config/env.ts requires it there.
-          PASSWORD: testEnv.WALLET_PASSWORD ?? '',
+          PASSWORD: testEnv.TEST_WALLET_PASSWORD ?? '',
         },
         walletConfig: getWalletConfigByName(testEnv.WALLET_NAME),
         nodeConfig: {

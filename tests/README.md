@@ -39,14 +39,14 @@ cp tests/.env.example tests/.env
 
 Then fill it in:
 
-| Variable               | Required                         | Description                                                                                                                                                                                                                                                                                    |
-| ---------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `CHAIN_ID`             | **yes**                          | Which chain to fork: `1` (mainnet) or `560048` (Hoodi). No default — this is an explicit switch                                                                                                                                                                                                |
-| `RPC_URL`              | no                               | Fork source for that chain. When unset, a public no-key RPC is used: `https://ethereum-rpc.publicnode.com` (mainnet) or `https://0xrpc.io/hoodi` (Hoodi). Works out of the box, but public endpoints are slower and rate-limited — a dedicated RPC makes runs noticeably faster and less flaky |
-| `WALLET_NAME`          | no (defaults to `walletconnect`) | `walletconnect`, `metamask` or `okx`                                                                                                                                                                                                                                                           |
-| `WALLET_SECRET_PHRASE` | **yes**                          | For `walletconnect` — the EOA that signs (derived at index 0). For `metamask`/`okx` — the onboarding seed phrase, which **must differ** from Anvil's default `test test … junk` mnemonic, otherwise importing the test account keys fails as duplicates                                        |
-| `WALLET_PASSWORD`      | only `metamask` / `okx`          | Extension unlock password: 8+ characters, at least one digit and one symbol                                                                                                                                                                                                                    |
-| `WC_PROJECT_ID`        | only `walletconnect`             | WalletConnect Cloud project id from [dashboard.reown.com](https://dashboard.reown.com)                                                                                                                                                                                                         |
+| Variable                  | Required                         | Description                                                                                                                                                                                                                                                                                    |
+| ------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CHAIN_ID`                | **yes**                          | Which chain to fork: `1` (mainnet) or `560048` (Hoodi). No default — this is an explicit switch                                                                                                                                                                                                |
+| `RPC_URL`                 | no                               | Fork source for that chain. When unset, a public no-key RPC is used: `https://ethereum-rpc.publicnode.com` (mainnet) or `https://0xrpc.io/hoodi` (Hoodi). Works out of the box, but public endpoints are slower and rate-limited — a dedicated RPC makes runs noticeably faster and less flaky |
+| `WALLET_NAME`             | no (defaults to `walletconnect`) | `walletconnect`, `metamask` or `okx`                                                                                                                                                                                                                                                           |
+| `TEST_WALLET_SEED_PHRASE` | **yes**                          | For `walletconnect` — the EOA that signs (derived at index 0). For `metamask`/`okx` — the onboarding seed phrase, which **must differ** from Anvil's default `test test … junk` mnemonic, otherwise importing the test account keys fails as duplicates                                        |
+| `TEST_WALLET_PASSWORD`    | only `metamask` / `okx`          | Extension unlock password: 8+ characters, at least one digit and one symbol                                                                                                                                                                                                                    |
+| `WC_PROJECT_ID`           | only `walletconnect`             | WalletConnect Cloud project id from [dashboard.reown.com](https://dashboard.reown.com)                                                                                                                                                                                                         |
 
 ## Running
 
@@ -154,7 +154,7 @@ Chromium itself still runs headed on every wallet — `browser-service` defaults
 `headless: false` — so CI wraps `yarn test:e2e` in `xvfb-run --auto-servernum`.
 
 `metamask` and `okx` drive a real extension instead. They are supported and
-selectable via `WALLET_NAME`, but need `WALLET_PASSWORD`, are slower and are
+selectable via `WALLET_NAME`, but need `TEST_WALLET_PASSWORD`, are slower and are
 more prone to popup race conditions.
 
 ## Secret protection in reports
@@ -195,7 +195,8 @@ request and on demand via **Run workflow**, which takes three inputs:
 | `wallet`  | `walletconnect` | `walletconnect` or `metamask` → `WALLET_NAME`                                                               |
 
 Wallet credentials come from repository secrets
-(`WALLET_SECRET_PHRASE`, `WALLET_PASSWORD`, `WC_PROJECT_ID`). Failing tests are
+(`TEST_WALLET_SEED_PHRASE`, `TEST_WALLET_PASSWORD`; WalletConnect uses the
+`VITE_WALLETCONNECT_PROJECT_ID` repository variable). Failing tests are
 retried once. The HTML report and `test-results/` are uploaded as artifacts and
 kept for 5 days.
 

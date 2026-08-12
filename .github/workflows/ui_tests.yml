@@ -35,8 +35,8 @@ jobs:
       cancel-in-progress: true
     env:
       WALLET_NAME: ${{ (github.event_name == 'workflow_dispatch' && inputs.wallet) || 'walletconnect' }}
-      WALLET_SECRET_PHRASE: ${{ secrets.WALLET_SECRET_PHRASE }}
-      WALLET_PASSWORD: ${{ secrets.WALLET_PASSWORD }}
+      TEST_WALLET_SEED_PHRASE: ${{ secrets.TEST_WALLET_SEED_PHRASE }}
+      TEST_WALLET_PASSWORD: ${{ secrets.TEST_WALLET_PASSWORD }}
       WC_PROJECT_ID: ${{ vars.VITE_WALLETCONNECT_PROJECT_ID }}
       RPC_URL: ${{ (github.event_name == 'workflow_dispatch' && inputs.rpc_url) || secrets.RPC_URL }}
       CHAIN_ID: ${{ (github.event_name == 'workflow_dispatch' && inputs.chain == 'hoodi') && '560048' || '1' }}

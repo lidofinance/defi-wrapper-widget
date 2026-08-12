@@ -12,9 +12,9 @@ const schema = z
     CHAIN_ID: z.string().min(1),
     // Anvil fork source; falls back to a public no-key RPC per chain.
     RPC_URL: z.string().url().optional(),
-    WALLET_SECRET_PHRASE: z.string().min(1),
+    TEST_WALLET_SEED_PHRASE: z.string().min(1),
     // Extension unlock password — unused by walletconnect.
-    WALLET_PASSWORD: z.string().min(1).optional(),
+    TEST_WALLET_PASSWORD: z.string().min(1).optional(),
     // walletconnect is the default: no extension, no popup clicks.
     WALLET_NAME: z.string().default('walletconnect'),
     // Read straight from process.env by wallets-testing-wallets' WCWallet.
@@ -26,19 +26,19 @@ const schema = z
     message: 'WC_PROJECT_ID is required when WALLET_NAME=walletconnect',
   })
   .refine(
-    (env) => env.WALLET_NAME === 'walletconnect' || !!env.WALLET_PASSWORD,
+    (env) => env.WALLET_NAME === 'walletconnect' || !!env.TEST_WALLET_PASSWORD,
     {
-      path: ['WALLET_PASSWORD'],
+      path: ['TEST_WALLET_PASSWORD'],
       message:
-        'WALLET_PASSWORD is required for extension wallets (WALLET_NAME=metamask | okx)',
+        'TEST_WALLET_PASSWORD is required for extension wallets (WALLET_NAME=metamask | okx)',
     },
   );
 
 export const testEnv = schema.parse({
   CHAIN_ID: process.env.CHAIN_ID,
   RPC_URL: process.env.RPC_URL,
-  WALLET_SECRET_PHRASE: process.env.WALLET_SECRET_PHRASE,
-  WALLET_PASSWORD: process.env.WALLET_PASSWORD,
+  TEST_WALLET_SEED_PHRASE: process.env.TEST_WALLET_SEED_PHRASE,
+  TEST_WALLET_PASSWORD: process.env.TEST_WALLET_PASSWORD,
   WALLET_NAME: process.env.WALLET_NAME,
   WC_PROJECT_ID: process.env.WC_PROJECT_ID,
 });
