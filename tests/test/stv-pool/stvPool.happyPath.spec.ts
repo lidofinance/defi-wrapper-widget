@@ -112,6 +112,7 @@ test('deposit, request withdrawal, finalize, claim', async ({
       'full withdrawal should remove all active assets',
     ).toBe(0n);
 
+    await dwService.navigation.goToDashboard();
     await expect(
       dwService.dashboardPage.pendingWithdrawalRequestsSection,
       'pending withdrawal section should be visible',
