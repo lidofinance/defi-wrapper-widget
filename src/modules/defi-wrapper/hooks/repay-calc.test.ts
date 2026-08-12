@@ -40,7 +40,7 @@ describe('buildRepayCalc — exceeds unlocked, STETH balance sufficient', () => 
   it('full repay from STETH balance, no rebalance', () => {
     const calc = makeCalc();
     const r = calc(1n * ETH, 'STETH');
-    expect(r.repayableStethShares).toBe(45n * ETH / 100n);
+    expect(r.repayableStethShares).toBe((45n * ETH) / 100n);
     expect(r.rebalancableStethShares).toBe(0n);
     expect(r.withdrawalValue).toBe(1n * ETH);
   });
@@ -48,8 +48,10 @@ describe('buildRepayCalc — exceeds unlocked, STETH balance sufficient', () => 
   it('repayableStethShares + rebalancableStethShares = sharesToRepay', () => {
     const calc = makeCalc();
     const r = calc(1n * ETH, 'STETH');
-    const sharesToRepay = 45n * ETH / 100n; // 0.45 ETH (1:1, 10% RR)
-    expect(r.repayableStethShares + r.rebalancableStethShares).toBe(sharesToRepay);
+    const sharesToRepay = (45n * ETH) / 100n; // 0.45 ETH (1:1, 10% RR)
+    expect(r.repayableStethShares + r.rebalancableStethShares).toBe(
+      sharesToRepay,
+    );
   });
 });
 
@@ -90,7 +92,7 @@ describe('buildRepayCalc — WSTETH repay token', () => {
     const calc = makeCalc({ sharesBalance: 0n, wstETHBalance: 1n * ETH });
     const r = calc(1n * ETH, 'WSTETH');
     // sharesToRepay = (0.5 * 0.9) = 0.45 ETH
-    expect(r.repayableStethShares).toBe(45n * ETH / 100n);
+    expect(r.repayableStethShares).toBe((45n * ETH) / 100n);
     expect(r.rebalancableStethShares).toBe(0n);
   });
 });
@@ -105,7 +107,9 @@ describe('buildRepayCalc — exceedingLiability adds to repay requirement', () =
     const rNo = noExcess(1n * ETH, 'STETH');
     const rWith = withExcess(1n * ETH, 'STETH');
 
-    expect(rWith.repayableStethShares).toBeGreaterThan(rNo.repayableStethShares);
+    expect(rWith.repayableStethShares).toBeGreaterThan(
+      rNo.repayableStethShares,
+    );
   });
 });
 

@@ -3,7 +3,9 @@ import { describe, it, expect, vi } from 'vitest';
 vi.mock('@/modules/web3/web3-provider/web3-provider', () => ({
   wagmiChainMap: {
     1: { blockExplorers: { default: { url: 'https://etherscan.io' } } },
-    10: { blockExplorers: { default: { url: 'https://optimistic.etherscan.io' } } },
+    10: {
+      blockExplorers: { default: { url: 'https://optimistic.etherscan.io' } },
+    },
   },
 }));
 
@@ -39,7 +41,9 @@ describe('getEtherscanLink', () => {
   });
 
   it('throws for an unknown chainId', () => {
-    expect(() => getEtherscanLink(999, '0xabc', ETHERSCAN_ENTITIES.TX)).toThrow();
+    expect(() =>
+      getEtherscanLink(999, '0xabc', ETHERSCAN_ENTITIES.TX),
+    ).toThrow();
   });
 });
 

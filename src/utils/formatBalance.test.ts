@@ -22,7 +22,7 @@ describe('formatBalance', () => {
     });
 
     it('formats zero', () => {
-      const { actual, trimmed, isTrimmedRepresentZero } = formatBalance(0n);
+      const { actual, isTrimmedRepresentZero } = formatBalance(0n);
       expect(actual).toBe('0.0');
       expect(isTrimmedRepresentZero).toBe(true);
     });

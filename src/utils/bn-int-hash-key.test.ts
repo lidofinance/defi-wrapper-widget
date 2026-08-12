@@ -71,7 +71,10 @@ describe('bigIntHashKey', () => {
     });
 
     it('class instances are not treated as plain objects (key order preserved)', () => {
-      class Point { z = 1; a = 2; }
+      class Point {
+        z = 1;
+        a = 2;
+      }
       const result = bigIntHashKey(new Point());
       const parsed = JSON.parse(result);
       // not sorted — class instances skip the plain-object branch
