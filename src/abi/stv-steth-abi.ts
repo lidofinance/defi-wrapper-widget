@@ -16,7 +16,32 @@ export const StvStethAbi = [
     ],
     stateMutability: 'view',
   },
-
+  {
+    type: 'function',
+    name: 'RESERVE_RATIO_GAP_BP',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'poolForcedRebalanceThresholdBP',
+    inputs: [],
+    outputs: [
+      {
+        name: 'threshold',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
   {
     type: 'function',
     name: 'totalLiabilityShares',

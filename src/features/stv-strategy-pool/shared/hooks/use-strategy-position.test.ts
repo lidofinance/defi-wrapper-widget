@@ -22,22 +22,21 @@ const USER = '0x2222222222222222222222222222222222222222' as Address;
 const WSTETH = '0x3333333333333333333333333333333333333333' as Address;
 
 // readWithReport destructuring order:
-// [proxyBalanceStvInEth, proxyNominalBalanceStvInEth, proxyUnlockedBalanceStvInEth,
-//  unlockedStv, strategyDepositOffsetInLockedEth, totalStethLiabilityInEth,
-//  totalStethSharesAvailableForReturnInEth, withdrawableStvAfterRepay,
-//  withdrawableEthAfterRepay, pendingUnlockFromStrategyVaultInEth,
-//  currentProxyMintingCapacityShares, currentVaultMintingCapacityShares]
 type RWR = {
   proxyBalanceStvInEth?: bigint;
   proxyNominalBalanceStvInEth?: bigint;
   proxyUnlockedBalanceStvInEth?: bigint;
   unlockedStv?: bigint;
+  //
   strategyDepositOffsetInLockedEth?: bigint;
   totalStethLiabilityInEth?: bigint;
   totalStethSharesAvailableForReturnInEth?: bigint;
+  //
   withdrawableStvAfterRepay?: bigint;
   withdrawableEthAfterRepay?: bigint;
+  stethLiabilityToRepayInEth?: bigint;
   pendingUnlockFromStrategyVaultInEth?: bigint;
+  //
   currentProxyMintingCapacityShares?: bigint;
   currentVaultMintingCapacityShares?: bigint;
 };
@@ -97,12 +96,16 @@ function buildFixture(opts: FixtureInput = {}) {
     rwr.proxyNominalBalanceStvInEth ?? 0n,
     rwr.proxyUnlockedBalanceStvInEth ?? 0n,
     rwr.unlockedStv ?? 0n,
+    //
     rwr.strategyDepositOffsetInLockedEth ?? 0n,
     rwr.totalStethLiabilityInEth ?? 0n,
     rwr.totalStethSharesAvailableForReturnInEth ?? 0n,
+    //
     rwr.withdrawableStvAfterRepay ?? 0n,
     rwr.withdrawableEthAfterRepay ?? 0n,
+    rwr.stethLiabilityToRepayInEth ?? 0n,
     rwr.pendingUnlockFromStrategyVaultInEth ?? 0n,
+    //
     rwr.currentProxyMintingCapacityShares ?? 1_000_000n,
     rwr.currentVaultMintingCapacityShares ?? 1_000_000n,
   ];

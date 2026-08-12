@@ -2,7 +2,7 @@ import { type Address, isAddress } from 'viem';
 import { CHAINS } from '@lidofinance/lido-ethereum-sdk/common';
 import { type DefiWrapperTypes } from '@/modules/defi-wrapper';
 
-export type UserConfigDefaultType = {
+export type UserConfigDefaultType = Readonly<{
   defaultChain: number;
   supportedChainIds: number[];
   publicElRpcUrls: Record<CHAINS, string[]>;
@@ -15,7 +15,7 @@ export type UserConfigDefaultType = {
   strategyAddress?: Address;
   isDev: boolean;
   widgetTitle?: string;
-};
+}>;
 
 const assertAddress = (value: unknown, envLabel?: string): Address => {
   if (typeof value !== 'string' || !isAddress(value.toLowerCase())) {
@@ -94,4 +94,4 @@ export const USER_CONFIG: UserConfigDefaultType = {
           'VITE_STRATEGY_ADDRESS',
         )
       : undefined,
-};
+} as const;

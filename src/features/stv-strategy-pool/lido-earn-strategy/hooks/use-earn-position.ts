@@ -17,6 +17,7 @@ const useEarnPositionData = () => {
         strategyProxyAddress: earnStrategy?.strategyProxyAddress,
       },
     ],
+    throwOnError: true,
     enabled: !!earnStrategy && !!earnStrategy.strategyProxyAddress,
     queryFn: async () => {
       invariant(

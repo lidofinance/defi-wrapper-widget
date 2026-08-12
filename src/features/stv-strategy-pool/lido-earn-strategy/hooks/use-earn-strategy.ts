@@ -33,6 +33,7 @@ export const useEarnStrategy = () => {
       strategy?.address,
       { address, chainId: publicClient.chain?.id },
     ],
+    throwOnError: true,
     enabled: !!wrapper && !!strategy,
     // Poll every 60s so deposit/withdrawal pause-state changes are reflected promptly
     refetchInterval: VAULT_REPORT_REFETCH_INTERVAL_MS,

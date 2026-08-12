@@ -49,6 +49,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@chakra-ui/charts": "^3.35.0",
     "@lidofinance/browser-service": "1.11.5",
     "@lidofinance/secret-guard-reporter": "1.1.0",
     "@lidofinance/wallets-testing-nodes": "1.10.0",
@@ -77,6 +78,7 @@
     "jsdom": "^29.0.2",
     "lint-staged": "16.2.7",
     "prettier": "^3.8.1",
+    "recharts": "^3.8.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.0",
     "vite": "^7.3.5",
