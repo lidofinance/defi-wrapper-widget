@@ -13,9 +13,14 @@ const SENSITIVE_ENV_KEYS = [
 ];
 
 export const getReporters = (): ReporterDescription[] => {
-  const reporters: ReporterDescription[] = process.env.CI
-    ? [['github'], ['html', { open: 'never' }]]
-    : [['list']];
+  const reporters: ReporterDescription[] = [
+    ['html', { open: 'never' }],
+    ['list', { printSteps: !process.env.CI }],
+  ];
+
+  if (process.env.CI) {
+    reporters.push(['github']);
+  }
 
   return [
     [
