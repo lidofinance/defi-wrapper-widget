@@ -23,9 +23,24 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
+          cache-dependency-path: |
+            yarn.lock
+            tests/yarn.lock
 
       - name: Install dependencies
         run: yarn install --immutable
 
       - name: Yarn lint
         run: yarn lint
+
+      - name: Install E2E dependencies
+        run: yarn install --immutable
+        working-directory: tests
+
+      - name: E2E lint
+        run: yarn lint
+        working-directory: tests
+
+      - name: E2E types
+        run: yarn types
+        working-directory: tests

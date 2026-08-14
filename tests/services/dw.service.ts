@@ -12,7 +12,6 @@ import { NavigationPage } from '../pages/navigation.page';
 import { WithdrawalPage } from '../pages/withdrawal.page';
 
 // Multi-step flows and wallet-type branching; page objects stay atomic.
-// See .claude/skills/e2e-pom-convention.
 export class DwService {
   readonly header: BasePage;
   readonly connectWalletModal: ConnectWalletModal;

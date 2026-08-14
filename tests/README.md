@@ -22,11 +22,12 @@ and against on-chain state read with viem.
 ## Requirements
 
 - **Node 22** (see `.nvmrc`).
-- **Yarn 4** — `corepack enable`, then `yarn install` in the repo root.
+- **Yarn 4** — `corepack enable`, then install the widget and E2E projects as
+  shown below.
 - **Foundry** — `anvil` must be on your `PATH`
   ([`foundryup`](https://book.getfoundry.sh/getting-started/installation)).
   The suite spawns Anvil itself; it does not connect to a running node.
-- **Chromium for Playwright** — `yarn playwright install chromium`.
+- **Chromium for Playwright** — `yarn --cwd tests playwright install chromium`.
 - **Free ports**: `4100`, `4200`, `4300` (widget dev servers) and `8545` for
   mainnet or `8045` for Hoodi (Anvil). A leftover `anvil` or `yarn dev` process
   from a killed run will block the next one.
@@ -34,6 +35,10 @@ and against on-chain state read with viem.
 ## Setup
 
 ```bash
+yarn install
+yarn --cwd tests install
+yarn --cwd tests playwright install chromium
+
 cp tests/.env.example tests/.env
 ```
 
@@ -61,9 +66,9 @@ The per-type scripts target the UI project and pull in their setup project
 automatically:
 
 ```jsonc
-"test:stv-pool":     "playwright test -c tests/playwright.config.ts --project=stv-pool-ui",
-"test:stv-steth":    "playwright test -c tests/playwright.config.ts --project=stv-steth-ui",
-"test:stv-strategy": "playwright test -c tests/playwright.config.ts --project=stv-strategy-ui",
+"test:stv-pool":     "playwright test -c playwright.config.ts --project=stv-pool-ui",
+"test:stv-steth":    "playwright test -c playwright.config.ts --project=stv-steth-ui",
+"test:stv-strategy": "playwright test -c playwright.config.ts --project=stv-strategy-ui",
 ```
 
 Any Playwright flag can be appended:
@@ -72,14 +77,14 @@ Any Playwright flag can be appended:
 # watch the browser / step through
 yarn test:stv-pool --headed
 yarn test:stv-pool --debug
-yarn playwright test -c tests/playwright.config.ts --ui
+yarn --cwd tests playwright test -c playwright.config.ts --ui
 
 # narrow down
-yarn playwright test -c tests/playwright.config.ts --grep "claim"
-yarn playwright test -c tests/playwright.config.ts --last-failed
+yarn --cwd tests playwright test -c playwright.config.ts --grep "claim"
+yarn --cwd tests playwright test -c playwright.config.ts --last-failed
 
 # re-run against the pool that is already on disk, skipping pool creation
-yarn playwright test -c tests/playwright.config.ts --project=stv-pool-ui --no-deps
+yarn --cwd tests playwright test -c playwright.config.ts --project=stv-pool-ui --no-deps
 ```
 
 Timeouts are 220s per UI test and 480s for a setup project (pool creation is
@@ -88,13 +93,13 @@ server and one wallet exist at a time.
 
 ### Artifacts
 
-| Path                      | What it is                                                            |
-| ------------------------- | --------------------------------------------------------------------- |
-| `playwright-report/`      | HTML report (`yarn playwright show-report`)                           |
-| `test-results/`           | Screenshots and traces, kept only for failures                        |
-| `tests/state.<type>.json` | Anvil state snapshot of the created pool                              |
-| `tests/pools.<type>.json` | Addresses of the created pool                                         |
-| `local_fork_config.json`  | Fork metadata written by the node service (accounts, block, endpoint) |
+| Path                       | What it is                                                            |
+| -------------------------- | --------------------------------------------------------------------- |
+| `tests/playwright-report/` | HTML report (`yarn --cwd tests playwright show-report`)               |
+| `tests/test-results/`      | Screenshots and traces, kept only for failures                        |
+| `tests/state.<type>.json`  | Anvil state snapshot of the created pool                              |
+| `tests/pools.<type>.json`  | Addresses of the created pool                                         |
+| `local_fork_config.json`   | Fork metadata written by the node service (accounts, block, endpoint) |
 
 ## How it works
 
@@ -187,6 +192,9 @@ characters are ignored to avoid false positives.
 
 `.github/workflows/ui_tests.yml` runs the full suite on every non-draft pull
 request and on demand via **Run workflow**, which takes three inputs:
+
+The workflow installs the widget and `tests` as separate Yarn projects. A
+regular widget install does not include the E2E wallet or browser tooling.
 
 | Input     | Default         | Meaning                                                                                                     |
 | --------- | --------------- | ----------------------------------------------------------------------------------------------------------- |

@@ -1,0 +1,29 @@
+{
+  "name": "defi-wrapper-e2e-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "yarn --cwd .. eslint tests --no-ignore",
+    "types": "tsc --noEmit -p tsconfig.json",
+    "test:stv-pool": "playwright test -c playwright.config.ts --project=stv-pool-ui",
+    "test:stv-steth": "playwright test -c playwright.config.ts --project=stv-steth-ui",
+    "test:stv-strategy": "playwright test -c playwright.config.ts --project=stv-strategy-ui",
+    "test:e2e": "playwright test -c playwright.config.ts"
+  },
+  "devDependencies": {
+    "@lidofinance/browser-service": "1.11.5",
+    "@lidofinance/secret-guard-reporter": "1.1.0",
+    "@lidofinance/wallets-testing-nodes": "1.10.0",
+    "@lidofinance/wallets-testing-wallets": "1.51.1",
+    "@playwright/test": "1.61.0",
+    "@types/node": "^24.5.2",
+    "dotenv": "^17.2.3",
+    "typescript": "^5.9.3",
+    "viem": "2.50.4",
+    "zod": "^4.3.6"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "yarn@4.9.0"
+}

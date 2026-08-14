@@ -52,9 +52,16 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
+          cache-dependency-path: |
+            yarn.lock
+            tests/yarn.lock
 
-      - name: Install dependencies
+      - name: Install widget dependencies
         run: yarn install --immutable
+
+      - name: Install E2E dependencies
+        run: yarn install --immutable
+        working-directory: tests
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
@@ -67,7 +74,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ hashFiles('yarn.lock') }}
+          key: playwright-${{ hashFiles('tests/yarn.lock') }}
 
       - name: Install Playwright browsers
         run: |
@@ -76,9 +83,11 @@ jobs:
           else
             yarn playwright install chromium --with-deps
           fi
+        working-directory: tests
 
       # Chromium runs headed (browser-service default), so it needs a display.
       - name: Run E2E tests
+        working-directory: tests
         run: |
           chain_name="mainnet"
           [ "$CHAIN_ID" = "560048" ] && chain_name="hoodi"
@@ -103,6 +112,6 @@ jobs:
         with:
           name: playwright-report
           path: |
-            playwright-report/
-            test-results/
+            tests/playwright-report/
+            tests/test-results/
           retention-days: 5

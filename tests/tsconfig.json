@@ -1,0 +1,8 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "include": ["**/*.ts", "../src/types/*.d.ts"],
+  "exclude": ["node_modules", "playwright-report", "test-results"]
+}
