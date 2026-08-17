@@ -62,7 +62,9 @@ describe('tokenAmountSchema', () => {
     });
 
     it('maxAmount = undefined disables extra cap', () => {
-      const result = tokenAmountSchema(10n * ETH, undefined).safeParse(10n * ETH);
+      const result = tokenAmountSchema(10n * ETH, undefined).safeParse(
+        10n * ETH,
+      );
       expect(result.success).toBe(true);
     });
   });

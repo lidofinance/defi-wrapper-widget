@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import invariant from 'tiny-invariant';
-import { useInvalidateWrapper, useStvStrategy } from '@/modules/defi-wrapper';
+import { useInvalidateWrapper } from '@/modules/defi-wrapper';
 import { useWalletWhitelisted } from '@/modules/defi-wrapper/hooks/use-wallet-whitelisted';
 import { useDappStatus } from '@/modules/web3';
 import { FormController } from '@/shared/hook-form/form-controller';
