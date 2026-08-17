@@ -4,13 +4,13 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
-      chain:
-        description: 'chain_id'
+      stand_env:
+        description: 'Stand environment'
         type: choice
         default: mainnet
         options:
           - mainnet
-          - hoodi
+          - testnet
       rpc_url:
         description: 'Override fork RPC URL (optional — falls back to secrets.RPC_URL, then a public RPC)'
         required: false
@@ -39,7 +39,7 @@ jobs:
       TEST_WALLET_PASSWORD: ${{ secrets.TEST_WALLET_PASSWORD }}
       WC_PROJECT_ID: ${{ vars.VITE_WALLETCONNECT_PROJECT_ID }}
       RPC_URL: ${{ (github.event_name == 'workflow_dispatch' && inputs.rpc_url) || secrets.RPC_URL }}
-      CHAIN_ID: ${{ (github.event_name == 'workflow_dispatch' && inputs.chain == 'hoodi') && '560048' || '1' }}
+      CHAIN_ID: ${{ (github.event_name == 'workflow_dispatch' && inputs.stand_env == 'testnet') && '560048' || '1' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -113,5 +113,4 @@ jobs:
           name: playwright-report
           path: |
             tests/playwright-report/
-            tests/test-results/
           retention-days: 5
