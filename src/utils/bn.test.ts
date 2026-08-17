@@ -62,7 +62,7 @@ describe('bnCeilDiv', () => {
     expect(() => bnCeilDiv(1n, 0n)).toThrow());
   it('handles large ETH-scale values', () => {
     // 1.5 ETH / 1 ETH = ceiling(1.5) = 2 in integer math
-    expect(bnCeilDiv(15n * ETH / 10n, ETH)).toBe(2n);
+    expect(bnCeilDiv((15n * ETH) / 10n, ETH)).toBe(2n);
   });
   it('1n / 1n = 1n', () => expect(bnCeilDiv(1n, 1n)).toBe(1n));
   it('0n / anything = 0n', () => expect(bnCeilDiv(0n, 5n)).toBe(0n));
@@ -112,8 +112,7 @@ describe('numberToBN', () => {
     expect(numberToBN(1, 0)).toBe(1n);
   });
 
-  it('throws on Infinity', () =>
-    expect(() => numberToBN(Infinity)).toThrow());
+  it('throws on Infinity', () => expect(() => numberToBN(Infinity)).toThrow());
   it('throws on -Infinity', () =>
     expect(() => numberToBN(-Infinity)).toThrow());
   it('throws on NaN', () => expect(() => numberToBN(NaN)).toThrow());
