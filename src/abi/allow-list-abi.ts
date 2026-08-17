@@ -33,4 +33,17 @@ export const AllowListAbi = [
     ],
     stateMutability: 'view',
   },
+  {
+    type: 'function',
+    name: 'addToAllowList',
+    inputs: [
+      {
+        name: '_user',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
 ] as const satisfies Abi;

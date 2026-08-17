@@ -21,5 +21,5 @@
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "dist", "*.config.[js|mjs]"]
+  "exclude": ["node_modules", "dist", "tests", "*.config.[js|mjs]"]
 }

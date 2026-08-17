@@ -19,6 +19,7 @@ export default defineConfig(
       'node_modules/**',
       'dist/**',
       'build/**',
+      'tests/**',
       '*.config.js',
       '*.config.mjs',
       './scripts/**',

@@ -1,4 +1,4 @@
-name: PR tests
+name: Unit tests
 
 on:
   pull_request:
@@ -20,7 +20,7 @@ jobs:
           cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --immutable
 
       - name: Unit tests
         run: yarn test

@@ -1,0 +1,46 @@
+name: Static checks
+
+on: pull_request
+
+jobs:
+  security:
+    uses: lidofinance/linters/.github/workflows/security.yml@master
+    permissions:
+      security-events: write
+      contents: read
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: corepack enable
+        run: corepack enable
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+          cache-dependency-path: |
+            yarn.lock
+            tests/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Yarn lint
+        run: yarn lint
+
+      - name: Install E2E dependencies
+        run: yarn install --immutable
+        working-directory: tests
+
+      - name: E2E lint
+        run: yarn lint
+        working-directory: tests
+
+      - name: E2E types
+        run: yarn types
+        working-directory: tests

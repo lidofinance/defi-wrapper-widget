@@ -3,6 +3,49 @@ import type { Abi } from 'viem';
 export const WithdrawalQueueAbi = [
   {
     type: 'function',
+    name: 'finalize',
+    inputs: [
+      {
+        name: '_maxRequests',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: '_gasCostCoverageRecipient',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: 'finalizedRequests',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'getClaimableEther',
+    inputs: [
+      {
+        name: '_requestId',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: 'claimableEth',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     name: 'MAX_WITHDRAWAL_ASSETS',
     inputs: [],
     outputs: [
