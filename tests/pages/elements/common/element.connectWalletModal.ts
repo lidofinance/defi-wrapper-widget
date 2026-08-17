@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
-import { WALLET_TILE_ENABLED_TIMEOUT } from '../../../testData/timeouts';
+import { WALLET_TILE_ENABLED_TIMEOUT } from '@tests/testData';
 
 // Locators + atomic actions for the reef-knot "Choose wallet" modal
 // (src/shared/wallet/connect/connect.tsx). Orchestration lives in DwService.
