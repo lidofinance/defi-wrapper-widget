@@ -8,10 +8,7 @@ import { readPoolRegistry } from '../../setup/poolRegistry';
 import { test } from '../../test.fixture';
 import { getRoleSigner } from '../../testData/accounts';
 import { WITHDRAWAL_DELAY_ADVANCE_SECONDS } from '../../testData/poolParams';
-import { finalizeWithdrawals } from '../../utils/nodeHelpers/finalize';
-import { applyVaultReport } from '../../utils/nodeHelpers/lazyOracleMock';
-
-test.use({ poolType: 'StvPool' });
+import { applyVaultReport, finalizeWithdrawals } from '../../utils';
 
 // allowListEnabled=false, so deposit/request/claim are permissionless.
 // finalize has no UI — it's an operator action, called on-chain directly.

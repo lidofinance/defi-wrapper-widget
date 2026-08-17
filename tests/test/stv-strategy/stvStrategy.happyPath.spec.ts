@@ -7,14 +7,12 @@ import { readPoolRegistry } from '../../setup/poolRegistry';
 import { test } from '../../test.fixture';
 import { getRoleSigner } from '../../testData/accounts';
 import { WITHDRAWAL_DELAY_ADVANCE_SECONDS } from '../../testData/poolParams';
-import { finalizeWithdrawals } from '../../utils/nodeHelpers/finalize';
-import { applyVaultReport } from '../../utils/nodeHelpers/lazyOracleMock';
 import {
+  applyVaultReport,
+  finalizeWithdrawals,
   handleMellowBatches,
   submitMellowReport,
-} from '../../utils/nodeHelpers/mellowMock';
-
-test.use({ poolType: 'StvStrategyPool' });
+} from '../../utils';
 
 test('deposit, exit Mellow, process, finalize, claim', async ({
   browserWithWallet,

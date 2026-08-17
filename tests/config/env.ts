@@ -29,8 +29,7 @@ const schema = z
     (env) => env.WALLET_NAME === 'walletconnect' || !!env.TEST_WALLET_PASSWORD,
     {
       path: ['TEST_WALLET_PASSWORD'],
-      message:
-        'TEST_WALLET_PASSWORD is required for extension wallets (WALLET_NAME=metamask | okx)',
+      message: 'TEST_WALLET_PASSWORD is required when WALLET_NAME=metamask',
     },
   );
 

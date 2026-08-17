@@ -2,10 +2,12 @@ import { statePath } from './paths';
 import { writePoolRegistry } from './poolRegistry';
 import { test } from '../test.fixture';
 import { getRoleAddress, getRoleSigner } from '../testData/accounts';
-import { addToAllowListViaImpersonation } from '../utils/nodeHelpers/allowListMock';
-import { MELLOW_VAULT_LIQUIDITY_TOP_UP } from '../utils/nodeHelpers/consts';
-import { createPool } from '../utils/nodeHelpers/createPool';
-import { ensureMellowVaultLiquidity } from '../utils/nodeHelpers/mellowMock';
+import {
+  addToAllowListViaImpersonation,
+  createPool,
+  ensureMellowVaultLiquidity,
+  MELLOW_VAULT_LIQUIDITY_TOP_UP,
+} from '../utils';
 import type { DefiWrapperTypes } from '../../src/modules/defi-wrapper';
 
 // Creates a pool and persists its Anvil state for the UI project.

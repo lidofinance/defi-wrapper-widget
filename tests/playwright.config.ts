@@ -4,8 +4,7 @@ import { getReporters } from './reportSettings';
 import type { TestOptions } from './test.fixture';
 import { SETUP_PROJECT_TIMEOUT, UI_TEST_TIMEOUT } from './testData/timeouts';
 
-// Anvil port / dev server port are per-type in chainConfig.ts + here; keep this
-// table as the single source for the UI project's port (see tests/CLAUDE.md).
+// Keep UI ports centralized here to prevent per-project server collisions.
 const DEV_SERVER_PORT = {
   StvPool: 4100,
   StvStETHPool: 4200,

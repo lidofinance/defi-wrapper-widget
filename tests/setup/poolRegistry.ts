@@ -2,7 +2,7 @@ import type { Address } from 'viem';
 import fs from 'fs';
 
 import { poolRegistryPath } from './paths';
-import type { PoolDeployment } from '../utils/nodeHelpers/createPool';
+import type { PoolDeployment } from '../utils';
 import type { DefiWrapperTypes } from '../../src/modules/defi-wrapper';
 
 export const writePoolRegistry = (
