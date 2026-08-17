@@ -1,13 +1,16 @@
 import { encodeAbiParameters, keccak256, type Address } from 'viem';
 
-import { getChainConfig } from '../../config/chainConfig';
-import { BaseOracleContract } from '../../contracts/base-oracle.contract';
-import { DashboardContract } from '../../contracts/dashboard.contract';
-import { HashConsensusContract } from '../../contracts/hash-consensus.contract';
-import { LazyOracleContract } from '../../contracts/lazy-oracle.contract';
-import { LidoLocatorContract } from '../../contracts/lido-locator.contract';
-import { VaultHubContract } from '../../contracts/vault-hub.contract';
-import { getPublicClient, getTestClient } from '../../providers';
+import { getChainConfig } from '@tests/config';
+import {
+  BaseOracleContract,
+  DashboardContract,
+  HashConsensusContract,
+  LazyOracleContract,
+  LidoLocatorContract,
+  VaultHubContract,
+} from '@tests/contracts';
+import { getPublicClient, getTestClient } from '@tests/providers';
+
 import { ensureFunded } from './impersonation';
 
 // Single-leaf OZ StandardMerkleTree leaf, matching CoreHarness.applyVaultReport

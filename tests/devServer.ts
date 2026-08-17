@@ -2,12 +2,11 @@ import type { Address } from 'viem';
 import { spawn, type ChildProcess } from 'child_process';
 import path from 'path';
 
-import { getChainConfig, MAINNET_CHAIN_ID } from './config/chainConfig';
-import { testEnv } from './config/env';
+import { getChainConfig, MAINNET_CHAIN_ID, testEnv } from '@tests/config';
 import {
   DEV_SERVER_POLL_INTERVAL,
   DEV_SERVER_READY_TIMEOUT,
-} from './testData/timeouts';
+} from '@tests/testData';
 import type { DefiWrapperTypes } from '../src/modules/defi-wrapper';
 
 const WIDGET_ROOT = path.resolve(__dirname, '..');

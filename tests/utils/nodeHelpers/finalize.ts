@@ -1,7 +1,7 @@
 import type { Address } from 'viem';
 
-import { WithdrawalQueueContract } from '../../contracts/withdrawal-queue.contract';
-import { getRoleSigner, getRoleAddress } from '../../testData/accounts';
+import { WithdrawalQueueContract } from '@tests/contracts';
+import { getRoleSigner, getRoleAddress } from '@tests/testData';
 import type { EthereumNodeService } from '@lidofinance/wallets-testing-nodes';
 
 /**

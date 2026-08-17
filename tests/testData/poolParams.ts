@@ -1,7 +1,8 @@
 import { zeroAddress } from 'viem';
 
+import { getChainConfig } from '@tests/config';
+
 import { getRoleAddress } from './accounts';
-import { getChainConfig } from '../config/chainConfig';
 import type { DefiWrapperTypes } from '../../src/modules/defi-wrapper';
 import type { EthereumNodeService } from '@lidofinance/wallets-testing-nodes';
 

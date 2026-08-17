@@ -5,8 +5,8 @@ import {
   http,
 } from 'viem';
 
-import { getNodeUrl, getViemChain } from '../config/chainConfig';
-import { RPC_TRANSPORT_TIMEOUT } from '../testData/timeouts';
+import { getNodeUrl, getViemChain } from '@tests/config';
+import { RPC_TRANSPORT_TIMEOUT } from '@tests/testData';
 
 const getTransport = () =>
   http(getNodeUrl(), { timeout: RPC_TRANSPORT_TIMEOUT });

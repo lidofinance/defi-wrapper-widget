@@ -1,8 +1,8 @@
 import { getContract } from 'viem';
 import type { Account, Address, Hex } from 'viem';
 
-import { getViemChain } from '../config/chainConfig';
-import { getPublicClient, getSharedWalletClient } from '../providers';
+import { getViemChain } from '@tests/config';
+import { getPublicClient, getSharedWalletClient } from '@tests/providers';
 import { MELLOW_VAULT_ABI } from './abi/mellow-abi';
 
 export class MellowVaultContract {

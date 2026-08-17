@@ -1,7 +1,8 @@
 import type { Address } from 'viem';
 
-import { AllowListContract } from '../../contracts/allow-list.contract';
-import { getTestClient } from '../../providers';
+import { AllowListContract } from '@tests/contracts';
+import { getTestClient } from '@tests/providers';
+
 import { ensureFunded } from './impersonation';
 
 /**

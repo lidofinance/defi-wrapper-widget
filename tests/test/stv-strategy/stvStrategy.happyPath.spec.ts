@@ -1,18 +1,23 @@
 import { expect } from '@playwright/test';
 
-import { MellowStrategyContract } from '../../contracts/mellow-strategy.contract';
-import { WithdrawalQueueContract } from '../../contracts/withdrawal-queue.contract';
-import { advanceTime, getPublicClient } from '../../providers';
-import { readPoolRegistry } from '../../setup/poolRegistry';
-import { test } from '../../test.fixture';
-import { getRoleSigner } from '../../testData/accounts';
-import { WITHDRAWAL_DELAY_ADVANCE_SECONDS } from '../../testData/poolParams';
+import {
+  MellowStrategyContract,
+  WithdrawalQueueContract,
+} from '@tests/contracts';
+import { advanceTime, getPublicClient } from '@tests/providers';
+import {
+  getRoleSigner,
+  WITHDRAWAL_DELAY_ADVANCE_SECONDS,
+} from '@tests/testData';
 import {
   applyVaultReport,
   finalizeWithdrawals,
   handleMellowBatches,
   submitMellowReport,
-} from '../../utils';
+} from '@tests/utils';
+
+import { readPoolRegistry } from '../../setup/poolRegistry';
+import { test } from '../../test.fixture';
 
 test('deposit, exit Mellow, process, finalize, claim', async ({
   browserWithWallet,

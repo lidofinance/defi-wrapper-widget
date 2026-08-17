@@ -1,7 +1,7 @@
 import { getContract, maxUint256 } from 'viem';
 import type { Address } from 'viem';
 
-import { getPublicClient } from '../providers';
+import { getPublicClient } from '@tests/providers';
 import { MELLOW_STRATEGY_READ_ABI } from './abi/mellow-abi';
 
 export class MellowStrategyContract {

@@ -2,14 +2,18 @@ import { zeroAddress } from 'viem';
 import { BrowserService } from '@lidofinance/browser-service';
 import { test as base } from '@playwright/test';
 
-import { getChainConfig, getNodeUrl } from './config/chainConfig';
-import { testEnv } from './config/env';
-import { getWalletConfigByName } from './config/walletConfig';
+import {
+  getChainConfig,
+  getNodeUrl,
+  getWalletConfigByName,
+  testEnv,
+} from '@tests/config';
+import { getRoleAccounts, getRoleAddress } from '@tests/testData';
+
 import { startDevServer, type DevServerHandle } from './devServer';
 import { DwService } from './services/dw.service';
 import { statePath } from './setup/paths';
 import { readPoolRegistry } from './setup/poolRegistry';
-import { getRoleAccounts, getRoleAddress } from './testData/accounts';
 import type { DefiWrapperTypes } from '../src/modules/defi-wrapper';
 
 export type TestOptions = {

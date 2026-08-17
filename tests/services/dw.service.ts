@@ -4,12 +4,14 @@ import {
 } from '@lidofinance/wallets-testing-wallets';
 import { expect, type Page } from '@playwright/test';
 
-import { BasePage } from '../pages/base.page';
-import { DashboardPage } from '../pages/dashboard.page';
-import { DepositPage } from '../pages/deposit.page';
-import { ConnectWalletModal } from '../pages/elements/common/element.connectWalletModal';
-import { NavigationPage } from '../pages/navigation.page';
-import { WithdrawalPage } from '../pages/withdrawal.page';
+import {
+  BasePage,
+  ConnectWalletModal,
+  DashboardPage,
+  DepositPage,
+  NavigationPage,
+  WithdrawalPage,
+} from '@tests/pages';
 
 // Multi-step flows and wallet-type branching; page objects stay atomic.
 export class DwService {

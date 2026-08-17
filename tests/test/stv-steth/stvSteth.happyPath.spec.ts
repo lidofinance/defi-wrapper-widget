@@ -1,17 +1,22 @@
 import { parseEther } from 'viem';
 import { expect } from '@playwright/test';
 
-import { getChainConfig } from '../../config/chainConfig';
-import { LidoLocatorContract } from '../../contracts/lido-locator.contract';
-import { StethContract } from '../../contracts/steth.contract';
-import { StvStethContract } from '../../contracts/stv-steth.contract';
-import { WithdrawalQueueContract } from '../../contracts/withdrawal-queue.contract';
-import { advanceTime, getPublicClient } from '../../providers';
+import { getChainConfig } from '@tests/config';
+import {
+  LidoLocatorContract,
+  StethContract,
+  StvStethContract,
+  WithdrawalQueueContract,
+} from '@tests/contracts';
+import { advanceTime, getPublicClient } from '@tests/providers';
+import {
+  getRoleSigner,
+  WITHDRAWAL_DELAY_ADVANCE_SECONDS,
+} from '@tests/testData';
+import { applyVaultReport, finalizeWithdrawals } from '@tests/utils';
+
 import { readPoolRegistry } from '../../setup/poolRegistry';
 import { test } from '../../test.fixture';
-import { getRoleSigner } from '../../testData/accounts';
-import { WITHDRAWAL_DELAY_ADVANCE_SECONDS } from '../../testData/poolParams';
-import { applyVaultReport, finalizeWithdrawals } from '../../utils';
 
 const depositAmountEth = 1;
 

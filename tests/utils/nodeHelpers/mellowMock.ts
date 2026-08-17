@@ -1,13 +1,16 @@
 import { encodeAbiParameters, parseEther, zeroHash } from 'viem';
 import type { Account, Address } from 'viem';
 
-import { getChainConfig } from '../../config/chainConfig';
-import { AsyncRedeemQueueContract } from '../../contracts/async-redeem-queue.contract';
-import { Erc20Contract } from '../../contracts/erc20.contract';
-import { MellowOracleContract } from '../../contracts/mellow-oracle.contract';
-import { MellowVaultContract } from '../../contracts/mellow-vault.contract';
-import { WstethReferralStakerContract } from '../../contracts/wsteth-referral-staker.contract';
-import { getPublicClient, getTestClient } from '../../providers';
+import { getChainConfig } from '@tests/config';
+import {
+  AsyncRedeemQueueContract,
+  Erc20Contract,
+  MellowOracleContract,
+  MellowVaultContract,
+  WstethReferralStakerContract,
+} from '@tests/contracts';
+import { getPublicClient, getTestClient } from '@tests/providers';
+
 import { ensureFunded } from './impersonation';
 
 // Queue addresses are factory immutables; deployBytes contains only this flag.

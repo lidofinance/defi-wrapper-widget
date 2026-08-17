@@ -1,13 +1,14 @@
-import { statePath } from './paths';
-import { writePoolRegistry } from './poolRegistry';
-import { test } from '../test.fixture';
-import { getRoleAddress, getRoleSigner } from '../testData/accounts';
+import { getRoleAddress, getRoleSigner } from '@tests/testData';
 import {
   addToAllowListViaImpersonation,
   createPool,
   ensureMellowVaultLiquidity,
   MELLOW_VAULT_LIQUIDITY_TOP_UP,
-} from '../utils';
+} from '@tests/utils';
+
+import { statePath } from './paths';
+import { writePoolRegistry } from './poolRegistry';
+import { test } from '../test.fixture';
 import type { DefiWrapperTypes } from '../../src/modules/defi-wrapper';
 
 // Creates a pool and persists its Anvil state for the UI project.

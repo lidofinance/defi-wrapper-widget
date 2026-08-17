@@ -1,8 +1,8 @@
 import { getContract } from 'viem';
 import type { Account, Address, Hash, Hex } from 'viem';
 
-import { getViemChain } from '../config/chainConfig';
-import { getPublicClient, getSharedWalletClient } from '../providers';
+import { getViemChain } from '@tests/config';
+import { getPublicClient, getSharedWalletClient } from '@tests/providers';
 import { LAZY_ORACLE_ABI } from './abi/core-abi';
 
 export class LazyOracleContract {

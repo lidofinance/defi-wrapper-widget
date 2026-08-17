@@ -1,7 +1,7 @@
 import { getContract } from 'viem';
 import type { Address } from 'viem';
 
-import { getPublicClient } from '../providers';
+import { getPublicClient } from '@tests/providers';
 import { DASHBOARD_ABI } from './abi/core-abi';
 
 export class DashboardContract {

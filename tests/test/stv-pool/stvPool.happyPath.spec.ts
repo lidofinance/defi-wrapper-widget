@@ -1,14 +1,16 @@
 import { parseEther } from 'viem';
 import { expect } from '@playwright/test';
 
-import { StvPoolContract } from '../../contracts/stv-pool.contract';
-import { WithdrawalQueueContract } from '../../contracts/withdrawal-queue.contract';
-import { advanceTime, getPublicClient } from '../../providers';
+import { StvPoolContract, WithdrawalQueueContract } from '@tests/contracts';
+import { advanceTime, getPublicClient } from '@tests/providers';
+import {
+  getRoleSigner,
+  WITHDRAWAL_DELAY_ADVANCE_SECONDS,
+} from '@tests/testData';
+import { applyVaultReport, finalizeWithdrawals } from '@tests/utils';
+
 import { readPoolRegistry } from '../../setup/poolRegistry';
 import { test } from '../../test.fixture';
-import { getRoleSigner } from '../../testData/accounts';
-import { WITHDRAWAL_DELAY_ADVANCE_SECONDS } from '../../testData/poolParams';
-import { applyVaultReport, finalizeWithdrawals } from '../../utils';
 
 // allowListEnabled=false, so deposit/request/claim are permissionless.
 // finalize has no UI — it's an operator action, called on-chain directly.

@@ -1,20 +1,19 @@
 import { parseEther } from 'viem';
 
-import { getChainConfig } from '../../config/chainConfig';
-import { FactoryContract } from '../../contracts/factory.contract';
-import { getRoleSigner } from '../../testData/accounts';
+import { getChainConfig } from '@tests/config';
+import { FactoryContract } from '@tests/contracts';
 import {
   commonPoolConfig,
+  getRoleSigner,
   POOL_PARAMS,
   timelockConfig,
   vaultConfig,
-} from '../../testData/poolParams';
+} from '@tests/testData';
+
 import { encodeMellowDeployBytes } from './mellowMock';
 import type { DefiWrapperTypes } from '../../../src/modules/defi-wrapper';
-import type { PoolDeployment } from '../../contracts/factory.contract';
 import type { EthereumNodeService } from '@lidofinance/wallets-testing-nodes';
-
-export type { PoolDeployment } from '../../contracts/factory.contract';
+import type { PoolDeployment } from '@tests/contracts';
 
 /**
  * Creates a fresh pool of `poolType` on the forked Anvil node behind

@@ -1,9 +1,9 @@
 import { getContract } from 'viem';
 import type { Account, Address } from 'viem';
 
+import { getViemChain } from '@tests/config';
+import { getPublicClient, getSharedWalletClient } from '@tests/providers';
 import { WithdrawalQueueAbi } from '../../src/abi/withdrawal-queue-abi';
-import { getViemChain } from '../config/chainConfig';
-import { getPublicClient, getSharedWalletClient } from '../providers';
 
 export class WithdrawalQueueContract {
   constructor(private readonly address: Address) {}

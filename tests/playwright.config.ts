@@ -1,8 +1,9 @@
 import { defineConfig } from '@playwright/test';
 
+import { SETUP_PROJECT_TIMEOUT, UI_TEST_TIMEOUT } from '@tests/testData';
+
 import { getReporters } from './reportSettings';
 import type { TestOptions } from './test.fixture';
-import { SETUP_PROJECT_TIMEOUT, UI_TEST_TIMEOUT } from './testData/timeouts';
 
 // Keep UI ports centralized here to prevent per-project server collisions.
 const DEV_SERVER_PORT = {

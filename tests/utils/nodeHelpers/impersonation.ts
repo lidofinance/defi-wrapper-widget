@@ -1,6 +1,7 @@
 import type { Address } from 'viem';
 
-import { getPublicClient, getTestClient } from '../../providers';
+import { getPublicClient, getTestClient } from '@tests/providers';
+
 import { IMPERSONATION_BALANCE, MIN_GAS_AMOUNT_BALANCE } from './consts';
 
 /**

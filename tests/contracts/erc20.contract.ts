@@ -1,8 +1,8 @@
 import { erc20Abi, getContract } from 'viem';
 import type { Account, Address } from 'viem';
 
-import { getViemChain } from '../config/chainConfig';
-import { getPublicClient, getSharedWalletClient } from '../providers';
+import { getViemChain } from '@tests/config';
+import { getPublicClient, getSharedWalletClient } from '@tests/providers';
 
 export class Erc20Contract {
   constructor(private readonly address: Address) {}

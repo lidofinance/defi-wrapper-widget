@@ -1,8 +1,8 @@
 import { getContract } from 'viem';
 import type { Address } from 'viem';
 
+import { getPublicClient } from '@tests/providers';
 import { StvPoolAbi } from '../../src/abi/stv-pool-abi';
-import { getPublicClient } from '../providers';
 
 export class StvPoolContract {
   constructor(private readonly address: Address) {}
