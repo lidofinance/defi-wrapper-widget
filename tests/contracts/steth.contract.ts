@@ -1,8 +1,8 @@
 import { getContract } from 'viem';
 import type { Address } from 'viem';
+import { LidoAbi } from '@lidofinance/lido-ethereum-sdk/core';
 
 import { getPublicClient } from '../providers';
-import { STETH_ABI } from './abi/steth-abi';
 
 export class StethContract {
   constructor(private readonly address: Address) {}
@@ -10,7 +10,7 @@ export class StethContract {
   private getContract() {
     return getContract({
       address: this.address,
-      abi: STETH_ABI,
+      abi: LidoAbi,
       client: getPublicClient(),
     });
   }

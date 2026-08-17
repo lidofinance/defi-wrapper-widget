@@ -1,9 +1,8 @@
-import { getContract } from 'viem';
+import { erc20Abi, getContract } from 'viem';
 import type { Account, Address } from 'viem';
 
 import { getViemChain } from '../config/chainConfig';
 import { getPublicClient, getSharedWalletClient } from '../providers';
-import { ERC20_ABI } from './abi/erc20-abi';
 
 export class Erc20Contract {
   constructor(private readonly address: Address) {}
@@ -11,7 +10,7 @@ export class Erc20Contract {
   private getContract() {
     return getContract({
       address: this.address,
-      abi: ERC20_ABI,
+      abi: erc20Abi,
       client: { public: getPublicClient(), wallet: getSharedWalletClient() },
     });
   }

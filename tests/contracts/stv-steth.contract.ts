@@ -1,8 +1,8 @@
 import { getContract } from 'viem';
 import type { Address } from 'viem';
 
+import { StvStethAbi } from '../../src/abi/stv-steth-abi';
 import { getPublicClient } from '../providers';
-import { STV_STETH_ABI } from './abi/stv-steth-abi';
 
 export class StvStethContract {
   constructor(private readonly address: Address) {}
@@ -10,7 +10,7 @@ export class StvStethContract {
   private getContract() {
     return getContract({
       address: this.address,
-      abi: STV_STETH_ABI,
+      abi: StvStethAbi,
       client: getPublicClient(),
     });
   }

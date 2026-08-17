@@ -1,9 +1,9 @@
 import { getContract } from 'viem';
 import type { Account, Address } from 'viem';
 
+import { StvPoolAbi } from '../../src/abi/stv-pool-abi';
 import { getViemChain } from '../config/chainConfig';
 import { getPublicClient, getSharedWalletClient } from '../providers';
-import { ALLOW_LIST_ABI } from './abi/allow-list-abi';
 
 export class AllowListContract {
   constructor(private readonly address: Address) {}
@@ -11,7 +11,7 @@ export class AllowListContract {
   private getContract() {
     return getContract({
       address: this.address,
-      abi: ALLOW_LIST_ABI,
+      abi: StvPoolAbi,
       client: { public: getPublicClient(), wallet: getSharedWalletClient() },
     });
   }

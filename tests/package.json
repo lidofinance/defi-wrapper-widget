@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@lidofinance/browser-service": "1.11.5",
+    "@lidofinance/lido-ethereum-sdk": "4.8.0",
     "@lidofinance/secret-guard-reporter": "1.1.0",
     "@lidofinance/wallets-testing-nodes": "1.10.0",
     "@lidofinance/wallets-testing-wallets": "1.51.1",

@@ -1,36 +1,3 @@
-// Core Lido ABIs, only the parts needed to inject and refresh oracle reports on
-// the fork. Source: vaults-wrapper/test/utils/CoreHarness.sol.
-export const LIDO_LOCATOR_ABI = [
-  {
-    type: 'function',
-    name: 'accountingOracle',
-    stateMutability: 'view',
-    inputs: [],
-    outputs: [{ name: '', type: 'address' }],
-  },
-  {
-    type: 'function',
-    name: 'vaultHub',
-    stateMutability: 'view',
-    inputs: [],
-    outputs: [{ name: '', type: 'address' }],
-  },
-  {
-    type: 'function',
-    name: 'lazyOracle',
-    stateMutability: 'view',
-    inputs: [],
-    outputs: [{ name: '', type: 'address' }],
-  },
-  {
-    type: 'function',
-    name: 'lido',
-    stateMutability: 'view',
-    inputs: [],
-    outputs: [{ name: '', type: 'address' }],
-  },
-] as const;
-
 export const DASHBOARD_ABI = [
   {
     type: 'function',
