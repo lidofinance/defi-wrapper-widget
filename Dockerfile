@@ -22,7 +22,12 @@ COPY . .
 
 # Accept build arguments for environment variables
 ARG NODE_ENV=production
-ARG VITE_OUT_DIR='./dist'
+# Build-only config (not included in the client bundle); defaults are
+# resolved in vite.config.js (OUT_DIR -> ./dist, BASE_URL -> root)
+ARG OUT_DIR=''
+ARG BASE_URL=''
+# Deprecated legacy names, kept as fallback for backward compatibility
+ARG VITE_OUT_DIR=''
 ARG VITE_BASE_URL=''
 ARG VITE_POOL_TYPE
 ARG VITE_POOL_ADDRESS
@@ -38,8 +43,10 @@ ARG VITE_DEVNET_OVERRIDES
 ARG VITE_LOCALE
 
 ENV NODE_ENV=$NODE_ENV \
+    BASE_URL=$BASE_URL \
+    OUT_DIR=$OUT_DIR \
     VITE_BASE_URL=$VITE_BASE_URL \
-    VITE_OUT_DIR=$VITE_OUT_DIR\
+    VITE_OUT_DIR=$VITE_OUT_DIR \
     VITE_POOL_TYPE=$VITE_POOL_TYPE \
     VITE_POOL_ADDRESS=$VITE_POOL_ADDRESS \
     VITE_STRATEGY_ADDRESS=$VITE_STRATEGY_ADDRESS \

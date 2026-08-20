@@ -51,7 +51,7 @@ export const startDevServer = async (opts: {
   const chainId = getChainConfig().networkConfig.chainId;
   const env = {
     ...process.env,
-    VITE_PORT: String(opts.port),
+    PORT: String(opts.port),
     VITE_POOL_TYPE: opts.poolType,
     VITE_POOL_ADDRESS: opts.poolAddress,
     VITE_STRATEGY_ADDRESS: opts.strategyAddress ?? '',
