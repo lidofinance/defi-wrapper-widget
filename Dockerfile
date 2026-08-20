@@ -22,11 +22,12 @@ COPY . .
 
 # Accept build arguments for environment variables
 ARG NODE_ENV=production
-# Build-only config (not included in the client bundle); defaults are
-# resolved in vite.config.js (OUT_DIR -> ./dist, BASE_URL -> root)
+# Build-only config (not included in the client bundle); defaults resolved in
+# vite.config.js (OUT_DIR -> ./dist; empty BASE_URL -> relative asset paths).
+# Resolved on the `yarn build` line below, with the deprecated VITE_-prefixed
+# names as fallback for backward compatibility.
 ARG OUT_DIR=''
 ARG BASE_URL=''
-# Deprecated legacy names, kept as fallback for backward compatibility
 ARG VITE_OUT_DIR=''
 ARG VITE_BASE_URL=''
 ARG VITE_POOL_TYPE
@@ -43,10 +44,6 @@ ARG VITE_DEVNET_OVERRIDES
 ARG VITE_LOCALE
 
 ENV NODE_ENV=$NODE_ENV \
-    BASE_URL=$BASE_URL \
-    OUT_DIR=$OUT_DIR \
-    VITE_BASE_URL=$VITE_BASE_URL \
-    VITE_OUT_DIR=$VITE_OUT_DIR \
     VITE_POOL_TYPE=$VITE_POOL_TYPE \
     VITE_POOL_ADDRESS=$VITE_POOL_ADDRESS \
     VITE_STRATEGY_ADDRESS=$VITE_STRATEGY_ADDRESS \
@@ -60,8 +57,11 @@ ENV NODE_ENV=$NODE_ENV \
     VITE_DEVNET_OVERRIDES=$VITE_DEVNET_OVERRIDES \
     VITE_LOCALE=$VITE_LOCALE
 
-# Build the application
-RUN yarn build
+# Build the application (legacy VITE_-prefixed args win only when the
+# unprefixed ones are unset or empty)
+RUN BASE_URL="${BASE_URL:-$VITE_BASE_URL}" \
+    OUT_DIR="${OUT_DIR:-$VITE_OUT_DIR}" \
+    yarn build
 
 # Stage 2: Serve
 FROM nginx:1.27-alpine AS runner

@@ -13,7 +13,9 @@ export default defineConfig(async ({ mode }) => {
   // reaches the client bundle. Legacy VITE_-prefixed names are kept as
   // fallback for backward compatibility.
   const buildEnv = loadEnv(mode, process.cwd(), '');
-  const base = buildEnv['BASE_URL'] || buildEnv['VITE_BASE_URL'];
+  // Note: empty-string base is meaningful (relative asset paths, relied on by
+  // the Pages deploy), so fall back on absence only — not on emptiness
+  const base = buildEnv['BASE_URL'] ?? buildEnv['VITE_BASE_URL'];
   const port = buildEnv['PORT'] || buildEnv['VITE_PORT'] || 3017;
   const outDir = buildEnv['OUT_DIR'] || buildEnv['VITE_OUT_DIR'] || `./dist`;
 
