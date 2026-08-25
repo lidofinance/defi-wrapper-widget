@@ -1,3 +1,7 @@
+# 0.5.1
+
+- `VITE_PORT`, `VITE_BASE_URL`, `VITE_OUT_DIR` are now `PORT`, `BASE_URL`, `OUT_DIR`. Older envs are still supported but are deprecated due to leakage to frontend bundle.
+
 # 0.5.0
 
 - Added SRI hashes for scripts
