@@ -4,8 +4,12 @@ import { defineConfig, loadEnv } from 'vite';
 import svgr from 'vite-plugin-svgr';
 
 export default defineConfig(async ({ mode }) => {
-  const env = loadEnv(mode, process.cwd());
-  const base = env['VITE_BASE_URL'];
+  // Build-only configuration is read from unprefixed env vars so it never
+  // reaches the client bundle. Legacy VITE_BASE_URL is kept as fallback.
+  const buildEnv = loadEnv(mode, process.cwd(), '');
+  // Note: empty-string base is meaningful (relative asset paths, relied on by
+  // the Pages deploy), so fall back on absence only — not on emptiness
+  const base = buildEnv['BASE_URL'] ?? buildEnv['VITE_BASE_URL'];
 
   return {
     base,
