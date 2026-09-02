@@ -1,12 +1,7 @@
 import { useCallback } from 'react';
 import invariant from 'tiny-invariant';
 import { useStvStrategy } from '@/modules/defi-wrapper';
-import {
-  DisplayableError,
-  readWithReport,
-  useReportCalls,
-  useVault,
-} from '@/modules/vaults';
+import { readWithReport, useReportCalls, useVault } from '@/modules/vaults';
 import {
   TransactionEntry,
   useDappStatus,

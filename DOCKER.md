@@ -36,9 +36,9 @@ This keeps Docker build cache stable when you edit Nginx config.
 
 ### Base path
 
-This deployment is set up to **not** rely on `VITE_BASE_URL`. Nginx serves the app from `/` only, and unknown routes return `404` (no SPA fallback).
+This deployment is set up to **not** rely on `BASE_URL` (legacy name: `VITE_BASE_URL`). Nginx serves the app from `/` only, and unknown routes return `404` (no SPA fallback).
 
-If you need to serve the widget under a sub-path (e.g. `/defi-wrapper-widget/`), update `nginx.conf` accordingly and keep `VITE_BASE_URL` empty. Do not set `VITE_BASE_URL` unless you also update asset paths in your Nginx config to match.
+If you need to serve the widget under a sub-path (e.g. `/defi-wrapper-widget/`), update `nginx.conf` accordingly and keep `BASE_URL` empty. Do not set `BASE_URL` unless you also update asset paths in your Nginx config to match.
 
 ### Deploying to a remote server (minimal steps)
 

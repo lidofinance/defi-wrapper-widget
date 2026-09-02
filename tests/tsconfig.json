@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "paths": {
+      "@/*": ["../src/*"],
+      "@tests/*": ["./*"]
+    }
+  },
+  "include": ["**/*.ts", "../src/types/*.d.ts"],
+  "exclude": ["node_modules", "playwright-report", "test-results"]
+}

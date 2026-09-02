@@ -16,7 +16,7 @@ Based on your deployment of Stv Pool you must fill in variables in `.env` file:
 
 - Use node LTS V22 or higher
 - install dependencies with `yarn install`
-- fill in envs in `.env`, see `.env.example` for build specific envs like base path and out dir
+- fill in envs in `.env`, see `.env.example` for build specific envs like base path and out dir (`BASE_URL`, `OUT_DIR`, `PORT` — never included in the client bundle)
 - run `yarn build:preview` to run a test server and preview your dapp (do not use this for production)
 - build dapp with `yarn build`
 - serve build from `/dist` as static HTML via your web server of choice

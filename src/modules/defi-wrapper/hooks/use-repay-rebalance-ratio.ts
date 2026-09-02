@@ -40,7 +40,6 @@ type CaculateStethSharesToRepayParams = {
   stvWithdrawAmountInEth: bigint;
 };
 
-
 export type CalcWithdrawalRepayRebalanceRatio = Awaited<
   ReturnType<typeof prepareLocalWithdrawalCalc>
 >;

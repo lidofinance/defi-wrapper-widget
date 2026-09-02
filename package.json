@@ -15,7 +15,11 @@
     "prune:abi": "node scripts/prune-abis.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:stv-pool": "yarn --cwd tests test:stv-pool",
+    "test:stv-steth": "yarn --cwd tests test:stv-steth",
+    "test:stv-strategy": "yarn --cwd tests test:stv-strategy",
+    "test:e2e": "yarn --cwd tests test:e2e"
   },
   "dependencies": {
     "@chakra-ui/react": "3.33.0",

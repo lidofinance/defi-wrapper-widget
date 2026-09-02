@@ -34,7 +34,7 @@ export const DashboardBalanceApy = ({
     >
       <Stat.Root width={'100%'}>
         <Stat.Label>My vault balance</Stat.Label>
-        <Stat.ValueText>
+        <Stat.ValueText data-testid="vaultBalanceValue">
           <FormatToken
             fontSize="3xl"
             isLoading={isBalanceLoading}

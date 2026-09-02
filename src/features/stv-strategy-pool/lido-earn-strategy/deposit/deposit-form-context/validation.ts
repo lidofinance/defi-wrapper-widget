@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
 
+import { ASYNC_FORM_CONTEXT_TIMEOUT } from '@/consts/form';
 import {
   depositTokenSchema,
   tokenAmountSchema,
@@ -15,7 +16,6 @@ import type {
   DepositFormValues,
 } from './types';
 import type { Resolver } from 'react-hook-form';
-import { ASYNC_FORM_CONTEXT_TIMEOUT } from '@/consts/form';
 
 type DepositFormValidationSchemaParams =
   DepositFormValidationAsyncContextType & {
